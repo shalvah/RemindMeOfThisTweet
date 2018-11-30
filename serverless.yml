@@ -5,6 +5,7 @@ plugins:
 provider:
   name: aws
   runtime: nodejs8.10
+  logRetentionInDays: 20
 
   environment:
     TWITTER_CONSUMER_KEY: ${env:TWITTER_CONSUMER_KEY}
