@@ -16,10 +16,10 @@ const t = new Twit({
 
 const isTweetAReply = (tweet) => !!tweet.in_reply_to_status_id_str;
 
-module.exports = (db) => {
+module.exports = (cache) => {
 
     const getMentions = async (lastTweetRetrieved) => {
-        let lastTweetId = lastTweetRetrieved || await db.getAsync('lastTweetRetrieved');
+        let lastTweetId = lastTweetRetrieved || await cache.getAsync('lastTweetRetrieved');
         let options = {count: 200};
         if (lastTweetId) {
             options.since_id = lastTweetId;
@@ -64,14 +64,14 @@ module.exports = (db) => {
             .then((r) => {
                 if (r.data.errors) {
                     // not sending any more replies for 10 minutes to avoid Twitter blocking our API access
-                    return db.setAsync('no-reply', 1, 'EX', 10 * 60).then(() => r);
+                    return cache.setAsync('no-reply', 1, 'EX', 10 * 60).then(() => r);
                 }
                 return r;
             });
     };
 
     const replyWithReminder = async (tweet) => {
-        let noReply = await db.getAsync('no-reply');
+        let noReply = await cache.getAsync('no-reply');
         if (noReply == 1) {
             return true;
         }

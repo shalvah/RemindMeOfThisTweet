@@ -2,12 +2,12 @@
 
 const { finish } = require('./utils');
 const makeService = require('./service');
-const makeDb = require('./factory.db');
+const makeCache = require('./factory.cache');
 const makeTwitter = require('./factory.twitter');
 
 module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => {
-    const db = await makeDb();
-    const twitter = makeTwitter(db);
+    const cache = await makeCache();
+    const twitter = makeTwitter(cache);
 
     let lastTweetRetrieved = null;
     let count = 0;
@@ -21,12 +21,24 @@ module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => 
     }
 
     if (lastTweetRetrieved) {
-        await db.setAsync('lastTweetRetrieved', lastTweetRetrieved);
+        await cache.setAsync('lastTweetRetrieved', lastTweetRetrieved);
     }
 
-    const service = makeService(db);
+    const service = makeService(cache);
     let results = allMentions.map(service.parseReminderTime);
     await results.map(service.handleParsingResult);
 
-    finish(callback, db).success(`Published ${count} tweets`);
+    finish(callback, cache).success(`Published ${count} tweets`);
+};
+
+module.exports.remind = async (event, context, callback) => {
+    const cache = await makeCache();
+    const twitter = makeTwitter(cache);
+
+    const time = event.reminderTime;
+    if (parseInt(event.reminderTime) - (new Date).getTime() < 100) {
+
+    }
+
+    finish(callback, cache).success(`Published ${count} tweets`);
 };
