@@ -9,9 +9,11 @@ provider:
   logRetentionInDays: 30
   stackPolicy:
   - Effect: Allow
+    Sid: "InvokePermission"
     Principal:
       Service: "events.amazonaws.com"
-    Action: "lambda:InvokeFunction"
+    Action:
+    - "lambda:InvokeFunction"
     Resource: "*"
   iamRoleStatements:
   - Effect: "Allow"

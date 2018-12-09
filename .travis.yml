@@ -3,7 +3,7 @@ node_js:
 - "8.10"
 
 env:
-- LAMBDA_FUNCTION_NAME=testLambdaFunction SLS_DEBUG=*
+- SLS_DEBUG=*
 
 cache:
   directories:
@@ -19,6 +19,14 @@ stages:
 jobs:
   include:
   - stage: test
+    env: LAMBDA_FUNCTION_NAME=testLambdaFunction LAMBDA_FUNCTION_ARN="arn:aws:lambda:us-east-1:741799119337:function:testLambdaFunction"
     script: npm run test
   - stage: deploy
+    env: LAMBDA_FUNCTION_NAME=RemindMeOfThisTweet-dev-remind
+    before_script:
+    - curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+    - unzip awscli-bundle.zip
+    - ./awscli-bundle/install -b ~/bin/aws
+    - export PATH=~/bin:$PATH
     script: sls deploy
+    after_script: aws --region us-east-1 lambda add-permission --function-name RemindMeOfThisTweet-dev-remind  --statement-id InvokePermission --principal events.amazonaws.com --action lambda:InvokeFunction
