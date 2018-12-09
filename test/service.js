@@ -38,7 +38,7 @@ describe('Service', function() {
             const data = {thisIs: "theData"};
 
             const date = new Date;
-            date.setMinutes(parseInt(date.getMinutes()) + 3);
+            date.setMinutes(parseInt(date.getMinutes()) + 2);
 
             scheduleLambda('TestLambda', cronify(date), data)
                 .then(r => {
