@@ -23,11 +23,10 @@ const finish = (cb, cache = null) => {
 
 const randomSuccessResponse = (username) => {
     let responses = [
-        "Yay, video! Check for your download link at {link}.\n\nNote: I may not always show this message in the future, so just check that link whenever you make a new download request.🤗🤗",
-        "Your video is ready! Your download link: {link}.\n\nNote: I may not always show this message in the future, so check that link whenever you make a new download request.🤗",
+        `Hi, @${username}, you asked me to remind you of this tweet. Here's your reminder. 😁😁`,
+        `Hey, @${username}, you wanted me to remind you of this tweet. Well, here you go!. 🤗🤗`,
     ];
-    let response = responses[Math.floor(Math.random() * responses.length)];
-    return response.replace('{link}', `http://${process.env.EXTERNAL_URL}/${username}`);
+    return responses[Math.floor(Math.random() * responses.length)];
 };
 
 const dateToCronExpression = (date) => {
