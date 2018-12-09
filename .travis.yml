@@ -4,6 +4,7 @@ node_js:
 
 env:
 - LAMBDA_FUNCTION_NAME=testLambdaFunction
+- SLS_DEBUG=*
 
 cache:
   directories:
