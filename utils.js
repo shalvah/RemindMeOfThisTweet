@@ -30,6 +30,19 @@ const randomSuccessResponse = (username) => {
     return response.replace('{link}', `http://${process.env.EXTERNAL_URL}/${username}`);
 };
 
+const dateToCronExpression = (date) => {
+    let minutes, hours, dayOfMonth, month, dayOfWeek, year;
+    year = date.getUTCFullYear();
+    month = parseInt(date.getUTCMonth()) + 1;
+    dayOfMonth = date.getUTCDate();
+    hours = date.getUTCHours();
+    minutes = date.getUTCMinutes();
+
+    return `${minutes} ${hours} ${dayOfMonth} ${month} ${dayOfWeek || '?'} ${year}`;
+};
+
+const cronify = (date) => `cron(${dateToCronExpression(date)})`;
+
 class TwitterErrorResponse extends Error {
     constructor(endpoint, errors) {
         super('Error from Twitter API call');
@@ -48,6 +61,8 @@ const UNCERTAIN = 'Uncertain';
 module.exports = {
     randomSuccessResponse,
     finish,
+    dateToCronExpression,
+    cronify,
     TwitterErrorResponse,
     SUCCESS,
     FAIL,
