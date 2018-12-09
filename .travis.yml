@@ -3,8 +3,7 @@ node_js:
 - "8.10"
 
 env:
-- LAMBDA_FUNCTION_NAME=testLambdaFunction
-- SLS_DEBUG=*
+- LAMBDA_FUNCTION_NAME=testLambdaFunction SLS_DEBUG=*
 
 cache:
   directories:
