@@ -31,3 +31,19 @@ module.exports.remind = async (event, context, callback) => {
 
     finish(callback, cache).success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
 };
+
+module.exports.retryFailedTasks = async (event, context, callback) => {
+    const cache = await makeCache();
+    const failedTasks = await cache.lrangeAsync(event.queue, 0, -1);
+
+    if (!failedTasks.length) {
+        finish(callback, cache).success(`No tasks for retrying in queue ${event.queue}`);
+        return;
+    }
+
+    await cache.delAsync(event.queue);
+    let results = failedTasks.map(service.parseReminderTime);
+    await Promise.all(results.map(service.handleParsingResult));
+
+    finish(callback, cache).success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
+};

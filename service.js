@@ -72,11 +72,11 @@ const make = (cache) => {
             console.log(result)
             if (result.remindAt) {
                 return await Promise.all([
-                    cache.lpushAsync('PARSE_SUCCESS', [JSON.stringify(result)]),
+                    cache.lpushAsync('PARSE_SUCCESS', [JSON.stringify(result.tweet)]),
                     scheduleReminder(result.tweet, result.remindAt)
                 ]);
             } else {
-                await cache.lpushAsync(result.error, [JSON.stringify(result)]);
+                await cache.lpushAsync(result.error, [JSON.stringify(result.tweet)]);
                 return result.error;
             }
         };

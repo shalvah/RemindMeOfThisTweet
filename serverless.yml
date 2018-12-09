@@ -39,7 +39,9 @@ package:
 functions:
   fetchTweetsAndSetReminders:
     handler: handler.fetchTweetsAndSetReminders
-    # events:
-    # - schedule: rate(1 minutes)
+    events:
+    - schedule: rate(1 minutes)
   remind:
     handler: handler.remind
+  retryFailedTasks:
+    handler: handler.retryFailedTasks
