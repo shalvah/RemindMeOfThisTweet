@@ -40,7 +40,7 @@ functions:
   fetchTweetsAndSetReminders:
     handler: handler.fetchTweetsAndSetReminders
     events:
-    - schedule: rate(1 minutes)
+    - schedule: rate(1 minute)
   remind:
     handler: handler.remind
   retryFailedTasks:
