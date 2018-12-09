@@ -27,7 +27,7 @@ module.exports = (cache) => {
         return t.get('statuses/mentions_timeline', options)
             .then(r => {
                 if (r.data.errors) {
-                    throw `Error in statuses/mentions_timeline response: ${JSON.stringify(r.data.errors)}`;
+                    throw new TwitterErrorResponse('statuses/mentions_timeline', r.data.errors);
                 }
                 return r.data;
             })
@@ -43,18 +43,6 @@ module.exports = (cache) => {
             }));
     };
 
-    const getActualTweetsReferenced = (tweets) => {
-        return t.post(`statuses/lookup`, {
-            id: pluck(tweets, 'referencing_tweet'),
-            tweet_mode: 'extended',
-        }).then(r => {
-            if (r.data.errors) {
-                throw new TwitterErrorResponse('statuses/lookup', r.data.errors);
-            }
-            return r.data;
-        });
-    };
-
     const reply = async (tweet, content) => {
         let options = {
             in_reply_to_status_id: tweet.id,
@@ -64,6 +52,7 @@ module.exports = (cache) => {
             .then((r) => {
                 if (r.data.errors) {
                     // not sending any more replies for 10 minutes to avoid Twitter blocking our API access
+                    console.log(JSON.stringify(r.data.errors));
                     return cache.setAsync('no-reply', 1, 'EX', 10 * 60).then(() => r);
                 }
                 return r;
@@ -80,24 +69,28 @@ module.exports = (cache) => {
         return reply(tweet, content);
     };
 
-    const fetchTweet = (tweetId) => {
-        return t.get(`statuses/show`, {
-            id: tweetId,
-            tweet_mode: 'extended',
-        }).then(r => {
-            if (r.data.errors) {
-                throw new TwitterErrorResponse('statuses/show', r.data.errors);
-            }
-            return r.data;
-        });
+    const fetchAllMentions = async () => {
+        let lastTweetRetrieved = null;
+        let count = 0;
+        let mentions = await getMentions();
+        let allMentions = [...mentions];
+        while (mentions.length) {
+            lastTweetRetrieved = mentions[0].id;
+            count += mentions.length;
+            mentions = await twitter.getMentions(lastTweetRetrieved);
+            allMentions.concat(mentions);
+        }
+
+        if (lastTweetRetrieved) {
+            await cache.setAsync('lastTweetRetrieved', lastTweetRetrieved);
+        }
+        return allMentions;
     };
 
     return {
         getMentions,
-        reply,
         replyWithReminder,
-        getActualTweetsReferenced,
-        fetchTweet
+        fetchAllMentions
     };
 
 };
