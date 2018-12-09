@@ -10,12 +10,14 @@ cache:
   - node_modules
 
 stages:
+- name: test
 - name: deploy
   if: branch = master
 
 jobs:
   include:
   - stage: test
+    before_script: npm i
     script: npm run test
   - stage: deploy
     install: npm i -g serverless
