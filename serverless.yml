@@ -1,28 +1,36 @@
 service: RemindMeOfThisTweet
 plugins:
 - serverless-dotenv-plugin
+- serverless-mocha-plugin
 
 provider:
   name: aws
   runtime: nodejs8.10
-  logRetentionInDays: 20
+  logRetentionInDays: 30
+  stackPolicy:
+  - Effect: Allow
+    Principal:
+      Service: "events.amazonaws.com"
+    Action: "lambda:InvokeFunction"
+    Resource: "*"
+  iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+    - "events:DeleteRule"
+    - "events:RemoveTargets"
+    Resource:
+    - "*"
 
   environment:
     TWITTER_CONSUMER_KEY: ${env:TWITTER_CONSUMER_KEY}
     TWITTER_CONSUMER_SECRET: ${env:TWITTER_CONSUMER_SECRET}
     TWITTER_ACCESS_TOKEN: ${env:TWITTER_ACCESS_TOKEN}
     TWITTER_ACCESS_TOKEN_SECRET: ${env:TWITTER_ACCESS_TOKEN_SECRET}
-    TWITTER_SCREEN_NAME: ${env:TWITTER_SCREEN_NAME}
     REDIS_HOSTNAME: ${env:REDIS_HOSTNAME}
     REDIS_PORT: ${env:REDIS_PORT}
     REDIS_PASSWORD: ${env:REDIS_PASSWORD}
-    TOPIC_ARN:
-      "Fn::Join":
-      - ':'
-      -
-        - "arn:aws:sns:us-east-1"
-        - Ref: AWS::AccountId
-        - "newReminder"
+    LAMBDA_FUNCTION_NAME: ${env:LAMBDA_FUNCTION_NAME}
+    LAMBDA_FUNCTION_ARN: ${env:LAMBDA_FUNCTION_ARN}
 
 package:
   exclude:
@@ -32,11 +40,12 @@ package:
   - .env.example
   - .idea/**
   - .git/**
+  - test/**
 
 functions:
   fetchTweetsAndSetReminders:
     handler: handler.fetchTweetsAndSetReminders
-    events:
-    - schedule: rate(10 minutes)
+    # events:
+    # - schedule: rate(1 minutes)
   remind:
     handler: handler.remind
