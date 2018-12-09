@@ -6,7 +6,8 @@ const { cronify }= require('../utils');
 const makeService = require('../service');
 const {
     parseReminderTime,
-    scheduleLambda
+    scheduleLambda,
+    cleanup
 } = makeService();
 
 describe('Service', function() {
@@ -35,14 +36,37 @@ describe('Service', function() {
     describe('#scheduleLambda()', function() {
 
         it('schedules Lambda function correctly', function(done) {
-            const data = {thisIs: "theData"};
+            const data = {thisIs: "theData", cleanup: true};
 
             const date = new Date;
             date.setMinutes(parseInt(date.getMinutes()) + 2);
 
-            scheduleLambda('TestLambda', cronify(date), data)
+            scheduleLambda(cronify(date), data)
                 .then(r => {
-                    expect(r).to.equal('SUCCESS');
+                    expect(r.status).to.equal('SUCCESS');
+                    done();
+                })
+                .catch(e => {
+                    done(e);
+                });
+        });
+    });
+
+    describe('#cleanup()', function() {
+
+        it('deletes CloudWatch event correctly', function(done) {
+            const data = {thisIs: "theData", cleanup: false};
+
+            const date = new Date;
+            date.setMinutes(parseInt(date.getMinutes()) + 2);
+
+            scheduleLambda(cronify(date), data)
+                .then(r => {
+                    expect(r.status).to.equal('SUCCESS');
+                    return cleanup(r.ruleName);
+                })
+                .then(r => {
+                    expect(r.status).to.equal('SUCCESS');
                     done();
                 })
                 .catch(e => {

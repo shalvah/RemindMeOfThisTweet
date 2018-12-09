@@ -2,7 +2,7 @@
 
 const chrono = require('chrono-node');
 
-const { cronify }= require('./utils');
+const {cronify} = require('./utils');
 
 const make = (cache) => {
 
@@ -20,7 +20,7 @@ const make = (cache) => {
             }
         },
 
-        async scheduleLambda(eventName, scheduleAt, data) {
+        async scheduleLambda(scheduleAt, data) {
             const AWS = require('aws-sdk');
             const cwevents = new AWS.CloudWatchEvents({region: 'us-east-1'});
 
@@ -31,16 +31,9 @@ const make = (cache) => {
                 State: 'ENABLED'
             };
 
-            await cwevents.putRule(ruleParams).promise()
-                .then(r => {
-                    return 'SUCCESS';
-                })
-                .catch(r => {
-                    console.log(r);
-                    return 'FAIL';
-                });
+            await cwevents.putRule(ruleParams).promise();
 
-            const input = { data, ruleName };
+            const input = {data, ruleName};
             const targetParams = {
                 Rule: ruleName,
                 Targets: [
@@ -54,11 +47,11 @@ const make = (cache) => {
             return cwevents.putTargets(targetParams).promise()
                 .then(r => {
                     console.log(r);
-                    return 'SUCCESS';
+                    return {ruleName, status: 'SUCCESS'};
                 })
                 .catch(r => {
                     console.log(r);
-                    return 'FAIL';
+                    return {ruleName, status: 'FAIL'};
                 });
         },
 
@@ -69,10 +62,12 @@ const make = (cache) => {
         async handleParsingResult(result) {
             console.log(result)
             if (result.remindAt) {
-                await cache.lpushAsync('Success', [JSON.stringify(result)]);
-                return this.scheduleReminder(result.tweet, result.remindAt);
+                await Promise.all([
+                    cache.lpushAsync('ParsingSuccess', [JSON.stringify(result)]),
+                    this.scheduleReminder(result.tweet, result.remindAt)
+                    ]);
             } else {
-                await cache.lpushAsync('Fail', [JSON.stringify(result)]);
+                await cache.lpushAsync('ParsingFail', [JSON.stringify(result)]);
                 return 'FAIL';
             }
         },
@@ -83,15 +78,16 @@ const make = (cache) => {
             return cwevents.removeTargets({
                 Rule: ruleName,
                 Ids: [ruleName]
-            }).promise()
+            })
+                .promise()
                 .then(() => cwevents.deleteRule({Name: ruleName}).promise())
                 .then(r => {
                     console.log(r);
-                    return 'SUCCESS';
+                    return {status: 'SUCCESS'};
                 })
                 .catch(r => {
                     console.log(r);
-                    return 'FAIL';
+                    return {status: 'FAIL'};
                 });
         }
     };
