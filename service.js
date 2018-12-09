@@ -10,13 +10,23 @@ const make = (cache) => {
         parseReminderTime(tweet) {
             const refDate = new Date(tweet.created_at);
             let reminderTime = chrono.parseDate(tweet.text, refDate, {forwardDate: true});
-            if (reminderTime && reminderTime > refDate) {
+            if (reminderTime) {
+                if (reminderTime > refDate) {
+                    return {
+                        remindAt: reminderTime,
+                        tweet
+                    };
+                } else {
+                    return {
+                        error: "Reminder time appears to be in the past",
+                        tweet
+                    };
+                }
+            } else {
                 return {
-                    remindAt: reminderTime,
+                    error: "Couldn't parse reminder time",
                     tweet
                 };
-            } else {
-                return tweet;
             }
         },
 
