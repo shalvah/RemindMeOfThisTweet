@@ -6,8 +6,7 @@ const {cronify} = require('./utils');
 
 const make = (cache) => {
 
-    return {
-        parseReminderTime(tweet) {
+        const parseReminderTime = (tweet) => {
             const refDate = new Date(tweet.created_at);
             let reminderTime = chrono.parseDate(tweet.text, refDate, {forwardDate: true});
             if (reminderTime) {
@@ -28,9 +27,9 @@ const make = (cache) => {
                     tweet
                 };
             }
-        },
+        };
 
-        async scheduleLambda(scheduleAt, data) {
+        const scheduleLambda = async (scheduleAt, data) => {
             const AWS = require('aws-sdk');
             const cwevents = new AWS.CloudWatchEvents({region: 'us-east-1'});
 
@@ -63,26 +62,26 @@ const make = (cache) => {
                     console.log(r);
                     return {ruleName, status: 'FAIL'};
                 });
-        },
+        };
 
-        scheduleReminder(tweet, date) {
-            return this.scheduleLambda(cronify(date), tweet);
-        },
+        const scheduleReminder = async (tweet, date) => {
+            return scheduleLambda(cronify(date), tweet);
+        };
 
-        async handleParsingResult(result) {
+        const handleParsingResult = async (result) => {
             console.log(result)
             if (result.remindAt) {
-                await Promise.all([
+                return await Promise.all([
                     cache.lpushAsync('ParsingSuccess', [JSON.stringify(result)]),
-                    this.scheduleReminder(result.tweet, result.remindAt)
+                    scheduleReminder(result.tweet, result.remindAt)
                 ]);
             } else {
                 await cache.lpushAsync('ParsingFail', [JSON.stringify(result)]);
                 return 'FAIL';
             }
-        },
+        };
 
-        cleanup(ruleName) {
+        const cleanup = (ruleName) => {
             const AWS = require('aws-sdk');
             const cwevents = new AWS.CloudWatchEvents({region: 'us-east-1'});
             return cwevents.removeTargets({
@@ -99,8 +98,15 @@ const make = (cache) => {
                     console.log(r);
                     return {status: 'FAIL'};
                 });
+        };
+
+        return {
+            cleanup,
+            scheduleLambda,
+            handleParsingResult,
+            parseReminderTime,
+            scheduleReminder
         }
-    };
 };
 
 module.exports = make;

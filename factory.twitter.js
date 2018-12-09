@@ -77,7 +77,7 @@ module.exports = (cache) => {
         while (mentions.length) {
             lastTweetRetrieved = mentions[0].id;
             count += mentions.length;
-            mentions = await twitter.getMentions(lastTweetRetrieved);
+            mentions = await getMentions(lastTweetRetrieved);
             allMentions.concat(mentions);
         }
 
