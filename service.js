@@ -56,7 +56,7 @@ const make = (cache) => {
         },
 
         scheduleReminder(tweet, date) {
-            return this.scheduleLambda('TweetReminder', cronify(date), tweet);
+            return this.scheduleLambda(cronify(date), tweet);
         },
 
         async handleParsingResult(result) {
@@ -65,7 +65,7 @@ const make = (cache) => {
                 await Promise.all([
                     cache.lpushAsync('ParsingSuccess', [JSON.stringify(result)]),
                     this.scheduleReminder(result.tweet, result.remindAt)
-                    ]);
+                ]);
             } else {
                 await cache.lpushAsync('ParsingFail', [JSON.stringify(result)]);
                 return 'FAIL';
