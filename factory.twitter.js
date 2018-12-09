@@ -45,7 +45,7 @@ module.exports = (cache) => {
 
     const reply = async (tweet, content) => {
         let options = {
-            in_reply_to_status_id: tweet.referencing_tweet,
+            in_reply_to_status_id: tweet.id,
             status: `@${tweet.author} ${content}`
         };
         return t.post('statuses/update', options)
@@ -88,7 +88,6 @@ module.exports = (cache) => {
     };
 
     return {
-        getMentions,
         replyWithReminder,
         fetchAllMentions
     };
