@@ -18,7 +18,7 @@ describe('Service', function() {
             let tweets = [
                 {
                     text: "in 2 days",
-                    created_at: ""
+                    created_at: "Sun Dec 09 18:43:14 +0000 2018"
                 }
             ];
             expect(parseReminderTime(tweets[0]).remindAt).to.equal(true);

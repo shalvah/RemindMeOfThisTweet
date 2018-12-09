@@ -10,20 +10,20 @@ const make = (cache) => {
             const refDate = new Date(tweet.created_at);
             let reminderTime = chrono.parseDate(tweet.text, refDate, {forwardDate: true});
             if (reminderTime) {
-                if (reminderTime > refDate) {
+                if (reminderTime > refDate && reminderTime > new Date) {
                     return {
                         remindAt: reminderTime,
                         tweet
                     };
                 } else {
                     return {
-                        error: "Reminder time appears to be in the past",
+                        error: "TIME_IN_PAST",
                         tweet
                     };
                 }
             } else {
                 return {
-                    error: "Couldn't parse reminder time",
+                    error: "PARSE_TIME_FAILURE",
                     tweet
                 };
             }
@@ -72,12 +72,12 @@ const make = (cache) => {
             console.log(result)
             if (result.remindAt) {
                 return await Promise.all([
-                    cache.lpushAsync('ParsingSuccess', [JSON.stringify(result)]),
+                    cache.lpushAsync('PARSE_SUCCESS', [JSON.stringify(result)]),
                     scheduleReminder(result.tweet, result.remindAt)
                 ]);
             } else {
-                await cache.lpushAsync('ParsingFail', [JSON.stringify(result)]);
-                return 'FAIL';
+                await cache.lpushAsync(result.error, [JSON.stringify(result)]);
+                return result.error;
             }
         };
 
