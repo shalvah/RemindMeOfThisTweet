@@ -29,4 +29,6 @@ jobs:
     - ./awscli-bundle/install -b ~/bin/aws
     - export PATH=~/bin:$PATH
     script: sls deploy
-    after_script: aws --region us-east-1 lambda add-permission --function-name RemindMeOfThisTweet-dev-remind  --statement-id InvokePermission --principal events.amazonaws.com --action lambda:InvokeFunction
+    after_script: |
+      aws --region us-east-1 lambda get-policy  --function-name RemindMeOfThisTweet-dev-remind \
+      || aws lambda add-permission --function-name RemindMeOfThisTweet-dev-remind --statement-id InvokePermission --principal events.amazonaws.com --action lambda:InvokeFunction
