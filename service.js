@@ -77,6 +77,23 @@ const make = (cache) => {
             }
         },
 
+        cleanup(ruleName) {
+            const AWS = require('aws-sdk');
+            const cwevents = new AWS.CloudWatchEvents({region: 'us-east-1'});
+            return cwevents.removeTargets({
+                Rule: ruleName,
+                Ids: [ruleName]
+            }).promise()
+                .then(() => cwevents.deleteRule({Name: ruleName}).promise())
+                .then(r => {
+                    console.log(r);
+                    return 'SUCCESS';
+                })
+                .catch(r => {
+                    console.log(r);
+                    return 'FAIL';
+                });
+        }
     };
 };
 
