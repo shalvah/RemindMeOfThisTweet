@@ -9,6 +9,8 @@ cache:
   directories:
   - node_modules
 
+install: npm i && npm i -g serverless
+
 stages:
 - name: test
 - name: deploy
@@ -17,7 +19,6 @@ stages:
 jobs:
   include:
   - stage: test
-    install: npm i && npm i -g serverless
     script: npm run test
   - stage: deploy
     script: sls deploy
