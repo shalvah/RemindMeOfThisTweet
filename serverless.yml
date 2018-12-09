@@ -12,6 +12,8 @@ provider:
     Action:
     - "events:DeleteRule"
     - "events:RemoveTargets"
+    - "events:PutRule"
+    - "events:PutTargets"
     Resource:
     - "*"
 
