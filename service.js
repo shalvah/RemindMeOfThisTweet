@@ -64,7 +64,7 @@ const make = (cache) => {
                 });
         };
 
-        const scheduleReminder = async (tweet, date) => {
+        const scheduleReminder = (tweet, date) => {
             return scheduleLambda(cronify(date), tweet);
         };
 
