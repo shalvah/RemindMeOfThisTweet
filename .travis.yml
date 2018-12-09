@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+- "8.10"
+
+env:
+- LAMBDA_FUNCTION_NAME=testLambdaFunction
+
+before_script:
+- npm i -g serverless
+- npm i
+
+script:
+- npm run test
+- sls deploy

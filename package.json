@@ -9,5 +9,9 @@
     "mocha": "^5.2.0",
     "serverless-dotenv-plugin": "^2.0.1",
     "serverless-mocha-plugin": "^1.9.0"
+  },
+  "scripts": {
+    "test-dev": "cross-env SLS_DEBUG=* sls invoke test",
+    "test": "SLS_DEBUG=* sls invoke test"
   }
 }
