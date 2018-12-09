@@ -17,8 +17,7 @@ stages:
 jobs:
   include:
   - stage: test
-    before_script: npm i
+    install: npm i && npm i -g serverless
     script: npm run test
   - stage: deploy
-    install: npm i -g serverless
     script: sls deploy
