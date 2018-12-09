@@ -8,27 +8,14 @@ const makeTwitter = require('./factory.twitter');
 module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => {
     const cache = await makeCache();
     const twitter = makeTwitter(cache);
-
-    let lastTweetRetrieved = null;
-    let count = 0;
-    let mentions = await twitter.getMentions();
-    let allMentions = [...mentions];
-    while (mentions.length) {
-        lastTweetRetrieved = mentions[0].id;
-        count += mentions.length;
-        mentions = await twitter.getMentions(lastTweetRetrieved);
-        allMentions.concat(mentions);
-    }
-
-    if (lastTweetRetrieved) {
-        await cache.setAsync('lastTweetRetrieved', lastTweetRetrieved);
-    }
-
     const service = makeService(cache);
+
+    const allMentions = await twitter.fetchAllMentions();
+
     let results = allMentions.map(service.parseReminderTime);
     await results.map(service.handleParsingResult);
 
-    finish(callback, cache).success(`Handled ${count} tweets`);
+    finish(callback, cache).success(`Handled ${allMentions.length} tweets`);
 };
 
 module.exports.remind = async (event, context, callback) => {
