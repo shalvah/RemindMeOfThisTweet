@@ -35,7 +35,7 @@ module.exports = (cache) => {
             .then(tweets => tweets.map(tweetObject => {
                 return {
                     id: tweetObject.id_str,
-                    time: tweetObject.created_at,
+                    created_at: tweetObject.created_at,
                     text: tweetObject.text,
                     referencing_tweet: tweetObject.in_reply_to_status_id_str,
                     author: tweetObject.user.screen_name
