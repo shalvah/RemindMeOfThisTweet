@@ -23,9 +23,10 @@ const finish = (cb, cache = null) => {
 
 const randomSuccessResponse = (username) => {
     let responses = [
-        `Hi @${username} 👋, you asked me to remind you of this tweet. Here's your reminder. 😁😁`,
-        `⏰ Hey @${username}, you wanted me to remind you of this tweet. Well, here you go! 🤗🤗`,
+        `Hi @${username} 👋, you asked me to remind you of this tweet. 😁`,
+        `⏰ Hey @${username}, you wanted me to remind you of this tweet. Well, here you go! 🤗`,
         `Hey @${username}, here's your reminder.😄 ⏰`,
+        `Ding dong! ⏰ Here's your reminder, @${username}.`,
     ];
     return responses[Math.floor(Math.random() * responses.length)];
 };
