@@ -1,14 +1,14 @@
 'use strict';
 
 const { finish } = require('./utils');
-const makeService = require('./service');
+const makeService = require('./factory.service');
 const makeCache = require('./factory.cache');
 const makeTwitter = require('./factory.twitter');
 
 module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => {
     const cache = await makeCache();
     const twitter = makeTwitter(cache);
-    const service = makeService(cache);
+    const service = makeService(cache, twitter);
 
     const allMentions = await twitter.fetchAllMentions();
 

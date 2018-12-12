@@ -1,7 +1,8 @@
 "use strict";
 
 const {
-    randomSuccessResponse,
+    randomReminderMessage,
+    randomAcknowledgementMessage,
     TwitterErrorResponse
 } = require('./utils');
 
@@ -66,7 +67,17 @@ module.exports = (cache) => {
             return true;
         }
 
-        let content = randomSuccessResponse(tweet.author);
+        let content = randomReminderMessage(tweet.author);
+        return reply(tweet, content);
+    };
+
+    const replyWithAcknowledgement = async (tweet, date) => {
+        let noReply = await cache.getAsync('no-reply');
+        if (noReply == 1) {
+            return true;
+        }
+
+        let content = randomAcknowledgementMessage(date, tweet.author);
         return reply(tweet, content);
     };
 
@@ -90,6 +101,7 @@ module.exports = (cache) => {
 
     return {
         replyWithReminder,
+        replyWithAcknowledgement,
         fetchAllMentions
     };
 

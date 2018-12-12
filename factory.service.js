@@ -4,7 +4,7 @@ const chrono = require('chrono-node');
 
 const {cronify} = require('./utils');
 
-const make = (cache) => {
+const make = (cache, twitter) => {
 
         const parseReminderTime = (tweet) => {
             const refDate = new Date(tweet.created_at);
@@ -70,12 +70,17 @@ const make = (cache) => {
             return scheduleLambda(cronify(date), tweet);
         };
 
+        const notifyUserOfReminder = (tweet, date) => {
+            return twitter.replyWithAcknowledgement(tweet, date);
+        };
+
         const handleParsingResult = async (result) => {
             console.log(result)
             if (result.remindAt) {
                 return await Promise.all([
                     cache.lpushAsync('PARSE_SUCCESS', [JSON.stringify(result.tweet)]),
-                    scheduleReminder(result.tweet, result.remindAt)
+                    scheduleReminder(result.tweet, result.remindAt),
+                    notifyUserOfReminder(result.tweet, result.remindAt),
                 ]);
             } else {
                 await cache.lpushAsync(result.error, [JSON.stringify(result.tweet)]);

@@ -21,12 +21,20 @@ const finish = (cb, cache = null) => {
     }
 };
 
-const randomSuccessResponse = (username) => {
+const randomReminderMessage = (username) => {
     let responses = [
         `Hi @${username} 👋, you asked me to remind you of this tweet. 😁`,
         `⏰ Hey @${username}, you wanted me to remind you of this tweet. Well, here you go! 🤗`,
         `Hey @${username}, here's your reminder.😄 ⏰`,
         `Ding dong! ⏰ Here's your reminder, @${username}.`,
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
+};
+
+const randomAcknowledgementMessage = (reminderTime, username) => {
+    let responses = [
+        `Sure thing! I'll remind you of this tweet at ${reminderTime.toUTCString()}. 😃`,
+        `Got it, @${username}! I'll remind you about this at ${reminderTime.toUTCString()}.🤗`,
     ];
     return responses[Math.floor(Math.random() * responses.length)];
 };
@@ -60,7 +68,8 @@ const FAIL = 'Fail';
 const UNCERTAIN = 'Uncertain';
 
 module.exports = {
-    randomSuccessResponse,
+    randomReminderMessage,
+    randomAcknowledgementMessage,
     finish,
     dateToCronExpression,
     cronify,
