@@ -5,6 +5,7 @@
 Some guy on Twitter tweets:
 > In three years, humans will have established a colony on Uranus.
 
+
 And of course, naturally, you want to check back in three years to see if he was right. But you likely won't remember by that time.
 
 **The Solution:**
@@ -24,7 +25,7 @@ And when the time is right:
 Of course, that's not all you can do! You can set reminders for your own tweets (New Year's Resolutions, anyone?👀), too, for instance.
 
 ## How This Works
-## Stack
+### Stack
 - [AWS Lambda](https://aws.amazon.com/lambda/) with the [Serverless Framework](http://serverless.com)
 - [AWS CloudWatch Events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html)
 - [Redis](http://redis.io)
@@ -47,3 +48,5 @@ This handles the actual reminding. It sends the tweet to the user who requested 
 #### retryFailedTasks
 This re-publishes failed tasks (stored in Redis) and attempts to set reminders for them. It can only be triggered manually.
 
+## Known issues
+The bot will assume all absolute times are in UTC, so if you want to specify an absolute time, you need to specify a timezone if you're not in UTC/GMT. For instance, "11:30 pm WAT" (West African Time), "10:20 am UTC+0300", "10:20 am GMT-0900",
