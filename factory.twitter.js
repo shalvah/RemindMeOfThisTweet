@@ -57,7 +57,7 @@ module.exports = (cache) => {
                     console.log(JSON.stringify(r.data.errors));
                     return cache.setAsync('no-reply', 1, 'EX', 10 * 60).then(() => r);
                 }
-                return r;
+                return r.data;
             });
     };
 

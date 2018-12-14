@@ -33,10 +33,12 @@ const randomReminderMessage = (username) => {
 
 const randomAcknowledgementMessage = (reminderTime, username) => {
     let responses = [
-        `Sure thing! I'll remind you of this tweet at ${reminderTime.toUTCString()}. 😃`,
+        `Sure thing! I'll remind you of this tweet at ${reminderTime.toUTCString()}.😃`,
         `Got it, @${username}! I'll remind you about this at ${reminderTime.toUTCString()}.🤗`,
     ];
-    return responses[Math.floor(Math.random() * responses.length)];
+    let message = responses[Math.floor(Math.random() * responses.length)];
+    message += ' Reply "cancel" to this message to cancel this reminder.';
+    return message;
 };
 
 const dateToCronExpression = (date) => {
