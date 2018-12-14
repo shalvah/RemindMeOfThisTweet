@@ -12,7 +12,7 @@ module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => 
 
     const allMentions = await twitter.fetchAllMentions();
 
-    let results = allMentions.map(service.parseReminderTime);
+    let results = allMentions.map(service.handleMention);
     await Promise.all(results.map(service.handleParsingResult));
 
     finish(callback, cache).success(`Handled ${allMentions.length} tweets`);
