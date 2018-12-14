@@ -1,6 +1,6 @@
 # RemindMeOfThisTweet
 
-**The Problem:**
+### The Problem
 
 Some guy on Twitter tweets:
 > In three years, humans will have established a colony on Uranus.
@@ -8,7 +8,7 @@ Some guy on Twitter tweets:
 
 And of course, naturally, you want to check back in three years to see if he was right. But you likely won't remember by that time.
 
-**The Solution:**
+### The Solution
 
 Just tweet:
 > @RemindMe_OfThis in three years
