@@ -101,9 +101,11 @@ const make = (cache, twitter) => {
                     cache.setAsync(tweetId, ruleName, 'PX', result.remindAt - Date.now())
                 ),
             ]);
-        } else {
+        } else if (result.error) {
             await cache.lpushAsync(result.error, [JSON.stringify(result.tweet)]);
             return result.error;
+        } else {
+            return true;
         }
     };
 
