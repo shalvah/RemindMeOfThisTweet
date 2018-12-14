@@ -34,7 +34,10 @@ const make = (cache, twitter) => {
     const cancelReminder = async (tweet) => {
         const ruleName = await cache.getAsync(tweet.referencing_tweet);
         if (ruleName) {
-            return await unscheduleLambda(ruleName);
+            return await Promise.all([
+                unscheduleLambda(ruleName),
+                cache.delAsync(tweet.referencing_tweet),
+            ]);
         }
         return true;
     };
