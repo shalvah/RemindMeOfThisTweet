@@ -43,7 +43,7 @@ const make = (cache, twitter) => {
     };
 
     const handleMention = (tweet) => {
-        return tweet.text.match(/\bcancel\b/i) ? cancelReminder(tweet) : parseReminderTime(tweet);
+        return tweet.text.match(/\bcancel\b/i) && tweet.referencing_tweet ? cancelReminder(tweet) : parseReminderTime(tweet);
     };
 
     const scheduleLambda = async (scheduleAt, data, ruleName) => {

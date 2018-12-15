@@ -15,8 +15,6 @@ const t = new Twit({
     access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
-const isTweetAReply = (tweet) => !!tweet.in_reply_to_status_id_str;
-
 module.exports = (cache) => {
 
     const getMentions = async (lastTweetRetrieved) => {
@@ -32,7 +30,6 @@ module.exports = (cache) => {
                 }
                 return r.data;
             })
-            .then(tweets => tweets.filter(isTweetAReply))
             .then(tweets => tweets.map(tweetObject => {
                 return {
                     id: tweetObject.id_str,
