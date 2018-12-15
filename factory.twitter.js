@@ -19,7 +19,7 @@ module.exports = (cache) => {
 
     const getMentions = async (lastTweetRetrieved) => {
         let lastTweetId = lastTweetRetrieved || await cache.getAsync('lastTweetRetrieved');
-        let options = {count: 200};
+        let options = {count: 200, tweet_mode: "extended"};
         if (lastTweetId) {
             options.since_id = lastTweetId;
         }
