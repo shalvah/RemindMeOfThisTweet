@@ -95,11 +95,12 @@ const make = (cache, twitter) => {
             return await Promise.all([
                 cache.lpushAsync('PARSE_SUCCESS', [JSON.stringify(result.tweet)]),
                 scheduleReminder(result.tweet, result.remindAt, ruleName),
-                notifyUserOfReminder(result.tweet, result.remindAt).then(tweetId =>
+                notifyUserOfReminder(result.tweet, result.remindAt)
+                    .then(tweetId =>
                     // cache the link to the reminder so we can delete it if user replies "cancel"
                     // set TTL so it auto deletes when reminder time is up
                     cache.setAsync(tweetId, ruleName, 'PX', result.remindAt - Date.now())
-                ),
+                ).catch(e => console.log(`Couldn't notify user: ${JSON.stringify(result.tweet)} - Error: ${e.valueOf()}`)),
             ]);
         } else if (result.error) {
             await cache.lpushAsync(result.error, [JSON.stringify(result.tweet)]);

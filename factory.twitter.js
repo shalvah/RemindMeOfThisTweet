@@ -24,11 +24,9 @@ module.exports = (cache) => {
             options.since_id = lastTweetId;
         }
         return t.get('statuses/mentions_timeline', options)
-            .then(r => {
-                if (r.data.errors) {
-                    throw new TwitterErrorResponse('statuses/mentions_timeline', r.data.errors);
-                }
-                return r.data;
+            .then(r => r.data)
+            .catch(e => {
+                throw new TwitterErrorResponse('statuses/mentions_timeline', e);
             })
             .then(tweets => tweets.map(tweetObject => {
                 return {
@@ -48,13 +46,16 @@ module.exports = (cache) => {
             status: `@${tweet.author} ${content}`
         };
         return t.post('statuses/update', options)
-            .then((r) => {
-                if (r.data.errors) {
-                    // not sending any more replies for 10 minutes to avoid Twitter blocking our API access
-                    console.log(JSON.stringify(r.data.errors));
-                    return cache.setAsync('no-reply', 1, 'EX', 10 * 60).then(() => r);
+            .then((r) => r.data)
+            .catch(e => {
+                if ((e.valueOf() + '').includes('User is over daily status update limit')) {
+                    // not sending any more replies for 10 minutes
+                    // to avoid Twitter blocking our API access
+                    console.log('Rate limit reached, backing off for 10 minutes');
+                    return cache.setAsync('no-reply', 1, 'EX', 10 * 60);
                 }
-                return r.data;
+
+                throw new TwitterErrorResponse('statuses/update', e);
             });
     };
 

@@ -73,7 +73,6 @@ module.exports = {
     randomReminderMessage,
     randomAcknowledgementMessage,
     finish,
-    dateToCronExpression,
     cronify,
     TwitterErrorResponse,
     SUCCESS,
