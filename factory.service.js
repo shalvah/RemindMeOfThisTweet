@@ -43,7 +43,11 @@ const make = (cache, twitter) => {
     };
 
     const handleMention = (tweet) => {
-        return tweet.text.match(/\bcancel\b/i) && tweet.referencing_tweet ? cancelReminder(tweet) : parseReminderTime(tweet);
+        // if the tweet is a reply with the word "cancel",
+        // we'll attempt to cancel the reminder it references
+        return tweet.text.match(/\bcancel\b/i) && tweet.referencing_tweet
+            ? cancelReminder(tweet)
+            : parseReminderTime(tweet);
     };
 
     const scheduleLambda = async (scheduleAt, data, ruleName) => {
@@ -91,7 +95,7 @@ const make = (cache, twitter) => {
     const saveReminderDetails = (ruleName, user, remindAt, tweetId) => {
             // cache the link to the reminder so we can delete it if user replies "cancel"
             // set TTL so it auto deletes when reminder time is up
-            cache.setAsync(tweetId + '-' + user, ruleName, 'PX', remindAt - Date.now())
+            return cache.setAsync(tweetId + '-' + user, ruleName, 'PX', remindAt - Date.now())
     };
 
     const getRuleName = () => process.env.LAMBDA_FUNCTION_NAME + '-' + Date.now() + '-' + Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
