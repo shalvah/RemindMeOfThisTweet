@@ -32,7 +32,7 @@ Of course, that's not all you can do! You can set reminders for your own tweets 
 - Node.js 8.10
 
 ### Implementation
-The bot uses a number AWS Lambda functions that work in tandem:
+The bot uses a number of AWS Lambda functions that work in tandem:
 
 #### fetchTweetsAndSetReminders
 This function runs once every minute and checks for new mentions. For each mention, it parses it and attempts to set any reminders or cancellations requested.
