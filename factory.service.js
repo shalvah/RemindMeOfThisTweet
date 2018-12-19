@@ -32,7 +32,7 @@ const make = (cache, twitter) => {
     };
 
     const cancelReminder = async (tweet) => {
-        const ruleName = await cache.getAsync(tweet.referencing_tweet);
+        const ruleName = await cache.getAsync(tweet.referencing_tweet + '-' + tweet.author);
         if (ruleName) {
             return await Promise.all([
                 unscheduleLambda(ruleName),
@@ -88,19 +88,26 @@ const make = (cache, twitter) => {
             .then(r => r.id_str);
     };
 
+    const saveReminderDetails = (user) => (tweetId) => {
+            // cache the link to the reminder so we can delete it if user replies "cancel"
+            // set TTL so it auto deletes when reminder time is up
+            cache.setAsync(tweetId + '-' + user, ruleName, 'PX', result.remindAt - Date.now())
+    };
+
+    const getRuleName = () => process.env.LAMBDA_FUNCTION_NAME + '-' + Date.now() + '-' + Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+
     const handleParsingResult = async (result) => {
         console.log(result)
         if (result.remindAt) {
-            const ruleName = process.env.LAMBDA_FUNCTION_NAME + '-' + Date.now() + '-' + Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+            const ruleName = getRuleName();
             return await Promise.all([
                 cache.lpushAsync('PARSE_SUCCESS', [JSON.stringify(result.tweet)]),
                 scheduleReminder(result.tweet, result.remindAt, ruleName),
                 notifyUserOfReminder(result.tweet, result.remindAt)
-                    .then(tweetId =>
-                    // cache the link to the reminder so we can delete it if user replies "cancel"
-                    // set TTL so it auto deletes when reminder time is up
-                    cache.setAsync(tweetId, ruleName, 'PX', result.remindAt - Date.now())
-                ).catch(e => console.log(`Couldn't notify user: ${JSON.stringify(result.tweet)} - Error: ${e.valueOf()}`)),
+                    .then(saveReminderDetails(result.tweet.author))
+                    .catch(e =>
+                        console.log(`Couldn't notify user: ${JSON.stringify(result.tweet)} - Error: ${e.valueOf()}`)
+                    ),
             ]);
         } else if (result.error) {
             await cache.lpushAsync(result.error, [JSON.stringify(result.tweet)]);
