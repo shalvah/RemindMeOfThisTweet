@@ -88,10 +88,10 @@ const make = (cache, twitter) => {
             .then(r => r.id_str);
     };
 
-    const saveReminderDetails = (user) => (tweetId) => {
+    const saveReminderDetails = (ruleName, user, remindAt, tweetId) => {
             // cache the link to the reminder so we can delete it if user replies "cancel"
             // set TTL so it auto deletes when reminder time is up
-            cache.setAsync(tweetId + '-' + user, ruleName, 'PX', result.remindAt - Date.now())
+            cache.setAsync(tweetId + '-' + user, ruleName, 'PX', remindAt - Date.now())
     };
 
     const getRuleName = () => process.env.LAMBDA_FUNCTION_NAME + '-' + Date.now() + '-' + Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
@@ -104,7 +104,7 @@ const make = (cache, twitter) => {
                 cache.lpushAsync('PARSE_SUCCESS', [JSON.stringify(result.tweet)]),
                 scheduleReminder(result.tweet, result.remindAt, ruleName),
                 notifyUserOfReminder(result.tweet, result.remindAt)
-                    .then(saveReminderDetails(result.tweet.author))
+                    .then(tweetId => saveReminderDetails(ruleName, result.tweet.author, result.remindAt, tweetId))
                     .catch(e =>
                         console.log(`Couldn't notify user: ${JSON.stringify(result.tweet)} - Error: ${e.valueOf()}`)
                     ),
