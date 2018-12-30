@@ -54,6 +54,11 @@ const dateToCronExpression = (date) => {
 
 const cronify = (date) => `cron(${dateToCronExpression(date)})`;
 
+const getDateToNearestMinute = (date = new Date) => {
+    const coefficient = 1000 * 60;
+    return new Date(Math.floor(date.getTime() / coefficient) * coefficient)
+};
+
 class TwitterErrorResponse extends Error {
     constructor(endpoint, errors) {
         super('Error from Twitter API call');
@@ -74,6 +79,7 @@ module.exports = {
     randomAcknowledgementMessage,
     finish,
     cronify,
+    getDateToNearestMinute,
     TwitterErrorResponse,
     SUCCESS,
     FAIL,

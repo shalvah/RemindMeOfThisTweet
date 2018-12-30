@@ -2,7 +2,7 @@
 
 const chrono = require('chrono-node');
 
-const {cronify} = require('./utils');
+const { cronify, getDateToNearestMinute } = require('./utils');
 
 const make = (cache, twitter) => {
 
@@ -83,35 +83,25 @@ const make = (cache, twitter) => {
             });
     };
 
-    const scheduleReminder = (tweet, date, ruleName) => {
-        return scheduleLambda(cronify(date), tweet, ruleName);
+    const scheduleReminder = (tweet, date) => {
+        return cache.lpushAsync(getDateToNearestMinute(date).toISOString(), [JSON.stringify(tweet)]);
     };
 
     const notifyUserOfReminder = (tweet, date) => {
         return twitter.replyWithAcknowledgement(tweet, date)
-            .then(r => r.id_str);
+            .then(r => r.id_str)
+            .catch(e =>
+                console.log(`Couldn't notify user: ${JSON.stringify(tweet)} - Error: ${e.valueOf()}`)
+            );
     };
-
-    const saveReminderDetails = (ruleName, user, remindAt, tweetId) => {
-            // cache the link to the reminder so we can delete it if user replies "cancel"
-            // set TTL so it auto deletes when reminder time is up
-            return cache.setAsync(tweetId + '-' + user, ruleName, 'PX', remindAt - Date.now())
-    };
-
-    const getRuleName = () => process.env.LAMBDA_FUNCTION_NAME + '-' + Date.now() + '-' + Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
 
     const handleParsingResult = async (result) => {
-        console.log(result)
+        console.log(result);
         if (result.remindAt) {
-            const ruleName = getRuleName();
             return await Promise.all([
                 cache.lpushAsync('PARSE_SUCCESS', [JSON.stringify(result.tweet)]),
-                scheduleReminder(result.tweet, result.remindAt, ruleName),
-                notifyUserOfReminder(result.tweet, result.remindAt)
-                    .then(tweetId => saveReminderDetails(ruleName, result.tweet.author, result.remindAt, tweetId))
-                    .catch(e =>
-                        console.log(`Couldn't notify user: ${JSON.stringify(result.tweet)} - Error: ${e.valueOf()}`)
-                    ),
+                scheduleReminder(result.tweet, result.remindAt),
+                notifyUserOfReminder(result.tweet, result.remindAt),
             ]);
         } else if (result.error) {
             await cache.lpushAsync(result.error, [JSON.stringify(result.tweet)]);
