@@ -45,7 +45,7 @@ functions:
     events:
     - schedule: rate(1 minute)
   checkForReminders:
-    handler: checkForReminders
+    handler: handler.checkForReminders
     events:
     - schedule: rate(1 minute)
   remind:

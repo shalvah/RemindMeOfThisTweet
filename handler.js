@@ -50,7 +50,7 @@ module.exports.checkForReminders = async (event, context, callback) => {
 
 module.exports.retryFailedTasks = async (event, context, callback) => {
     const cache = await makeCache();
-    const failedTasks = await cache.lrangeAsync(event.queue, 0, -1);
+    const failedTasks = await cache.lrangeAsync(event.queue || 'PARSE_TIME_FAILURE', 0, -1);
 
     if (!failedTasks.length) {
         finish(callback, cache).success(`No tasks for retrying in queue ${event.queue}`);
