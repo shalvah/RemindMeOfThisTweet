@@ -1,6 +1,6 @@
 'use strict';
 
-const { finish } = require('./utils');
+const { finish, getDateToNearestMinute } = require('./utils');
 const makeService = require('./factory.service');
 const makeCache = require('./factory.cache');
 const makeTwitter = require('./factory.twitter');
@@ -30,6 +30,22 @@ module.exports.remind = async (event, context, callback) => {
     ]);
 
     finish(callback, cache).success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
+};
+
+module.exports.checkForReminders = async (event, context, callback) => {
+    const cache = await makeCache();
+    const twitter = makeTwitter(cache);
+    const service = makeService(cache);
+
+    const key = getDateToNearestMinute().toISOString();
+    let reminders = await cache.lrangeAsync(key, 0, -1);
+    reminders = reminders.map(JSON.parse);
+    await Promise.all([
+        reminders.map(twitter.replyWithReminder),
+        cache.delAsync(key)
+    ]);
+
+    finish(callback, cache).success(`Reminded for ${reminders.length} tweets`);
 };
 
 module.exports.retryFailedTasks = async (event, context, callback) => {
