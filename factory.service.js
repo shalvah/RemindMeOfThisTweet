@@ -43,11 +43,16 @@ const make = (cache, twitter) => {
     };
 
     const handleMention = (tweet) => {
+
         // if the tweet is a reply with the word "cancel",
         // we'll attempt to cancel the reminder it references
-        return tweet.text.match(/\bcancel\b/i) && tweet.referencing_tweet
-            ? cancelReminder(tweet)
-            : parseReminderTime(tweet);
+        const isReminderCancellation = tweet => tweet.text.match(/\bcancel\b/i) && tweet.referencing_tweet;
+
+        if (isReminderCancellation(tweet)) {
+            return cancelReminder(tweet);
+        }
+
+        return parseReminderTime(tweet);
     };
 
     const scheduleLambda = async (scheduleAt, data, ruleName) => {

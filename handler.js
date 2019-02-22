@@ -21,17 +21,25 @@ module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => 
 module.exports.handleAccountActivity = async (event, context, callback) => {
     const body = JSON.parse(event.body);
     console.log(body);
-    callback(null, {
-        statusCode: 200,
-        body: 'ok'
-    });
-    return;
+
+    if (!body.tweet_create_events) {
+        callback(null, {
+            statusCode: 200,
+            body: 'ok'
+        });
+        return;
+    }
 
     const cache = await makeCache();
     const twitter = makeTwitter(cache);
     const service = makeService(cache, twitter);
 
-    const allMentions = body.tweet_create_events;
+    const allMentions = body.tweet_create_events.filter(tweet => {
+        // ignore retweets
+        if (tweet.retweeted_status && !tweet.is_quote_status) {
+            return false;
+        }
+    });
 
     let results = allMentions.map(service.handleMention);
     await Promise.all(results.map(service.handleParsingResult));
