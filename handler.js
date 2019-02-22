@@ -43,10 +43,12 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
             author: tweetObject.user.screen_name,
             utcOffset: parseInt(tweetObject.user.utc_offset)
         };
-    })
+    });
 
-    let results = allMentions.map(service.handleMention);
-    await Promise.all(results.map(service.handleParsingResult));
+    if (allMentions.length) {
+        let results = allMentions.map(service.handleMention);
+        await Promise.all(results.map(service.handleParsingResult));
+    }
 
     finish(callback, cache).success(`Handled ${allMentions.length} tweets`);
 };
