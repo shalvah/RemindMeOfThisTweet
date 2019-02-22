@@ -43,7 +43,19 @@ functions:
   fetchTweetsAndSetReminders:
     handler: handler.fetchTweetsAndSetReminders
     events:
-    - schedule: rate(1 minute)
+    - schedule: rate(5 minutes)
+  handleAccountActivity:
+    handler: handler.handleAccountActivity
+    events:
+    - http:
+        path: /webhook
+        method: post
+  handleTwitterCrc:
+    handler: handler.handleTwitterCrc
+    events:
+    - http:
+        path: /webhook
+        method: get
   checkForReminders:
     handler: handler.checkForReminders
     events:

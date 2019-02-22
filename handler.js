@@ -18,6 +18,41 @@ module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => 
     finish(callback, cache).success(`Handled ${allMentions.length} tweets`);
 };
 
+module.exports.handleAccountActivity = async (event, context, callback) => {
+    const body = JSON.parse(event.body);
+    console.log(body);
+    callback(null, {
+        statusCode: 200,
+        body: 'ok'
+    });
+    return;
+
+    const cache = await makeCache();
+    const twitter = makeTwitter(cache);
+    const service = makeService(cache, twitter);
+
+    const allMentions = body.tweet_create_events;
+
+    let results = allMentions.map(service.handleMention);
+    await Promise.all(results.map(service.handleParsingResult));
+
+    finish(callback, cache).success(`Handled ${allMentions.length} tweets`);
+};
+
+module.exports.handleTwitterCrc = async (event, context, callback) => {
+    const crypto = require('crypto');
+    const hmac = crypto.createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET)
+        .update(event.queryStringParameters.crc_token).digest('base64');
+    const response = {
+        statusCode: 200,
+        headers: {
+            'content-type': 'application/json',
+        },
+        body: JSON.stringify({ response_token: hmac })
+    };
+    callback(null, response);
+};
+
 module.exports.remind = async (event, context, callback) => {
     const cache = await makeCache();
     const twitter = makeTwitter(cache);
