@@ -12,15 +12,11 @@ cache:
 install: npm i && npm i -g serverless
 
 stages:
-- name: test
 - name: deploy
   if: branch = master
 
 jobs:
   include:
-  - stage: test
-    env: LAMBDA_FUNCTION_NAME=testLambdaFunction LAMBDA_FUNCTION_ARN="arn:aws:lambda:us-east-1:741799119337:function:testLambdaFunction"
-    script: npm run test
   - stage: deploy
     env: LAMBDA_FUNCTION_NAME=RemindMeOfThisTweet-dev-remind
     before_script:
