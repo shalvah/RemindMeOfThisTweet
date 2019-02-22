@@ -42,10 +42,6 @@ package:
   - "*.png"
 
 functions:
-  fetchTweetsAndSetReminders:
-    handler: handler.fetchTweetsAndSetReminders
-    events:
-    - schedule: rate(5 minutes)
   handleAccountActivity:
     handler: handler.handleAccountActivity
     events:

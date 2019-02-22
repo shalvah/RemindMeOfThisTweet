@@ -5,19 +5,6 @@ const makeService = require('./factory.service');
 const makeCache = require('./factory.cache');
 const makeTwitter = require('./factory.twitter');
 
-module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => {
-    const cache = await makeCache();
-    const twitter = makeTwitter(cache);
-    const service = makeService(cache, twitter);
-
-    const allMentions = await twitter.fetchAllMentions();
-
-    let results = allMentions.map(service.handleMention);
-    await Promise.all(results.map(service.handleParsingResult));
-
-    finish(callback, cache).success(`Handled ${allMentions.length} tweets`);
-};
-
 module.exports.handleAccountActivity = async (event, context, callback) => {
     const body = JSON.parse(event.body);
     console.log(body);
