@@ -39,6 +39,7 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
         if (tweet.retweeted_status && !tweet.is_quote_status) {
             return false;
         }
+        return true;
     });
 
     let results = allMentions.map(service.handleMention);
