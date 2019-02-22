@@ -48,7 +48,7 @@ module.exports.handleTwitterCrc = async (event, context, callback) => {
         headers: {
             'content-type': 'application/json',
         },
-        body: JSON.stringify({ response_token: hmac })
+        body: JSON.stringify({ response_token: 'sha256=' + hmac })
     };
     callback(null, response);
 };
