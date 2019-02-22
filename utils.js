@@ -66,6 +66,14 @@ class TwitterErrorResponse extends Error {
         this.errors = errors;
         this.endpoint = endpoint;
     }
+
+    valueOf() {
+        return JSON.stringify({
+            name: this.name,
+            errors: this.errors,
+            endpoint: this.endpoint,
+        });
+    }
 }
 
 const SUCCESS = 'Success';
