@@ -39,8 +39,24 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
         if (tweet.retweeted_status && !tweet.is_quote_status) {
             return false;
         }
+
+        // ignore tweets by myself
+        if (tweet.user.screen_name === process.env.TWITTER_SCREEN_NAME) {
+            return false;
+        }
+
         return true;
-    });
+
+    }).map(tweetObject => {
+        return {
+            id: tweetObject.id_str,
+            created_at: tweetObject.created_at,
+            text: tweetObject.full_text,
+            referencing_tweet: tweetObject.in_reply_to_status_id_str,
+            author: tweetObject.user.screen_name,
+            utcOffset: parseInt(tweetObject.user.utc_offset)
+        };
+    })
 
     let results = allMentions.map(service.handleMention);
     await Promise.all(results.map(service.handleParsingResult));
