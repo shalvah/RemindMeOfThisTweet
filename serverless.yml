@@ -22,6 +22,7 @@ provider:
     TWITTER_CONSUMER_SECRET: ${env:TWITTER_CONSUMER_SECRET}
     TWITTER_ACCESS_TOKEN: ${env:TWITTER_ACCESS_TOKEN}
     TWITTER_ACCESS_TOKEN_SECRET: ${env:TWITTER_ACCESS_TOKEN_SECRET}
+    TWITTER_SCREEN_NAME: RemindMe_OfThis
     REDIS_HOSTNAME: ${env:REDIS_HOSTNAME}
     REDIS_PORT: ${env:REDIS_PORT}
     REDIS_PASSWORD: ${env:REDIS_PASSWORD}
@@ -31,6 +32,7 @@ provider:
 package:
   exclude:
   - README.md
+  - bin/**
   - .gitignore
   - .env
   - .env.example
@@ -40,10 +42,18 @@ package:
   - "*.png"
 
 functions:
-  fetchTweetsAndSetReminders:
-    handler: handler.fetchTweetsAndSetReminders
+  handleAccountActivity:
+    handler: handler.handleAccountActivity
     events:
-    - schedule: rate(1 minute)
+    - http:
+        path: /webhook
+        method: post
+  handleTwitterCrc:
+    handler: handler.handleTwitterCrc
+    events:
+    - http:
+        path: /webhook
+        method: get
   checkForReminders:
     handler: handler.checkForReminders
     events:

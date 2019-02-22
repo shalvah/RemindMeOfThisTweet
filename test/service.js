@@ -101,47 +101,5 @@ describe('Service', function() {
             done();
         });
     });*/
-
-    describe('#scheduleLambda()', function() {
-
-        it('schedules Lambda function correctly', function(done) {
-            const data = {thisIs: "theData", cleanup: true};
-
-            const date = new Date;
-            date.setMinutes(parseInt(date.getMinutes()) + 2);
-
-            scheduleLambda(cronify(date), data)
-                .then(r => {
-                    expect(r.status).to.equal('SUCCESS');
-                    done();
-                })
-                .catch(e => {
-                    done(e);
-                });
-        });
-    });
-
-    describe('#cleanup()', function() {
-
-        it('deletes CloudWatch event correctly', function(done) {
-            const data = {thisIs: "theData", cleanup: false};
-
-            const date = new Date;
-            date.setMinutes(parseInt(date.getMinutes()) + 2);
-
-            scheduleLambda(cronify(date), data)
-                .then(r => {
-                    expect(r.status).to.equal('SUCCESS');
-                    return cleanup(r.ruleName);
-                })
-                .then(r => {
-                    expect(r.status).to.equal('SUCCESS');
-                    done();
-                })
-                .catch(e => {
-                    done(e);
-                });
-        });
-    });
 });
 
