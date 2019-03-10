@@ -10,7 +10,6 @@ const make = (cache, twitter) => {
         const refDate = new Date(tweet.created_at);
         let results = chrono.parse(tweet.text, refDate, {forwardDate: true});
         if (results.length) {
-            results[0].start.assign('timezoneOffset', tweet.utcOffset / 60);
             const reminderTime = results[0].start.date();
             if (reminderTime > refDate && reminderTime > new Date) {
                 return {

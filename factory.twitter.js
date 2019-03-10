@@ -35,7 +35,6 @@ module.exports = (cache) => {
                     text: tweetObject.full_text,
                     referencing_tweet: tweetObject.in_reply_to_status_id_str,
                     author: tweetObject.user.screen_name,
-                    utcOffset: parseInt(tweetObject.user.utc_offset)
                 }
             }));
     };
