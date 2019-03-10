@@ -22,7 +22,7 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
     const service = makeService(cache, twitter);
 
     const allMentions = body.tweet_create_events.filter(tweet => {
-        // ignore retweets
+        // ignore retweets, but accept quotes
         if (tweet.retweeted_status && !tweet.is_quote_status) {
             return false;
         }
@@ -44,6 +44,9 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
             utcOffset: parseInt(tweetObject.user.utc_offset)
         };
     });
+
+    // for failure/recovery purposes
+    await cache.setAsync('lastTweetRetrieved', lastTweetRetrieved);
 
     if (allMentions.length) {
         let results = allMentions.map(service.handleMention);
@@ -111,4 +114,17 @@ module.exports.retryFailedTasks = async (event, context, callback) => {
     await Promise.all(results.map(service.handleParsingResult));
 
     finish(callback, cache).success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
+};
+
+module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => {
+    const cache = await makeCache();
+    const twitter = makeTwitter(cache);
+    const service = makeService(cache, twitter);
+
+    const allMentions = await twitter.fetchAllMentions();
+
+    let results = allMentions.map(service.handleMention);
+    await Promise.all(results.map(service.handleParsingResult));
+
+    finish(callback, cache).success(`Handled ${allMentions.length} tweets`);
 };

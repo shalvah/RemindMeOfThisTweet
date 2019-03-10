@@ -37,7 +37,6 @@ const randomAcknowledgementMessage = (reminderTime, username) => {
         `Got it, @${username}! I'll remind you about this at ${reminderTime.toUTCString()}.🤗`,
     ];
     let message = responses[Math.floor(Math.random() * responses.length)];
-    message += ' Reply "cancel" to this message to cancel this reminder.';
     return message;
 };
 
