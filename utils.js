@@ -31,10 +31,19 @@ const randomReminderMessage = (username) => {
     return responses[Math.floor(Math.random() * responses.length)];
 };
 
+const getReminderDay = (dateTime) => {
+    return dateTime.toDateString();
+};
+
+const getReminderTime = (dateTime) => {
+    return dateTime.toTimeString().replace(/ \(.+\)/, '');
+};
+
 const randomAcknowledgementMessage = (reminderTime, username) => {
     let responses = [
-        `Sure thing! I'll remind you of this tweet at ${reminderTime.toUTCString()}.😃`,
-        `Got it, @${username}! I'll remind you about this at ${reminderTime.toUTCString()}.🤗`,
+        `Sure thing! I'll remind you of this tweet on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.😃`,
+        `Got it, @${username}! I'll remind you about this on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.🤗`,
+        `Gotcha, boss! I've set your reminder for ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.🤗`,
     ];
     let message = responses[Math.floor(Math.random() * responses.length)];
     return message;
