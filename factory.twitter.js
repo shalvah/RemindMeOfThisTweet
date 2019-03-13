@@ -17,11 +17,14 @@ const t = new Twit({
 
 module.exports = (cache) => {
 
-    const getMentions = async (lastTweetRetrieved) => {
-        let lastTweetId = lastTweetRetrieved || await cache.getAsync('lastTweetRetrieved');
+    const getMentions = async (from = null, to = null) => {
+        let lastTweetId = from || await cache.getAsync('lastTweetRetrieved');
         let options = {count: 200, tweet_mode: "extended"};
         if (lastTweetId) {
             options.since_id = lastTweetId;
+        }
+        if (to) {
+            options.max_id = to;
         }
         return t.get('statuses/mentions_timeline', options)
             .then(r => r.data)
@@ -36,7 +39,14 @@ module.exports = (cache) => {
                     referencing_tweet: tweetObject.in_reply_to_status_id_str,
                     author: tweetObject.user.screen_name,
                 }
-            }));
+            }))
+            .then(tweets => {
+                if (to) {
+                    return tweets.filter(t => t.id !== to);
+                }
+
+                return tweets;
+            });
     };
 
     const reply = async (tweet, content) => {
@@ -78,15 +88,15 @@ module.exports = (cache) => {
         return reply(tweet, content);
     };
 
-    const fetchAllMentions = async () => {
+    const fetchAllMentions = async (from = null, to = null) => {
         let lastTweetRetrieved = null;
         let count = 0;
-        let mentions = await getMentions();
+        let mentions = await getMentions(from, to);
         let allMentions = [...mentions];
         while (mentions.length) {
             lastTweetRetrieved = mentions[0].id;
             count += mentions.length;
-            mentions = await getMentions(lastTweetRetrieved);
+            mentions = await getMentions(lastTweetRetrieved, to);
             allMentions.concat(mentions);
         }
 

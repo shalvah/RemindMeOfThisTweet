@@ -120,7 +120,9 @@ module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => 
     const twitter = makeTwitter(cache);
     const service = makeService(cache, twitter);
 
-    const allMentions = await twitter.fetchAllMentions();
+    console.log(event);
+    const { from, to } = event;
+    const allMentions = await twitter.fetchAllMentions(from, to);
 
     let results = allMentions.map(service.handleMention);
     await Promise.all(results.map(service.handleParsingResult));

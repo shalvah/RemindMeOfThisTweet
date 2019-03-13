@@ -62,3 +62,5 @@ functions:
     handler: handler.remind
   retryFailedTasks:
     handler: handler.retryFailedTasks
+  fetchTweetsAndSetReminders:
+    handler: handler.fetchTweetsAndSetReminders
