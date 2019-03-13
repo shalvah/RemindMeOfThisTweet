@@ -44,10 +44,10 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
         };
     });
 
-    // for failure/recovery purposes
-    await cache.setAsync('lastTweetRetrieved', lastTweetRetrieved);
 
     if (allMentions.length) {
+        // for failure/recovery purposes
+        await cache.setAsync('lastTweetRetrieved', allMentions[allMentions.length - 1].id);
         let results = allMentions.map(service.handleMention);
         await Promise.all(results.map(service.handleParsingResult));
     }
