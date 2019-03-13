@@ -1,6 +1,7 @@
 service: RemindMeOfThisTweet
 plugins:
 - serverless-dotenv-plugin
+- serverless-plugin-aws-alerts
 - serverless-mocha-plugin
 
 provider:
@@ -64,3 +65,24 @@ functions:
     handler: handler.retryFailedTasks
   fetchTweetsAndSetReminders:
     handler: handler.fetchTweetsAndSetReminders
+
+custom:
+  alerts:
+    alarms:
+    - functionErrors
+    - functionDuration
+    definitions:
+      functionErrors:
+        # alert if function throws an error
+        threshold: 1
+        period: 5
+      functionDuration:
+        # alert if function takes more than 2 seconds
+        threshold: 1000
+        period: 5
+    topics:
+      alarm:
+        topic: ${self:service}-${opt:stage}-alerts-alarm
+        notifications:
+        - protocol: email
+          endpoint: shalvah.adebayo+awsalerts@gmail.com

@@ -11,7 +11,8 @@
     "mocha": "^5.2.0",
     "request-promise": "^4.2.4",
     "serverless-dotenv-plugin": "^2.0.1",
-    "serverless-mocha-plugin": "^1.9.0"
+    "serverless-mocha-plugin": "^1.9.0",
+    "serverless-plugin-aws-alerts": "^1.2.4"
   },
   "scripts": {
     "test-dev": "cross-env SLS_DEBUG=* sls invoke test",
