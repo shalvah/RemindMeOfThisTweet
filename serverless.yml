@@ -93,7 +93,7 @@ custom:
         treatMissingData: notBreaching
       functionDuration:
         # alert if function takes more than 2 seconds over an hour
-        threshold: 1000
+        threshold: 2000
         period: 600
         treatMissingData: notBreaching
     topics:
