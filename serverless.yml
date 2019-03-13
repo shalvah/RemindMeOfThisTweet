@@ -49,37 +49,53 @@ functions:
     - http:
         path: /webhook
         method: post
+    alarms:
+    - functionErrors
+    - functionDuration
+
   handleTwitterCrc:
     handler: handler.handleTwitterCrc
     events:
     - http:
         path: /webhook
         method: get
+    alarms:
+    - functionErrors
+    - functionDuration
+
   checkForReminders:
     handler: handler.checkForReminders
     events:
     - schedule: rate(1 minute)
+    alarms:
+    - functionErrors
+    - functionDuration
+
   remind:
     handler: handler.remind
+    alarms:
+    - functionErrors
+    - functionDuration
+
   retryFailedTasks:
     handler: handler.retryFailedTasks
+
   fetchTweetsAndSetReminders:
     handler: handler.fetchTweetsAndSetReminders
 
 custom:
   alerts:
-    alarms:
-    - functionErrors
-    - functionDuration
     definitions:
       functionErrors:
         # alert if function throws an error
         threshold: 1
         period: 60
+        treatMissingData: notBreaching
       functionDuration:
         # alert if function takes more than 2 seconds over an hour
         threshold: 1000
         period: 600
+        treatMissingData: notBreaching
     topics:
       alarm:
         topic: ${self:service}-dev-alerts-alarm
