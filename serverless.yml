@@ -82,7 +82,7 @@ custom:
         period: 5
     topics:
       alarm:
-        topic: ${self:service}-${opt:stage}-alerts-alarm
+        topic: ${self:service}-dev-alerts-alarm
         notifications:
         - protocol: email
           endpoint: shalvah.adebayo+awsalerts@gmail.com
