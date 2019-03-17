@@ -14,6 +14,7 @@ const make = (cache, twitter) => {
             if (reminderTime > refDate && reminderTime > new Date) {
                 return {
                     remindAt: reminderTime,
+                    refDate,
                     tweet
                 };
             } else {
@@ -104,7 +105,8 @@ const make = (cache, twitter) => {
         if (result.remindAt) {
             return await Promise.all([
                 cache.lpushAsync('PARSE_SUCCESS', [JSON.stringify(result.tweet)]),
-                scheduleReminder(result.tweet, result.remindAt),
+                scheduleReminder(result.tweet, result.remindAt)
+                    .then(() => metrics.newReminderSet(result)),
                 notifyUserOfReminder(result.tweet, result.remindAt),
             ]);
         } else if (result.error) {
