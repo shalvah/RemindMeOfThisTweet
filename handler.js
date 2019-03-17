@@ -1,9 +1,9 @@
 'use strict';
 
-const { finish, getDateToNearestMinute } = require('./utils');
-const makeService = require('./factory.service');
-const makeCache = require('./factory.cache');
-const makeTwitter = require('./factory.twitter');
+const { finish, getDateToNearestMinute } = require('./src/utils');
+const makeService = require('./src/factory.service');
+const makeCache = require('./src/factory.cache');
+const makeTwitter = require('./src/factory.twitter');
 
 module.exports.handleAccountActivity = async (event, context, callback) => {
     const body = JSON.parse(event.body);
@@ -120,7 +120,7 @@ module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => 
     const twitter = makeTwitter(cache);
     const service = makeService(cache, twitter);
 
-    console.log(event);
+    console.log({inputData: event});
     const { from, to } = event;
     const allMentions = await twitter.fetchAllMentions(from, to);
 

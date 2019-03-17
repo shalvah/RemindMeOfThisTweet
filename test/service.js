@@ -2,16 +2,16 @@
 
 const expect = require('chai').expect;
 
-const { cronify }= require('../utils');
-const makeService = require('../factory.service');
-const {
+const { cronify }= require('../src/utils');
+const makeService = require('../src/factory.service');
+/*const {
     parseReminderTime,
     scheduleLambda,
     cleanup
 } = makeService();
 
 describe('Service', function() {
-/*
+
     describe('#parseReminderTime()', function() {
 
         it('parses reminder times correctly', function(done) {
@@ -100,6 +100,7 @@ describe('Service', function() {
             });
             done();
         });
-    });*/
+    });
 });
 
+*/
