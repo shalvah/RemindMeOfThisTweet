@@ -4,7 +4,6 @@ module.exports = {
     newReminderSet,
 };
 
-const { SUCCESS, FAIL, UNCERTAIN } = require('./../utils');
 const AWS = require('aws-sdk');
 const cloudWatch = new AWS.CloudWatch();
 

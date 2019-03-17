@@ -3,7 +3,7 @@
 const chrono = require('chrono-node');
 
 const { cronify, getDateToNearestMinute } = require('./utils');
-const metrics = require ('./metrics');
+const metrics = require('./metrics');
 
 const make = (cache, twitter) => {
 
