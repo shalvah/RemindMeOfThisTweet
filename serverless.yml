@@ -17,6 +17,11 @@ provider:
     - "events:PutTargets"
     Resource:
     - "*"
+  - Effect: Allow
+    Action:
+    - cloudwatch:PutMetricData
+    Resource:
+    - "*"
 
   environment:
     TWITTER_CONSUMER_KEY: ${env:TWITTER_CONSUMER_KEY}

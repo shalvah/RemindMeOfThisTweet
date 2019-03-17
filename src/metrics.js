@@ -9,8 +9,8 @@ const cloudWatch = new AWS.CloudWatch();
 
 function newReminderSet(reminderData) {
     const term = Math.round((reminderData.remindAt - reminderData.refDate) / 1000);
-    const params = [generateMetricsPayload(term, 1)];
-    return Promise.all(params.map(p => cloudWatch.putMetricData(p).promise()));
+    const params = generateMetricsPayload(term, 1);
+    return cloudWatch.putMetricData(params).promise();
 }
 
 function generateMetricsPayload(term, number) {
