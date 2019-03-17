@@ -21,7 +21,7 @@ function generateMetricsPayload(term, number) {
                 Dimensions: [
                     {
                         Name: 'ReminderTermInSeconds',
-                        Value: term // interval between time reminder was set and time of reminder
+                        Value: '' + term // interval between time reminder was set and time of reminder
                     },
                 ],
                 Timestamp: new Date,
