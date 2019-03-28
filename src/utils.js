@@ -69,7 +69,7 @@ const getDateToNearestMinute = (date = new Date) => {
 
 class TwitterErrorResponse extends Error {
     constructor(endpoint, errors) {
-        super('Error from Twitter API call');
+        super('Error from Twitter API call: ' + JSON.stringify(errors));
         this.name = 'TwitterErrorResponse';
         this.errors = errors;
         this.endpoint = endpoint;
