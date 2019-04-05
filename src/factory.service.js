@@ -2,7 +2,7 @@
 
 const chrono = require('chrono-node');
 
-const { cronify, getDateToNearestMinute } = require('./utils');
+const { getDateToNearestMinute, TwitterErrorResponse } = require('./utils');
 const metrics = require('./metrics');
 
 const make = (cache, twitter) => {
@@ -96,9 +96,12 @@ const make = (cache, twitter) => {
     const notifyUserOfReminder = (tweet, date) => {
         return twitter.replyWithAcknowledgement(tweet, date)
             .then(r => r.id_str)
-            .catch(e =>
-                console.log(`Couldn't notify user: ${JSON.stringify(tweet)} - Error: ${e.valueOf()}`)
-            );
+            .catch(e => {
+                console.log(`Couldn't notify user: ${JSON.stringify(tweet)} - Error: ${e.valueOf()}`);
+                if (e instanceof TwitterErrorResponse && e.errors.code == 261) {
+                    throw e;
+                }
+            });
     };
 
     const handleParsingResult = async (result) => {
