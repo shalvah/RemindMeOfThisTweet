@@ -3,6 +3,8 @@ const args = process.argv.splice(2);
 
 require('dotenv').config('../.env');
 
+// first arg is environment name
+
 const options = {
     url: 'https://api.twitter.com/1.1/account_activity/all/' + args[0] + '/webhooks.json',
     oauth: {
