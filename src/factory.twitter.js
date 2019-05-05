@@ -3,8 +3,14 @@
 const {
     randomReminderMessage,
     randomAcknowledgementMessage,
-    TwitterErrorResponse
 } = require('./utils');
+
+const {
+    BackOffTwitterError,
+    ClientTwitterError,
+    handleTwitterErrors
+} = require('./errors');
+const aargh = require('aargh');
 
 const Twit = require('twit');
 
@@ -28,9 +34,7 @@ module.exports = (cache) => {
         }
         return t.get('statuses/mentions_timeline', options)
             .then(r => r.data)
-            .catch(e => {
-                throw new TwitterErrorResponse('statuses/mentions_timeline', e);
-            })
+            .catch(e => handleTwitterErrors(e, 'statuses/mentions_timeline'))
             .then(tweets => tweets.map(tweetObject => {
                 return {
                     id: tweetObject.id_str,
@@ -56,15 +60,17 @@ module.exports = (cache) => {
         };
         return t.post('statuses/update', options)
             .then((r) => r.data)
+            .catch(e => handleTwitterErrors(e, 'statuses/update'))
             .catch(e => {
-                if ((e.valueOf() + '').includes('User is over daily status update limit')) {
-                    // not sending any more replies for 10 minutes
-                    // to avoid Twitter blocking our API access
-                    console.log('Rate limit reached, backing off for 10 minutes');
-                    return cache.setAsync('no-reply', 1, 'EX', 10 * 60);
-                }
-
-                throw new TwitterErrorResponse('statuses/update', e);
+                return aargh(e)
+                    .type(BackOffTwitterError, (e) => {
+                        // not sending any more replies for a few minutes
+                        // to avoid Twitter blocking our API access
+                        console.log(`Rate limit reached, backing off for ${e.backOffFor} minutes`);
+                        return cache.setAsync('no-reply', 1, 'EX', 60 * e.backOffFor);
+                    })
+                    .type(ClientTwitterError, (e) => console.log(e.valueOf()))
+                    .throw();
             });
     };
 
