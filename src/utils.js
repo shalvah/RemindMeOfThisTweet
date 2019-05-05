@@ -70,23 +70,6 @@ const getDateToNearestMinute = (date = new Date) => {
     return new Date(Math.floor(date.getTime() / coefficient) * coefficient)
 };
 
-class TwitterErrorResponse extends Error {
-    constructor(endpoint, errors) {
-        super('Error from Twitter API call: ' + JSON.stringify(errors));
-        this.name = 'TwitterErrorResponse';
-        this.errors = errors;
-        this.endpoint = endpoint;
-    }
-
-    valueOf() {
-        return JSON.stringify({
-            name: this.name,
-            errors: this.errors,
-            endpoint: this.endpoint,
-        });
-    }
-}
-
 const SUCCESS = 'Success';
 
 const FAIL = 'Fail';
@@ -99,7 +82,6 @@ module.exports = {
     finish,
     cronify,
     getDateToNearestMinute,
-    TwitterErrorResponse,
     SUCCESS,
     FAIL,
     UNCERTAIN
