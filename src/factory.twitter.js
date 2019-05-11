@@ -66,7 +66,7 @@ module.exports = (cache) => {
                     .type(BackOffTwitterError, (e) => {
                         // not sending any more replies for a few minutes
                         // to avoid Twitter blocking our API access
-                        console.log(`Rate limit reached, backing off for ${e.backOffFor} minutes`);
+                        console.log(`Error: ${e.code}, backing off for ${e.backOffFor} minutes`);
                         return cache.setAsync('no-reply', 1, 'EX', 60 * e.backOffFor);
                     })
                     .type(ClientTwitterError, (e) => console.log(e.valueOf()))

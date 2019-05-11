@@ -19,6 +19,7 @@ class TwitterApiError extends Error {
     constructor(endpoint, errors, type = 'Unknown') {
         super(`[${type}]: Error from Twitter API call`);
         this.errors = errors;
+        this.code = errors[0].code;
         this.endpoint = endpoint;
     }
 
@@ -26,6 +27,7 @@ class TwitterApiError extends Error {
         return JSON.stringify({
             name: this.name,
             errors: this.errors,
+            code: this.code,
             endpoint: this.endpoint,
         });
     }
@@ -60,7 +62,7 @@ const handleTwitterErrors = (e, endpoint) => {
             throw new BackOffTwitterError(endpoint, e.errors);
         case TWITTER_NEEDS_A_BREAK:
         case TWITTERS_DOWN_SORRY:
-            throw new BackOffTwitterError(endpoint, e.errors, 5);
+            throw new BackOffTwitterError(endpoint, e.errors, 4);
         case ACCOUNT_LOCKED_TEMPORARILY:
         case ACCOUNT_SUSPENDED:
         case APP_SUSPENDED:
