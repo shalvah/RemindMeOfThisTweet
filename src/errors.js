@@ -56,25 +56,25 @@ class BackOffTwitterError extends Error {
 }
 
 const handleTwitterErrors = (e, endpoint) => {
-    switch (e.errors[0].code) {
+    switch (e.allErrors[0].code) {
         case RATE_LIMIT_EXCEEDED:
         case HIT_TWEET_LIMIT:
-            throw new BackOffTwitterError(endpoint, e.errors);
+            throw new BackOffTwitterError(endpoint, e.allErrors);
         case TWITTER_NEEDS_A_BREAK:
         case TWITTERS_DOWN_SORRY:
-            throw new BackOffTwitterError(endpoint, e.errors, 4);
+            throw new BackOffTwitterError(endpoint, e.allErrors, 4);
         case ACCOUNT_LOCKED_TEMPORARILY:
         case ACCOUNT_SUSPENDED:
         case APP_SUSPENDED:
         case USER_SUSPENDED:
         case APP_MUZZLED:
-            throw new NeedsActionTwitterError(endpoint, e.errors);
+            throw new NeedsActionTwitterError(endpoint, e.allErrors);
         case COULDNT_FIND_USER:
         case AUTH_FAILED:
         case REPLIED_TO_UNAVAILABLE_TWEET:
-            throw new ClientTwitterError(endpoint, e.errors);
+            throw new ClientTwitterError(endpoint, e.allErrors);
         default:
-            throw new TwitterApiError(endpoint, e.errors);
+            throw new TwitterApiError(endpoint, e.allErrors);
     }
 };
 
