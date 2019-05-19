@@ -6,10 +6,12 @@ const {
 } = require('./utils');
 
 const {
-    BackOffTwitterError,
-    ClientTwitterError,
+    errors: {
+        RateLimited,
+        BadRequest,
+    },
     handleTwitterErrors
-} = require('./errors');
+} = require('twitter-error-handler');
 const aargh = require('aargh');
 
 const Twit = require('twit');
@@ -34,7 +36,7 @@ module.exports = (cache) => {
         }
         return t.get('statuses/mentions_timeline', options)
             .then(r => r.data)
-            .catch(e => handleTwitterErrors(e, 'statuses/mentions_timeline'))
+            .catch(e => handleTwitterErrors('statuses/mentions_timeline', e))
             .then(tweets => tweets.map(tweetObject => {
                 return {
                     id: tweetObject.id_str,
@@ -60,16 +62,16 @@ module.exports = (cache) => {
         };
         return t.post('statuses/update', options)
             .then((r) => r.data)
-            .catch(e => handleTwitterErrors(e, 'statuses/update'))
+            .catch(e => handleTwitterErrors('statuses/update', e))
             .catch(e => {
                 return aargh(e)
-                    .type(BackOffTwitterError, (e) => {
+                    .type([RateLimited], (e) => {
                         // not sending any more replies for a few minutes
                         // to avoid Twitter blocking our API access
-                        console.log(`Error: ${e.code}, backing off for ${e.backOffFor} minutes`);
-                        return cache.setAsync('no-reply', 1, 'EX', 60 * e.backOffFor);
+                        console.log(`Error: ${e.code}, backing off for 10 minutes`);
+                        return cache.setAsync('no-reply', 1, 'EX', 60 * 10);
                     })
-                    .type(ClientTwitterError, (e) => console.log(e.valueOf()))
+                    .type(BadRequest, (e) => console.log(e.valueOf()))
                     .throw();
             });
     };
