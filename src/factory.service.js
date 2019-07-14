@@ -1,6 +1,6 @@
 'use strict';
 
-const chrono = require('chrono-node');
+const parser = require('./timeparser');
 
 const { getDateToNearestMinute } = require('./utils');
 const metrics = require('./metrics');
@@ -9,7 +9,7 @@ const make = (cache, twitter) => {
 
     const parseReminderTime = (tweet) => {
         const refDate = new Date(tweet.created_at);
-        let results = chrono.en_GB.parse(tweet.text, refDate, {forwardDate: true});
+        let results = parser.parse(tweet.text, refDate, {forwardDate: true});
         if (results.length) {
             const reminderTime = results[0].start.date();
             if (reminderTime > refDate && reminderTime > new Date) {
