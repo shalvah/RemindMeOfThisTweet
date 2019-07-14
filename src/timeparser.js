@@ -19,7 +19,23 @@ rollOverYearRefiner.refine = (text, results, opt) => {
     return results;
 };
 
+const rollOverDayRefiner = new chrono.Refiner();
+rollOverDayRefiner.refine = (text, results, opt) => {
+    results.forEach((result) => {
+        if (result.start.isCertain('hour') &&
+            !result.start.isCertain('day') &&
+            result.start.date().getTime() < result.ref.getTime()
+        ) {
+            result.start.imply('day', result.start.get('day') + 1);
+        }
+    });
+    return results;
+};
+
+
+
 const parser = chrono.en_GB;
 parser.refiners.push(rollOverYearRefiner);
+parser.refiners.push(rollOverDayRefiner);
 
 module.exports = parser;
