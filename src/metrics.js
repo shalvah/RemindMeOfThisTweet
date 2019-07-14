@@ -24,7 +24,7 @@ function generateMetricsPayload(term, number) {
                         Value: '' + term // interval between time reminder was set and time of reminder
                     },                    {
                         Name: 'Count',
-                        Value: 1
+                        Value: "1"
                     },
                 ],
                 Timestamp: new Date,
