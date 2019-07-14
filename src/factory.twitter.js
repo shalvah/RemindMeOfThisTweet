@@ -82,7 +82,7 @@ module.exports = (cache) => {
             return true;
         }
 
-        let content = randomReminderMessage(tweet.author);
+        let content = randomReminderMessage(tweet.author, tweet.referencing_tweet);
         return reply(tweet, content);
     };
 
@@ -92,7 +92,7 @@ module.exports = (cache) => {
             return true;
         }
 
-        let content = randomAcknowledgementMessage(date, tweet.author);
+        let content = randomAcknowledgementMessage(date, tweet.author, tweet.referencing_tweet);
         return reply(tweet, content);
     };
 
