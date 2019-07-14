@@ -83,7 +83,7 @@ module.exports.remind = async (event, context, callback) => {
     finish(callback, cache).success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
 };
 
-module.exports.checkForReminders = async (event, context, callback) => {
+module.exports.checkForRemindersAndSend = async (event, context, callback) => {
     const cache = await makeCache();
     const twitter = makeTwitter(cache);
     const service = makeService(cache);

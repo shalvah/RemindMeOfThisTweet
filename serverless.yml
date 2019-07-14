@@ -69,14 +69,15 @@ functions:
     - functionErrors
     - functionDuration
 
-  checkForReminders:
-    handler: handler.checkForReminders
+  checkForRemindersAndSend:
+    handler: handler.checkForRemindersAndSend
     events:
     - schedule: rate(1 minute)
     alarms:
     - functionErrors
     - functionDuration
 
+# These functions are currently not being used
   remind:
     handler: handler.remind
     alarms:

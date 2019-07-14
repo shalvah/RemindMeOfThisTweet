@@ -12,11 +12,15 @@ cache:
 install: npm i && npm i -g serverless
 
 stages:
+- name: test
 - name: deploy
   if: branch = master
 
 jobs:
   include:
+  - stage: test
+    script: npm run test
+
   - stage: deploy
     env: LAMBDA_FUNCTION_NAME=RemindMeOfThisTweet-dev-remind
     before_script:
