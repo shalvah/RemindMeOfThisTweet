@@ -21,7 +21,7 @@ const finish = (cb, cache = null) => {
     }
 };
 
-const randomReminderMessage = (username, originalTweetId) => {
+const randomReminderMessage = (username, tweetId) => {
     let responses = [
         `Hi 👋, you asked me to remind you of this tweet. 😁`,
         `⏰ Hey @${username}, you wanted me to remind you of this tweet. Well, here you go! 🤗`,
@@ -30,7 +30,7 @@ const randomReminderMessage = (username, originalTweetId) => {
         `Hey boss! Here's the reminder you asked for.👍`,
     ];
     let response = responses[Math.floor(Math.random() * responses.length)];
-    response += "\n" + "http://twitter.com/i/web/status/" + originalTweetId;
+    response += "\n" + "https://twitter.com/i/web/status/" + tweetId;
     return response;
 };
 
@@ -42,7 +42,7 @@ const getReminderTime = (dateTime) => {
     return dateTime.toTimeString().replace(/ \(.+\)/, '');
 };
 
-const randomAcknowledgementMessage = (reminderTime, username, originalTweetId) => {
+const randomAcknowledgementMessage = (reminderTime, username, tweetId) => {
     let responses = [
         `Sure thing👌! I'll remind you of this tweet on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.😃`,
         `Got it, @${username}! I'll remind you about this on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.🤗`,
@@ -51,7 +51,7 @@ const randomAcknowledgementMessage = (reminderTime, username, originalTweetId) =
         `Yes, boss. ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}. One new reminder coming right up.`,
     ];
     let message = responses[Math.floor(Math.random() * responses.length)];
-    message += "\n" + "http://twitter.com/i/web/status/" + originalTweetId;
+    message += "\n" + "https://twitter.com/i/web/status/" + tweetId;
     return message;
 };
 
