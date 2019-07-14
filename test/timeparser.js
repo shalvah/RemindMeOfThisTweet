@@ -59,3 +59,14 @@ tap.equal(parsedDate.getMonth(), inMonths(5));
 
 parsedDate = getDate(scenario("in 15 hours"));
 tap.equal(parsedDate.getHours(), inHours(15));
+
+parsedDate = getDate(scenario("tomorrow by 6:59pm"));
+tap.equal(parsedDate.getDate(), tomorrow());
+tap.equal(parsedDate.getHours(), 18);
+tap.equal(parsedDate.getMinutes(), 59);
+
+parsedDate = getDate(scenario("Tuesday, 9th of July. 19:00 GMT"));
+tap.equal(parsedDate.getDate(), 9);
+tap.equal(parsedDate.getMonth(), 6);
+tap.equal(parsedDate.getHours(), 19);
+tap.equal(parsedDate.getMinutes(), 0);

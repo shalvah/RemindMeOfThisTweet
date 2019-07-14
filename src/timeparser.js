@@ -32,10 +32,44 @@ rollOverDayRefiner.refine = (text, results, opt) => {
     return results;
 };
 
+// Examples: "Tuesday, 9th of July 2019. 19:00 GMT" and "tomorrow by 9pm"
+// Both produce two results each: one with the date and one with the time
+const combineDateAndTime = new chrono.Refiner();
+combineDateAndTime.refine = (text, results, opt) => {
+    if (results.length !==  2) {
+        // Our current data suggests this scenario only yields two results
+        return results;
+    }
+
+   const resultWithDate = results.find((result) => {
+       return result.start.isCertain('day');
+   });
+   const resultWithTime = results.find((result) => {
+       return result.start.isCertain('hour');
+   });
+    if (resultWithDate == undefined || resultWithTime == undefined) {
+        // Faulty thesis; bail.
+        return results;
+    }
+
+    resultWithDate.start.imply('hour', resultWithTime.start.get('hour'));
+    resultWithDate.start.imply('minute', resultWithTime.start.get('minute'));
+    resultWithDate.start.imply('meridiem', resultWithTime.start.get('meridiem'));
+    resultWithDate.start.imply('timezoneOffset', resultWithTime.start.get('timezoneOffset'));
+
+    resultWithTime.start.imply('weekday', resultWithDate.start.get('weekday'));
+    resultWithTime.start.imply('day', resultWithDate.start.get('day'));
+    resultWithTime.start.imply('month', resultWithDate.start.get('month'));
+    resultWithTime.start.imply('year', resultWithDate.start.get('year'));
+
+    return results;
+};
+
 
 
 const parser = chrono.en_GB;
 parser.refiners.push(rollOverYearRefiner);
 parser.refiners.push(rollOverDayRefiner);
+parser.refiners.push(combineDateAndTime);
 
 module.exports = parser;
