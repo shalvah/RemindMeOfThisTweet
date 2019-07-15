@@ -51,6 +51,7 @@ const randomAcknowledgementMessage = (reminderTime, username, tweetId) => {
         `Yes, boss. ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}. One new reminder coming right up.`,
     ];
     let message = responses[Math.floor(Math.random() * responses.length)];
+    message += " Reply \"cancel\" to cancel this reminder.";
     message += "\n" + "https://twitter.com/random/status/" + tweetId;
     return message;
 };
