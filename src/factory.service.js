@@ -34,13 +34,16 @@ const make = (cache, twitter) => {
 
     const cancelReminder = async (tweet) => {
         const cacheKey = tweet.referencing_tweet + '-' + tweet.author;
-        console.log(`CANCEL ${cacheKey}`);
+        console.log("CANCEL " + { cacheKey });
         let reminderDetails = await cache.getAsync(cacheKey);
+        console.log("CANCEL " + { reminderDetails });
         if (reminderDetails) {
             reminderDetails = JSON.parse(reminderDetails);
             const remindersOnThatDate = await cache.lrangeAsync(reminderDetails.date, 0, -1);
+            console.log("CANCEL " + { remindersOnThatDate });
             const indexOfTheReminderWeWant = remindersOnThatDate.map(JSON.parse)
                 .findIndex(r => (r.author == tweet.author) && (reminderDetails.original_tweet == r.id));
+            console.log("CANCEL " + { indexOfTheReminderWeWant });
             if (indexOfTheReminderWeWant != null) {
                 await Promise.all([
                     cache.delAsync(cacheKey),
