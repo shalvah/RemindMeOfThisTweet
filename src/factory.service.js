@@ -65,7 +65,10 @@ const make = (cache, twitter) => {
         const isReminderCancellation = tweet => tweet.text.match(/\bcancel\b/i) && tweet.referencing_tweet;
 
         if (isReminderCancellation(tweet)) {
-            return cancelReminder(tweet);
+            return {
+                cancel: true,
+                tweet
+            };
         }
 
         return parseReminderTime(tweet);
@@ -86,6 +89,10 @@ const make = (cache, twitter) => {
 
     const handleParsingResult = async (result) => {
         console.log(result);
+        if (result.cancel) {
+            return await cancelReminder(result.tweet);
+        }
+
         if (result.remindAt) {
             const date = getDateToNearestMinute(result.remindAt).toISOString();
             await scheduleReminder(result.tweet, date);
