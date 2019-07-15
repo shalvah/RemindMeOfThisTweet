@@ -56,6 +56,11 @@ module.exports = (cache) => {
     };
 
     const reply = async (tweet, content) => {
+        let noReply = await cache.getAsync('no-reply');
+        if (noReply == 1) {
+            return true;
+        }
+
         let options = {
             in_reply_to_status_id: tweet.id,
             status: `@${tweet.author} ${content}`
@@ -77,21 +82,16 @@ module.exports = (cache) => {
     };
 
     const replyWithReminder = async (tweet) => {
-        let noReply = await cache.getAsync('no-reply');
-        if (noReply == 1) {
-            return true;
-        }
-
         let content = randomReminderMessage(tweet.author, tweet.referencing_tweet || tweet.id);
         return reply(tweet, content);
     };
 
-    const replyWithAcknowledgement = async (tweet, date) => {
-        let noReply = await cache.getAsync('no-reply');
-        if (noReply == 1) {
-            return true;
-        }
+    const replyWithCancellation = async (tweet) => {
+        let content = "Reminder cancelled.";
+        return reply(tweet, content);
+    };
 
+    const replyWithAcknowledgement = async (tweet, date) => {
         let content = randomAcknowledgementMessage(
             date,
             tweet.author,
@@ -121,6 +121,7 @@ module.exports = (cache) => {
     return {
         replyWithReminder,
         replyWithAcknowledgement,
+        replyWithCancellation,
         fetchAllMentions
     };
 

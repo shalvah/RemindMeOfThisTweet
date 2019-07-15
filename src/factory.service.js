@@ -33,12 +33,23 @@ const make = (cache, twitter) => {
     };
 
     const cancelReminder = async (tweet) => {
-        const ruleName = await cache.getAsync(tweet.referencing_tweet + '-' + tweet.author);
-        if (ruleName) {
-            return await Promise.all([
-                unscheduleLambda(ruleName),
-                cache.delAsync(tweet.referencing_tweet),
-            ]);
+        const cacheKey = tweet.referencing_tweet + '-' + tweet.author;
+        let reminderDetails = await cache.getAsync(cacheKey);
+        if (reminderDetails) {
+            reminderDetails = JSON.parse(reminderDetails);
+            const remindersOnThatDate = await cache.lrangeAsync(reminderDetails.date, 0, -1);
+            const indexOfTheReminderWeWant = remindersOnThatDate.map(JSON.parse)
+                .findIndex(r => (r.author == tweet.author) && (reminderDetails.original_tweet == r.id));
+            if (indexOfTheReminderWeWant) {
+                await Promise.all([
+                    cache.delAsync(cacheKey),
+                    // Atomic way to remove element from Redis list by index
+                    cache.lsetAsync(reminderDetails.date, indexOfTheReminderWeWant, "__TODELETE__")
+                        .then(() => cache.lremAsync(reminderDetails.date, 1, "__TODELETE__"))
+                ]);
+                await twitter.replyWithCancellation(tweet);
+            }
+
         }
         return true;
     };
@@ -56,41 +67,8 @@ const make = (cache, twitter) => {
         return parseReminderTime(tweet);
     };
 
-    const scheduleLambda = async (scheduleAt, data, ruleName) => {
-        const AWS = require('aws-sdk');
-        const cwevents = new AWS.CloudWatchEvents({region: 'us-east-1'});
-        const ruleParams = {
-            Name: ruleName,
-            ScheduleExpression: scheduleAt,
-            State: 'ENABLED'
-        };
-
-        await cwevents.putRule(ruleParams).promise();
-
-        const input = {data, ruleName};
-        const targetParams = {
-            Rule: ruleName,
-            Targets: [
-                {
-                    Arn: process.env.LAMBDA_FUNCTION_ARN,
-                    Id: ruleName,
-                    Input: JSON.stringify(input)
-                }
-            ],
-        };
-        return cwevents.putTargets(targetParams).promise()
-            .then(r => {
-                console.log(r);
-                return {ruleName, status: 'SUCCESS'};
-            })
-            .catch(r => {
-                console.log(r);
-                return {ruleName, status: 'FAIL'};
-            });
-    };
-
     const scheduleReminder = (tweet, date) => {
-        return cache.lpushAsync(getDateToNearestMinute(date).toISOString(), [JSON.stringify(tweet)]);
+        return cache.lpushAsync(date, [JSON.stringify(tweet)]);
     };
 
     const notifyUserOfReminder = (tweet, date) => {
@@ -105,17 +83,18 @@ const make = (cache, twitter) => {
     const handleParsingResult = async (result) => {
         console.log(result);
         if (result.remindAt) {
+            const date = getDateToNearestMinute(result.remindAt).toISOString();
+            await scheduleReminder(result.tweet, date);
+            const reminderNotificationTweetId = await notifyUserOfReminder(result.tweet, result.remindAt);
+            const cacheKey = reminderNotificationTweetId + "-" + result.tweet.author;
+            const reminderDetails = {
+                date,
+                original_tweet: result.tweet.id
+            };
             return await Promise.all([
-                cache.lpushAsync('PARSE_SUCCESS', [JSON.stringify(result.tweet)]),
-                scheduleReminder(result.tweet, result.remindAt)
-                    .then(() => metrics.newReminderSet(result)),
-                notifyUserOfReminder(result.tweet, result.remindAt),
+                metrics.newReminderSet(result),
+                cache.setAsync(cacheKey, JSON.stringify(reminderDetails), 'EX', 48 * 60 * 60), // can cancel reminder for up to two days later
             ]);
-        } else if (result.error) {
-            await cache.lpushAsync(result.error, [JSON.stringify(result.tweet)]);
-            return result.error;
-        } else {
-            return true;
         }
     };
 
@@ -142,7 +121,6 @@ const make = (cache, twitter) => {
 
     return {
         cleanup,
-        scheduleLambda,
         handleParsingResult,
         parseReminderTime,
         handleMention
