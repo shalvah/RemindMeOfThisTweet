@@ -37,6 +37,7 @@ const make = (cache, twitter) => {
         console.log("CANCEL " + { cacheKey });
         let reminderDetails = await cache.getAsync(cacheKey);
         console.log("CANCEL " + { reminderDetails });
+
         if (reminderDetails) {
             reminderDetails = JSON.parse(reminderDetails);
             const remindersOnThatDate = await cache.lrangeAsync(reminderDetails.date, 0, -1);

@@ -82,7 +82,7 @@ module.exports = (cache) => {
     };
 
     const replyWithReminder = async (tweet) => {
-        let content = randomReminderMessage(tweet.author, tweet.referencing_tweet || tweet.id);
+        let content = randomReminderMessage(tweet.author, tweet.id);
         return reply(tweet, content);
     };
 
@@ -95,7 +95,7 @@ module.exports = (cache) => {
         let content = randomAcknowledgementMessage(
             date,
             tweet.author,
-            tweet.referencing_tweet || tweet.id
+            tweet.id
         );
         return reply(tweet, content);
     };
