@@ -70,13 +70,13 @@ module.exports = (cache) => {
             .catch(e => handleTwitterErrors('statuses/update', e))
             .catch(e => {
                 return aargh(e)
-                    .type([RateLimited], (e) => {
+                    .type([RateLimited], async (e) => {
                         // not sending any more replies for a few minutes
                         // to avoid Twitter blocking our API access
                         console.log(`Error: ${e.code}, backing off for 10 minutes`);
-                        return cache.setAsync('no-reply', 1, 'EX', 60 * 10);
+                        await cache.setAsync('no-reply', 1, 'EX', 60 * 10);
                     })
-                    .type(BadRequest, (e) => console.log(e.valueOf()))
+                    .type(BadRequest)
                     .throw();
             });
     };
