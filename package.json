@@ -1,4 +1,5 @@
 {
+  "license": "MIT",
   "dependencies": {
     "aargh": "^1.1.0",
     "aws-sdk": "^2.463.0",
