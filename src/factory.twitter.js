@@ -10,7 +10,7 @@ const {
         RateLimited,
         BadRequest,
     },
-    handleTwitterErrors
+    wrapTwitterErrors
 } = require('twitter-error-handler');
 const aargh = require('aargh');
 
@@ -36,7 +36,7 @@ module.exports = (cache) => {
         }
         return t.get('statuses/mentions_timeline', options)
             .then(r => r.data)
-            .catch(e => handleTwitterErrors('statuses/mentions_timeline', e))
+            .catch(e => wrapTwitterErrors('statuses/mentions_timeline', e))
             .then(tweets => tweets.map(tweetObject => {
                 return {
                     id: tweetObject.id_str,
@@ -67,7 +67,7 @@ module.exports = (cache) => {
         };
         return t.post('statuses/update', options)
             .then((r) => r.data)
-            .catch(e => handleTwitterErrors('statuses/update', e))
+            .catch(e => wrapTwitterErrors('statuses/update', e))
             .catch(e => {
                 return aargh(e)
                     .type([RateLimited], async (e) => {
