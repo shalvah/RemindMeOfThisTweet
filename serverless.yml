@@ -71,6 +71,7 @@ functions:
 
   checkForRemindersAndSend:
     handler: handler.checkForRemindersAndSend
+    timeout: 15
     events:
     - schedule: rate(1 minute)
     alarms:
