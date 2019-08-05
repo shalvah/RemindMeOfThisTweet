@@ -58,7 +58,7 @@ module.exports = (cache) => {
     const reply = async (tweet, content) => {
         let noReply = await cache.getAsync('no-reply');
         if (noReply == 1) {
-            return true;
+            return;
         }
 
         let options = {
@@ -76,7 +76,7 @@ module.exports = (cache) => {
                         console.log(`Error: ${e.code}, backing off for 10 minutes`);
                         await cache.setAsync('no-reply', 1, 'EX', 60 * 10);
                     })
-                    .type(BadRequest)
+                    .type(BadRequest, () => null)
                     .throw();
             });
     };

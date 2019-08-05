@@ -80,7 +80,7 @@ const make = (cache, twitter) => {
 
     const notifyUserOfReminder = (tweet, date) => {
         return twitter.replyWithAcknowledgement(tweet, date)
-            .then(r => r.id_str)
+            .then(r => r ? r.id_str : null)
             .catch(e => {
                 console.log(`Couldn't notify user: ${JSON.stringify(tweet)} - Error: ${e.valueOf()}`);
                 throw e;
@@ -97,15 +97,17 @@ const make = (cache, twitter) => {
             const date = getDateToNearestMinute(result.remindAt).toISOString();
             await scheduleReminder(result.tweet, date);
             const reminderNotificationTweetId = await notifyUserOfReminder(result.tweet, result.remindAt);
-            const cacheKey = reminderNotificationTweetId + "-" + result.tweet.author;
-            const reminderDetails = {
-                date,
-                original_tweet: result.tweet.id
-            };
-            return await Promise.all([
-                metrics.newReminderSet(result),
-                cache.setAsync(cacheKey, JSON.stringify(reminderDetails), 'EX', 48 * 60 * 60), // can cancel reminder for up to two days later
-            ]);
+            if (reminderNotificationTweetId) {
+                const cacheKey = reminderNotificationTweetId + "-" + result.tweet.author;
+                const reminderDetails = {
+                    date,
+                    original_tweet: result.tweet.id
+                };
+                return await Promise.all([
+                    metrics.newReminderSet(result),
+                    cache.setAsync(cacheKey, JSON.stringify(reminderDetails), 'EX', 48 * 60 * 60), // can cancel reminder for up to two days later
+                ]);
+            }
         }
     };
 
