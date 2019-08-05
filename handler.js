@@ -10,11 +10,7 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
     console.log(body);
 
     if (!body.tweet_create_events) {
-        callback(null, {
-            statusCode: 200,
-            body: 'ok'
-        });
-        return;
+        return finish(callback).success(`No new tweets`)
     }
 
     const cache = await makeCache();
