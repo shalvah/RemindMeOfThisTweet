@@ -51,6 +51,7 @@ package:
 functions:
   handleAccountActivity:
     handler: handler.handleAccountActivity
+    timeout: 15
     events:
     - http:
         path: /webhook
@@ -71,7 +72,7 @@ functions:
 
   checkForRemindersAndSend:
     handler: handler.checkForRemindersAndSend
-    timeout: 15
+    timeout: 20
     events:
     - schedule: rate(1 minute)
     alarms:
