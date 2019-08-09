@@ -51,7 +51,7 @@ package:
 functions:
   handleAccountActivity:
     handler: handler.handleAccountActivity
-    timeout: 15
+    timeout: 30
     events:
     - http:
         path: /webhook
