@@ -21,6 +21,9 @@ jobs:
   - stage: test
     script: npm run test
 
+  - stage: lint
+    script: npm run lint
+
   - stage: deploy
     env: LAMBDA_FUNCTION_NAME=RemindMeOfThisTweet-dev-remind
     before_script:
