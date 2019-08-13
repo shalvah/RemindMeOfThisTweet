@@ -34,7 +34,7 @@ const make = (cache, twitter) => {
 
     const cancelReminder = async (tweet) => {
         const cacheKey = tweet.referencing_tweet + '-' + tweet.author;
-        console.log(`CANCEL ${{ cacheKey }}`);
+        console.log(`CANCEL ${JSON.stringify({ cacheKey })}`);
         let reminderDetails = await cache.getAsync(cacheKey);
 
         if (reminderDetails) {
@@ -44,7 +44,7 @@ const make = (cache, twitter) => {
             console.log({ remindersOnThatDate });
             const indexOfTheReminderWeWant = remindersOnThatDate.map(JSON.parse)
                 .findIndex(r => (r.author == tweet.author) && (reminderDetails.original_tweet == r.id));
-            if (indexOfTheReminderWeWant != null) {
+            if (indexOfTheReminderWeWant > -1) {
                 await Promise.all([
                     cache.delAsync(cacheKey),
                     // Atomic way to remove element from Redis list by index
