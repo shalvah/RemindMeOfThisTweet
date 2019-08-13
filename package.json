@@ -20,6 +20,6 @@
   },
   "scripts": {
     "test": "tap test/*.js",
-    "lint": "eslint src"
+    "lint": "eslint src handler.js"
   }
 }

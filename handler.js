@@ -41,11 +41,18 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
     });
 
 
-    if (allMentions.length) {
-        // for failure/recovery purposes
-        await cache.setAsync('lastTweetRetrieved', allMentions[allMentions.length - 1].id);
-        let results = allMentions.map(service.handleMention);
-        await Promise.all(results.map(service.handleParsingResult));
+    try {
+        if (allMentions.length) {
+            // for failure/recovery purposes
+            await cache.setAsync('lastTweetRetrieved', allMentions[allMentions.length - 1].id);
+            let results = allMentions.map(service.handleMention);
+            await Promise.all(results.map(service.handleParsingResult));
+        }
+    } catch (err) {
+        if (err instanceof (require("redis")).ReplyError) {
+            console.log(`Redis error: ${err.command} ${err.args} ${err}`);
+        }
+        throw err;
     }
 
     finish(callback, cache).success(`Handled ${allMentions.length} tweets`);
@@ -97,6 +104,7 @@ module.exports.checkForRemindersAndSend = async (event, context, callback) => {
 
 module.exports.retryFailedTasks = async (event, context, callback) => {
     const cache = await makeCache();
+    const service = makeService(cache);
     const failedTasks = await cache.lrangeAsync(event.queue || 'PARSE_TIME_FAILURE', 0, -1);
 
     if (!failedTasks.length) {
