@@ -16,7 +16,7 @@
     "serverless-dotenv-plugin": "^2.1.1",
     "serverless-mocha-plugin": "^1.10.0",
     "serverless-plugin-aws-alerts": "^1.2.4",
-    "tap": "^14.4.1"
+    "tap": "^14.6.1"
   },
   "scripts": {
     "test": "tap test/*.js",
