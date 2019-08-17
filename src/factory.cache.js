@@ -22,6 +22,7 @@ async function init() {
                 return undefined;
             }
             // reconnect after 1.5s
+            console.log("RETRY: Reconnecting in 1.5s");
             return 1500;
         }
     });
