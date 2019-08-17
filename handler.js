@@ -91,13 +91,21 @@ module.exports.checkForRemindersAndSend = async (event, context, callback) => {
     const twitter = makeTwitter(cache);
     const service = makeService(cache);
 
-    const key = getDateToNearestMinute().toISOString();
-    let reminders = await cache.lrangeAsync(key, 0, -1);
-    reminders = reminders.map(JSON.parse);
-    await Promise.all([
-        reminders.map(twitter.replyWithReminder),
-        cache.delAsync(key)
-    ]);
+    let reminders = [];
+    try {
+        const key = getDateToNearestMinute().toISOString();
+        reminders = await cache.lrangeAsync(key, 0, -1);
+        reminders = reminders.map(JSON.parse);
+        await Promise.all([
+            reminders.map(twitter.replyWithReminder),
+            cache.delAsync(key)
+        ]);
+    } catch (err) {
+        if (err instanceof (require("redis")).ReplyError) {
+            console.log(`Redis error: ${err.command} ${err.args} ${err}`);
+        }
+        throw err;
+    }
 
     finish(callback, cache).success(`Reminded for ${reminders.length} tweets`);
 };
