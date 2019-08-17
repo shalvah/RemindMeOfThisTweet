@@ -13,6 +13,7 @@ install: npm i && npm i -g serverless
 
 stages:
 - name: test
+- name: lint
 - name: deploy
   if: branch = master
 
