@@ -70,3 +70,9 @@ tap.equal(parsedDate.getDate(), 9);
 tap.equal(parsedDate.getMonth(), 6);
 tap.equal(parsedDate.getHours(), 19);
 tap.equal(parsedDate.getMinutes(), 0);
+
+parsedDate = getDate(scenario("on Friday by 9:30am"));
+tap.equal(parsedDate.getDate(), 14);
+tap.equal(parsedDate.getMonth(), 5);
+tap.equal(parsedDate.getHours(), 9);
+tap.equal(parsedDate.getMinutes(), 30);

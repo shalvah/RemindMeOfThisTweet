@@ -36,13 +36,13 @@ rollOverDayRefiner.refine = (text, results, opt) => {
 // Both produce two results each: one with the date and one with the time
 const combineDateAndTime = new chrono.Refiner();
 combineDateAndTime.refine = (text, results, opt) => {
-    if (results.length !==  2) {
+    if (results.length <  2) {
         // Our current data suggests this scenario only yields two results
         return results;
     }
 
    const resultWithDate = results.find((result) => {
-       return result.start.isCertain('day');
+       return result.start.isCertain('day') || result.start.isCertain('weekday');
    });
    const resultWithTime = results.find((result) => {
        return result.start.isCertain('hour');
