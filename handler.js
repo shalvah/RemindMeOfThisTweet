@@ -13,10 +13,6 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
         return finish(callback).success(`No new tweets`)
     }
 
-    const cache = await makeCache();
-    const twitter = makeTwitter(cache);
-    const service = makeService(cache, twitter);
-
     const allMentions = body.tweet_create_events.filter(tweet => {
         // ignore retweets, but accept quotes
         if (tweet.retweeted_status && !tweet.is_quote_status) {
@@ -40,8 +36,13 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
         };
     });
 
+    let cache;
 
     try {
+        cache = await makeCache();
+        const twitter = makeTwitter(cache);
+        const service = makeService(cache, twitter);
+
         if (allMentions.length) {
             // for failure/recovery purposes
             await cache.setAsync('lastTweetRetrieved', allMentions[allMentions.length - 1].id);
@@ -89,7 +90,6 @@ module.exports.remind = async (event, context, callback) => {
 module.exports.checkForRemindersAndSend = async (event, context, callback) => {
     const cache = await makeCache();
     const twitter = makeTwitter(cache);
-    const service = makeService(cache);
 
     let reminders = [];
     try {
