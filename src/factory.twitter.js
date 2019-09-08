@@ -58,6 +58,7 @@ module.exports = (cache) => {
     const reply = async (tweet, content) => {
         let noReply = await cache.getAsync('no-reply');
         if (noReply == 1) {
+            console.log("Twitter reply hiatus");
             return;
         }
 

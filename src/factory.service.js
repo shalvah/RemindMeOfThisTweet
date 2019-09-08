@@ -51,7 +51,7 @@ const make = (cache, twitter) => {
                     cache.lsetAsync(reminderDetails.date, indexOfTheReminderWeWant, "__TODELETE__")
                         .then(() => cache.lremAsync(reminderDetails.date, 1, "__TODELETE__"))
                 ]);
-                await twitter.replyWithCancellation(tweet);
+                // We don't send any cancellation acknowledgement bc Twitter API limits
             }
 
         }

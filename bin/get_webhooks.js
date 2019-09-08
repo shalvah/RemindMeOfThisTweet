@@ -6,7 +6,7 @@ require('dotenv').config('../.env');
 // first arg is environment name
 
 const options = {
-    url: 'https://api.twitter.com/1.1/account_activity/all/' + args[0] + '/webhooks.json',
+    url: 'https://api.twitter.com/1.1/account_activity/all/' + (args[0] || 'dev1') + '/webhooks.json',
     oauth: {
         consumer_key: process.env.TWITTER_CONSUMER_KEY,
         consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
