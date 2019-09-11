@@ -13,14 +13,20 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
         return finish(callback).success(`No new tweets`)
     }
 
+    const screenName = process.env.TWITTER_SCREEN_NAME;
     const allMentions = body.tweet_create_events.filter(tweet => {
         // ignore retweets, but accept quotes
         if (tweet.retweeted_status && !tweet.is_quote_status) {
             return false;
         }
 
+        // exclude manual retweets
+        if (tweet.text.startsWith(`RT @${screenName}:`)) {
+            return false;
+        }
+
         // ignore tweets by myself
-        if (tweet.user.screen_name === process.env.TWITTER_SCREEN_NAME) {
+        if (tweet.user.screen_name === screenName) {
             return false;
         }
 

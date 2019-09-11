@@ -98,6 +98,7 @@ const make = (cache, twitter) => {
             await scheduleReminder(result.tweet, date);
             const reminderNotificationTweetId = await notifyUserOfReminder(result.tweet, result.remindAt);
             if (reminderNotificationTweetId) {
+                // So the reminder can be cancelled.
                 const cacheKey = reminderNotificationTweetId + "-" + result.tweet.author;
                 const reminderDetails = {
                     date,
