@@ -5,7 +5,15 @@ const makeService = require('./src/factory.service');
 const makeCache = require('./src/factory.cache');
 const makeTwitter = require('./src/factory.twitter');
 
+const cache = await makeCache();
+const twitter = makeTwitter(cache);
+const service = makeService(cache, twitter);
+
 module.exports.handleAccountActivity = async (event, context, callback) => {
+    // Since we're using a single cache connection,
+    // we permit this instance of the function to exit without waiting for the cache
+    context.callbackWaitsForEmptyEventLoop = false;
+
     const body = JSON.parse(event.body);
     console.log(body);
 
@@ -42,12 +50,7 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
         };
     });
 
-    let cache;
-
     try {
-        cache = await makeCache();
-        const twitter = makeTwitter(cache);
-        const service = makeService(cache, twitter);
 
         if (allMentions.length) {
             // for failure/recovery purposes
@@ -62,7 +65,7 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
         throw err;
     }
 
-    finish(callback, cache).success(`Handled ${allMentions.length} tweets`);
+    finish(callback).success(`Handled ${allMentions.length} tweets`);
 };
 
 module.exports.handleTwitterCrc = async (event, context, callback) => {
@@ -90,7 +93,7 @@ module.exports.remind = async (event, context, callback) => {
         service.cleanup(event.ruleName),
     ]);
 
-    finish(callback, cache).success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
+    finish(callback).success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
 };
 
 module.exports.checkForRemindersAndSend = async (event, context, callback) => {
@@ -113,7 +116,7 @@ module.exports.checkForRemindersAndSend = async (event, context, callback) => {
         throw err;
     }
 
-    finish(callback, cache).success(`Reminded for ${reminders.length} tweets`);
+    finish(callback).success(`Reminded for ${reminders.length} tweets`);
 };
 
 module.exports.retryFailedTasks = async (event, context, callback) => {
@@ -122,7 +125,7 @@ module.exports.retryFailedTasks = async (event, context, callback) => {
     const failedTasks = await cache.lrangeAsync(event.queue || 'PARSE_TIME_FAILURE', 0, -1);
 
     if (!failedTasks.length) {
-        finish(callback, cache).success(`No tasks for retrying in queue ${event.queue}`);
+        finish(callback).success(`No tasks for retrying in queue ${event.queue}`);
         return;
     }
 
@@ -130,7 +133,7 @@ module.exports.retryFailedTasks = async (event, context, callback) => {
     let results = failedTasks.map(service.parseReminderTime);
     await Promise.all(results.map(service.handleParsingResult));
 
-    finish(callback, cache).success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
+    finish(callback).success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
 };
 
 module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => {
@@ -145,5 +148,5 @@ module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => 
     let results = allMentions.map(service.handleMention);
     await Promise.all(results.map(service.handleParsingResult));
 
-    finish(callback, cache).success(`Handled ${allMentions.length} tweets`);
+    finish(callback).success(`Handled ${allMentions.length} tweets`);
 };
