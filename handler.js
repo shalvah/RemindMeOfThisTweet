@@ -71,6 +71,8 @@ const makeTwitter = require('./src/factory.twitter');
     };
 
     module.exports.handleTwitterCrc = async (event, context, callback) => {
+        context.callbackWaitsForEmptyEventLoop = false;
+
         const crypto = require('crypto');
         const hmac = crypto.createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET)
             .update(event.queryStringParameters.crc_token).digest('base64');
@@ -85,9 +87,7 @@ const makeTwitter = require('./src/factory.twitter');
     };
 
     module.exports.remind = async (event, context, callback) => {
-        const cache = await makeCache();
-        const twitter = makeTwitter(cache);
-        const service = makeService(cache);
+        context.callbackWaitsForEmptyEventLoop = false;
 
         const tweet = event.data;
         await Promise.all([
@@ -99,8 +99,7 @@ const makeTwitter = require('./src/factory.twitter');
     };
 
     module.exports.checkForRemindersAndSend = async (event, context, callback) => {
-        const cache = await makeCache();
-        const twitter = makeTwitter(cache);
+        context.callbackWaitsForEmptyEventLoop = false;
 
         let reminders = [];
         try {
@@ -122,8 +121,8 @@ const makeTwitter = require('./src/factory.twitter');
     };
 
     module.exports.retryFailedTasks = async (event, context, callback) => {
-        const cache = await makeCache();
-        const service = makeService(cache);
+        context.callbackWaitsForEmptyEventLoop = false;
+
         const failedTasks = await cache.lrangeAsync(event.queue || 'PARSE_TIME_FAILURE', 0, -1);
 
         if (!failedTasks.length) {
@@ -139,9 +138,7 @@ const makeTwitter = require('./src/factory.twitter');
     };
 
     module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => {
-        const cache = await makeCache();
-        const twitter = makeTwitter(cache);
-        const service = makeService(cache, twitter);
+        context.callbackWaitsForEmptyEventLoop = false;
 
         console.log({inputData: event});
         const {from, to} = event;
