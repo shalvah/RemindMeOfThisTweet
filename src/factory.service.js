@@ -4,6 +4,7 @@ const parser = require('./timeparser');
 
 const { getDateToNearestMinute } = require('./utils');
 const metrics = require('./metrics');
+const aargh = require('aargh');
 
 const make = (cache, twitter) => {
 
@@ -42,16 +43,24 @@ const make = (cache, twitter) => {
             console.log({ reminderDetails });
             const remindersOnThatDate = await cache.lrangeAsync(reminderDetails.date, 0, -1);
             console.log({ remindersOnThatDate });
-            const indexOfTheReminderWeWant = remindersOnThatDate.map(JSON.parse)
-                .findIndex(r => (r.author == tweet.author) && (reminderDetails.original_tweet == r.id));
-            if (indexOfTheReminderWeWant > -1) {
-                await Promise.all([
-                    cache.delAsync(cacheKey),
-                    // Atomic way to remove element from Redis list by index
-                    cache.lsetAsync(reminderDetails.date, indexOfTheReminderWeWant, "__TODELETE__")
-                        .then(() => cache.lremAsync(reminderDetails.date, 1, "__TODELETE__"))
-                ]);
-                // We don't send any cancellation acknowledgement bc Twitter API limits
+            try {
+                const indexOfTheReminderWeWant = remindersOnThatDate.map(JSON.parse)
+                    .findIndex(r => (r.author == tweet.author) && (reminderDetails.original_tweet == r.id));
+                if (indexOfTheReminderWeWant > -1) {
+                    await Promise.all([
+                        cache.delAsync(cacheKey),
+                        // Atomic way to remove element from Redis list by index
+                        cache.lsetAsync(reminderDetails.date, indexOfTheReminderWeWant, "__TODELETE__")
+                            .then(() => cache.lremAsync(reminderDetails.date, 1, "__TODELETE__"))
+                            .catch(console.log) // We don't really care about this error
+                    ]);
+                    // We don't send any cancellation acknowledgement bc Twitter API limits
+                }
+            } catch (e) {
+                aargh(e)
+                // Probably from decoding JSON. The '__TODELETE__' element might still be there (race conditions)
+                    .type(SyntaxError, () => null)
+                    .throw();
             }
 
         }

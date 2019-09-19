@@ -5,7 +5,6 @@ const makeService = require('./src/factory.service');
 const makeCache = require('./src/factory.cache');
 const makeTwitter = require('./src/factory.twitter');
 
-
 (async () => {
     const cache = await makeCache();
     const twitter = makeTwitter(cache);
@@ -20,7 +19,8 @@ const makeTwitter = require('./src/factory.twitter');
         console.log(body);
 
         if (!body.tweet_create_events) {
-            return finish(callback).success(`No new tweets`)
+            finish(callback).success(`No new tweets`);
+            return;
         }
 
         const screenName = process.env.TWITTER_SCREEN_NAME;
