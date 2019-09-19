@@ -6,16 +6,15 @@ const finish = (cb, cache = null) => {
     return {
         success(body) {
             console.log(`Response: ${body}`);
-            const response = {
+            return {
                 statusCode: 200,
                 body
             };
-            cb(null, response);
         },
 
-        fail(body) {
-            console.log(`Fail response: ${body}`);
-            cb(body);
+        fail(err) {
+            console.log(`Fail response: ${err}`);
+            throw err;
         },
 
     }
