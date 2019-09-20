@@ -19,7 +19,7 @@ const makeTwitter = require('./src/factory.twitter');
         console.log(body);
 
         if (!body.tweet_create_events) {
-            finish(callback).success(`No new tweets`);
+            return finish(callback).success(`No new tweets`);
         }
 
         const screenName = process.env.TWITTER_SCREEN_NAME;
