@@ -7,7 +7,7 @@ plugins:
 provider:
   name: aws
   runtime: nodejs8.10
-  memorySize: 128
+  memorySize: 256
   logRetentionInDays: 30
   iamRoleStatements:
   - Effect: "Allow"
