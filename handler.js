@@ -5,8 +5,7 @@ const makeService = require('./src/factory.service');
 const makeCache = require('./src/factory.cache');
 const makeTwitter = require('./src/factory.twitter');
 
-(async () => {
-    const cache = await makeCache();
+makeCache().then(cache => {
     const twitter = makeTwitter(cache);
     const service = makeService(cache, twitter);
 
@@ -149,4 +148,4 @@ const makeTwitter = require('./src/factory.twitter');
         finish(callback).success(`Handled ${allMentions.length} tweets`);
     };
 
-})();
+});
