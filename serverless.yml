@@ -49,7 +49,7 @@ package:
   - "*.png"
   - .eslintrc.js
   - awscli-bundle.zip
-  - awscli-bundle
+  - awscli-bundle/**
 
 functions:
   handleAccountActivity:
