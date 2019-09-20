@@ -10,15 +10,16 @@ const makeTwitter = require('./src/factory.twitter');
     const twitter = makeTwitter(cache);
     const service = makeService(cache, twitter);
 
-    module.exports.handleAccountActivity = async (event, context) => {
+    module.exports.handleAccountActivity = async (event, context, cb) => {
         // Since we're using a single cache connection,
         // we permit this instance of the function to exit without waiting for the cache
+        context.callbackWaitsForEmptyEventLoop = false;
 
         const body = JSON.parse(event.body);
         console.log(body);
 
         if (!body.tweet_create_events) {
-            return finish().success(`No new tweets`);
+            return finish(cb).success(`No new tweets`);
         }
 
         const screenName = process.env.TWITTER_SCREEN_NAME;
@@ -65,7 +66,7 @@ const makeTwitter = require('./src/factory.twitter');
             throw err;
         }
 
-        return finish().success(`Handled ${allMentions.length} tweets`);
+        return finish(cb).success(`Handled ${allMentions.length} tweets`);
     };
 
     module.exports.handleTwitterCrc = async (event, context, callback) => {
@@ -84,7 +85,7 @@ const makeTwitter = require('./src/factory.twitter');
         callback(null, response);
     };
 
-    module.exports.remind = async (event, context) => {
+    module.exports.remind = async (event, context, cb) => {
         context.callbackWaitsForEmptyEventLoop = false;
 
         const tweet = event.data;
@@ -93,7 +94,7 @@ const makeTwitter = require('./src/factory.twitter');
             service.cleanup(event.ruleName),
         ]);
 
-        return finish().success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
+        return finish(cb).success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
     };
 
     module.exports.checkForRemindersAndSend = async (event, context, callback) => {
@@ -118,23 +119,23 @@ const makeTwitter = require('./src/factory.twitter');
         return finish(callback).success(`Reminded for ${reminders.length} tweets`);
     };
 
-    module.exports.retryFailedTasks = async (event, context) => {
+    module.exports.retryFailedTasks = async (event, context, cb) => {
         context.callbackWaitsForEmptyEventLoop = false;
 
         const failedTasks = await cache.lrangeAsync(event.queue || 'PARSE_TIME_FAILURE', 0, -1);
 
         if (!failedTasks.length) {
-            return finish().success(`No tasks for retrying in queue ${event.queue}`);
+            return finish(cb).success(`No tasks for retrying in queue ${event.queue}`);
         }
 
         await cache.delAsync(event.queue);
         let results = failedTasks.map(service.parseReminderTime);
         await Promise.all(results.map(service.handleParsingResult));
 
-        return finish().success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
+        return finish(cb).success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
     };
 
-    module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => {
+    module.exports.fetchTweetsAndSetReminders = async (event, context, cb) => {
         context.callbackWaitsForEmptyEventLoop = false;
 
         console.log({inputData: event});
@@ -144,7 +145,7 @@ const makeTwitter = require('./src/factory.twitter');
         let results = allMentions.map(service.handleMention);
         await Promise.all(results.map(service.handleParsingResult));
 
-        return finish().success(`Handled ${allMentions.length} tweets`);
+        return finish(cb).success(`Handled ${allMentions.length} tweets`);
     };
 
 })();
