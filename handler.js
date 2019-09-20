@@ -13,7 +13,6 @@ const makeTwitter = require('./src/factory.twitter');
     module.exports.handleAccountActivity = async (event, context) => {
         // Since we're using a single cache connection,
         // we permit this instance of the function to exit without waiting for the cache
-        context.callbackWaitsForEmptyEventLoop = false;
 
         const body = JSON.parse(event.body);
         console.log(body);
