@@ -2,10 +2,9 @@
 
 const {finish, getDateToNearestMinute} = require('./src/utils');
 const makeService = require('./src/factory.service');
-const makeCache = require('./src/factory.cache');
+const cache = require('./src/factory.cache');
 const makeTwitter = require('./src/factory.twitter');
 
-makeCache().then(cache => {
     const twitter = makeTwitter(cache);
     const service = makeService(cache, twitter);
 
@@ -147,5 +146,3 @@ makeCache().then(cache => {
 
         finish(callback).success(`Handled ${allMentions.length} tweets`);
     };
-
-});

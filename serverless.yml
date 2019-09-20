@@ -38,7 +38,7 @@ provider:
 
 package:
   exclude:
-  - README.md
+  - "*".md"
   - bin/**
   - .gitignore
   - .env
