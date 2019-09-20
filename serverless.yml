@@ -38,7 +38,7 @@ provider:
 
 package:
   exclude:
-  - "*".md"
+  - "*.md"
   - bin/**
   - .gitignore
   - .env
@@ -47,6 +47,9 @@ package:
   - .git/**
   - test/**
   - "*.png"
+  - .eslintrc.js
+  - awscli-bundle.zip
+  - awscli-bundle
 
 functions:
   handleAccountActivity:
