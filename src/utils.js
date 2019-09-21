@@ -1,6 +1,6 @@
 'use strict';
 
-const finish = (cb = null, cache = null) => {
+const finish = (cb = () => {}, cache = null) => {
     if (cache) cache.quit();
 
     return {
