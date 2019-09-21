@@ -68,7 +68,7 @@ module.exports = (cache) => {
         };
         return t.post('statuses/update', options)
             .then((r) => r.data)
-            .catch(e => wrapTwitterErrors('statuses/update', e))
+            .catch(e => (console.log(e), wrapTwitterErrors('statuses/update', e)))
             .catch(e => {
                 return aargh(e)
                     .type([RateLimited], async (e) => {
