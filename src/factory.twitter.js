@@ -83,6 +83,7 @@ module.exports = (cache) => {
     };
 
     const replyWithReminder = async (tweet) => {
+        console.log("Reminding for tweet: " + JSON.stringify(tweet));
         let content = randomReminderMessage(tweet.author, tweet.id);
         return reply(tweet, content);
     };
