@@ -2,11 +2,12 @@
   "license": "MIT",
   "dependencies": {
     "aargh": "^1.2.0",
-    "aws-sdk": "^2.532.0",
+    "aws-sdk": "^2.533.0",
     "chrono-node": "^1.3.11",
+    "moment": "^2.24.0",
     "redis": "^2.8.0",
     "twit": "^2.2.11",
-    "twitter-error-handler": "^2.0.0"
+    "twitter-error-handler": "^2.0.1"
   },
   "devDependencies": {
     "dotenv": "^6.2.0",
@@ -19,7 +20,7 @@
     "tap": "^14.6.4"
   },
   "scripts": {
-    "test": "tap test/*.js",
+    "test": "tap test/**",
     "lint": "eslint src handler.js"
   }
 }

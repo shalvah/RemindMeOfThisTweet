@@ -68,7 +68,6 @@ combineDateAndTime.refine = (text, results, opt) => {
 const hrsMinsParser = new chrono.Parser();
 hrsMinsParser.pattern = () => /(\d+)\s*hrs?(\s+(\d+)\s*min(s|ute|utes)?)?/i; // Match a pattern like "in 22hrs (30 mins)"
 hrsMinsParser.extract = (text, ref, match, opt) => {
-    console.log(ref)
     let dateMoment = require('moment')(ref);
     dateMoment = dateMoment.add(match[1], 'hours');
     dateMoment = dateMoment.add(match[3], 'minutes');
