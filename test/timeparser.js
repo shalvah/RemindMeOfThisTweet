@@ -76,3 +76,15 @@ tap.equal(parsedDate.getDate(), 14);
 tap.equal(parsedDate.getMonth(), 5);
 tap.equal(parsedDate.getHours(), 9);
 tap.equal(parsedDate.getMinutes(), 30);
+
+parsedDate = getDate(scenario("in 22hrs 30mins"));
+tap.equal(parsedDate.getDate(), 13);
+tap.equal(parsedDate.getMonth(), 5);
+tap.equal(parsedDate.getHours(), 1);
+tap.equal(parsedDate.getMinutes(), 30);
+
+parsedDate = getDate(scenario("in 30 mins"));
+tap.equal(parsedDate.getDate(), 12);
+tap.equal(parsedDate.getMonth(), 5);
+tap.equal(parsedDate.getHours(), 3);
+tap.equal(parsedDate.getMinutes(), 30);

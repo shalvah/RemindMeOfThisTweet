@@ -65,9 +65,32 @@ combineDateAndTime.refine = (text, results, opt) => {
     return results;
 };
 
+const hrsMinsParser = new chrono.Parser();
+hrsMinsParser.pattern = () => /(\d+)\s*hrs?(\s+(\d+)\s*min(s|ute|utes)?)?/i; // Match a pattern like "in 22hrs (30 mins)"
+hrsMinsParser.extract = (text, ref, match, opt) => {
+    console.log(ref)
+    let dateMoment = require('moment')(ref);
+    dateMoment = dateMoment.add(match[1], 'hours');
+    dateMoment = dateMoment.add(match[3], 'minutes');
+    return new chrono.ParsedResult({
+        ref: ref,
+        text: match[0],
+        index: match.index,
+        start: {
+            hour: dateMoment.hour(),
+            minute: dateMoment.minute(),
+            second: dateMoment.second(),
+            day: dateMoment.date(),
+            month: dateMoment.month() + 1,
+            year: dateMoment.year(),
+        }
+    });
+};
+
 
 
 const parser = chrono.en_GB;
+parser.parsers.push(hrsMinsParser);
 parser.refiners.push(rollOverYearRefiner);
 parser.refiners.push(rollOverDayRefiner);
 parser.refiners.push(combineDateAndTime);
