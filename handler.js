@@ -104,7 +104,7 @@ module.exports.checkForRemindersAndSend = async (event, context, callback) => {
         reminders = await cache.lrangeAsync(key, 0, -1);
         reminders = reminders.map(JSON.parse);
         await Promise.all([
-            reminders.map(twitter.replyWithReminder),
+                ...reminders.map(twitter.replyWithReminder),
             cache.delAsync(key)
         ]);
     } catch (err) {

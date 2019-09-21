@@ -67,7 +67,7 @@ module.exports = (cache) => {
             status: `@${tweet.author} ${content}`
         };
         return t.post('statuses/update', options)
-            .then((r) => r.data)
+            .then(r => r.data)
             .catch(e => (console.log(e), wrapTwitterErrors('statuses/update', e)))
             .catch(e => {
                 return aargh(e)
