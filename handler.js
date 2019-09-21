@@ -6,10 +6,6 @@ const service = require('./src/factory.service')(cache, twitter);
 const {finish, getDateToNearestMinute} = require('./src/utils');
 
 module.exports.handleAccountActivity = async (event, context) => {
-    // Since we're using a single cache connection,
-    // we permit this instance of the function to exit without waiting for the cache
-    context.callbackWaitsForEmptyEventLoop = false;
-
     const body = JSON.parse(event.body);
     console.log(body);
 
