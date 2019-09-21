@@ -5,7 +5,7 @@ const twitter = require('./src/factory.twitter')(cache);
 const service = require('./src/factory.service')(cache, twitter);
 const {finish, getDateToNearestMinute} = require('./src/utils');
 
-module.exports.handleAccountActivity = async (event, context, callback) => {
+module.exports.handleAccountActivity = async (event, context) => {
     // Since we're using a single cache connection,
     // we permit this instance of the function to exit without waiting for the cache
     context.callbackWaitsForEmptyEventLoop = false;
@@ -14,7 +14,7 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
     console.log(body);
 
     if (!body.tweet_create_events) {
-        return finish(callback).success(`No new tweets`);
+        return finish().success(`No new tweets`);
     }
 
     const screenName = process.env.TWITTER_SCREEN_NAME;
@@ -61,7 +61,7 @@ module.exports.handleAccountActivity = async (event, context, callback) => {
         throw err;
     }
 
-    finish(callback).success(`Handled ${allMentions.length} tweets`);
+    return finish().success(`Handled ${allMentions.length} tweets`);
 };
 
 module.exports.handleTwitterCrc = async (event, context, callback) => {
