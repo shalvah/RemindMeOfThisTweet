@@ -60,9 +60,7 @@ module.exports.handleAccountActivity = async (event, context) => {
     return finish().success(`Handled ${allMentions.length} tweets`);
 };
 
-module.exports.handleTwitterCrc = async (event, context, callback) => {
-    context.callbackWaitsForEmptyEventLoop = false;
-
+module.exports.handleTwitterCrc = async (event, context) => {
     const crypto = require('crypto');
     const hmac = crypto.createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET)
         .update(event.queryStringParameters.crc_token).digest('base64');
@@ -73,24 +71,21 @@ module.exports.handleTwitterCrc = async (event, context, callback) => {
         },
         body: JSON.stringify({response_token: 'sha256=' + hmac})
     };
-    callback(null, response);
+    console.log("CRC handled");
+    return response;
 };
 
-module.exports.remind = async (event, context, callback) => {
-    context.callbackWaitsForEmptyEventLoop = false;
-
+module.exports.remind = async (event, context) => {
     const tweet = event.data;
     await Promise.all([
         twitter.replyWithReminder(tweet),
         service.cleanup(event.ruleName),
     ]);
 
-    finish(callback).success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
+    return finish().success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
 };
 
-module.exports.checkForRemindersAndSend = async (event, context, callback) => {
-    context.callbackWaitsForEmptyEventLoop = false;
-
+module.exports.checkForRemindersAndSend = async (event, context) => {
     let reminders = [];
     try {
         const key = getDateToNearestMinute().toISOString();
@@ -107,29 +102,24 @@ module.exports.checkForRemindersAndSend = async (event, context, callback) => {
         throw err;
     }
 
-    finish(callback).success(`Reminded for ${reminders.length} tweets`);
+    return finish().success(`Reminded for ${reminders.length} tweets`);
 };
 
-module.exports.retryFailedTasks = async (event, context, callback) => {
-    context.callbackWaitsForEmptyEventLoop = false;
-
+module.exports.retryFailedTasks = async (event, context) => {
     const failedTasks = await cache.lrangeAsync(event.queue || 'PARSE_TIME_FAILURE', 0, -1);
 
     if (!failedTasks.length) {
-        finish(callback).success(`No tasks for retrying in queue ${event.queue}`);
-        return;
+        return finish().success(`No tasks for retrying in queue ${event.queue}`);
     }
 
     await cache.delAsync(event.queue);
     let results = failedTasks.map(service.parseReminderTime);
     await Promise.all(results.map(service.handleParsingResult));
 
-    finish(callback).success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
+    return finish().success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
 };
 
-module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => {
-    context.callbackWaitsForEmptyEventLoop = false;
-
+module.exports.fetchTweetsAndSetReminders = async (event, context) => {
     console.log({inputData: event});
     const {from, to} = event;
     const allMentions = await twitter.fetchAllMentions(from, to);
@@ -137,5 +127,5 @@ module.exports.fetchTweetsAndSetReminders = async (event, context, callback) => 
     let results = allMentions.map(service.handleMention);
     await Promise.all(results.map(service.handleParsingResult));
 
-    finish(callback).success(`Handled ${allMentions.length} tweets`);
+    return finish().success(`Handled ${allMentions.length} tweets`);
 };
