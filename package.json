@@ -20,7 +20,7 @@
     "tap": "^14.6.4"
   },
   "scripts": {
-    "test": "tap test/**",
+    "test": "tap test/** --reporter list",
     "lint": "eslint src handler.js"
   }
 }

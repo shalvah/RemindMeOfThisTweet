@@ -11,11 +11,13 @@ const finish = (cb = null, cache = null) => {
                 body
             };
             cb(null, response);
+            return response;
         },
 
         fail(err) {
             console.log(`Fail response: ${err}`);
             cb(err);
+            throw err;
         },
 
     }

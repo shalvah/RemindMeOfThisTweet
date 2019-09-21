@@ -1,12 +1,9 @@
 'use strict';
 
-const cache = require('./src/factory.cache');
+const cache = require('./src/cache');
+const twitter = require('./src/factory.twitter')(cache);
+const service = require('./src/factory.service')(cache, twitter);
 const {finish, getDateToNearestMinute} = require('./src/utils');
-const makeService = require('./src/factory.service');
-const makeTwitter = require('./src/factory.twitter');
-
-const twitter = makeTwitter(cache);
-const service = makeService(cache, twitter);
 
 module.exports.handleAccountActivity = async (event, context, callback) => {
     // Since we're using a single cache connection,
