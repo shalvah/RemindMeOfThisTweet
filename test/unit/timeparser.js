@@ -7,7 +7,7 @@ let MOCK_DATE_IN_USE;
 function mockDate(date) {
     const dateForTesting = date || DEFAULT_MOCK_DATE;
     const tzOffset = 0;
-    console.log(`Using date ${dateForTesting} with timezone offset ${tzOffset} (${dateForTesting.toISOString()}) for testing`);
+    console.log(`Timeparser: Using date ${dateForTesting} with timezone offset ${tzOffset} (${dateForTesting.toISOString()}) for testing`);
     const MockDate = require('mockdate');
     MockDate.set(dateForTesting, tzOffset);
     MOCK_DATE_IN_USE = dateForTesting

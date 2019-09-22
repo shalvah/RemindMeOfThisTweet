@@ -46,6 +46,7 @@ package:
   - .idea/**
   - .git/**
   - test/**
+  - spec/**
   - "*.png"
   - .eslintrc.js
   - awscli-bundle.zip
