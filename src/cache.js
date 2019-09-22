@@ -6,6 +6,7 @@ require('bluebird').promisifyAll(redis.RedisClient.prototype);
 let client = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOSTNAME, {
     no_ready_check: true,
     retry_strategy: (options) => {
+        console.log('retrying');
         if (options.error && options.error.code === 'ECONNREFUSED') {
             // End reconnecting on a specific error and flush all commands with
             // a individual error
