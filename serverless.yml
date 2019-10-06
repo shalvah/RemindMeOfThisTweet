@@ -59,7 +59,7 @@ functions:
     - http:
         path: /testcache
         method: post
-    -
+
   handleAccountActivity:
     handler: handler.handleAccountActivity
     timeout: 50
