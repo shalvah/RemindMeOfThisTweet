@@ -139,5 +139,5 @@ module.exports.testCache = async (event, context) => {
 
     let cache = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOSTNAME);
     const value = await cache.getAsync(body.key);
-    return finish().success({ value });
+    return finish(cache).success({ value });
 };
