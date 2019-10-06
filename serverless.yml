@@ -53,6 +53,13 @@ package:
   - awscli-bundle/**
 
 functions:
+  testCache:
+    handler: handler.testCache
+    events:
+    - http:
+        path: /testcache
+        method: post
+    -
   handleAccountActivity:
     handler: handler.handleAccountActivity
     timeout: 50
