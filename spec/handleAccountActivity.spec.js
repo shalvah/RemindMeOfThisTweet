@@ -5,14 +5,13 @@ const screenName = process.env.TWITTER_SCREEN_NAME;
 const {createWebhookEvent, createUser, createTweetCreateEvent, createRetweet, createTweet} = require("./support/utils");
 const getDateToNearestMinute = require("../src/utils").getDateToNearestMinute;
 
-const proxyquire = require('proxyquire');
 const { mockCache, mockDate, mockTwitterAPI, mockMetrics } = require("./support/mocks");
 const cache = mockCache();
 const today = mockDate();
 mockMetrics();
 mockTwitterAPI();
 
-const handleAccountActivity = proxyquire('../handler', {'./src/cache': cache}).handleAccountActivity;
+const handleAccountActivity = require('../handler').handleAccountActivity;
 
 describe("handleAccountActivity", () => {
 
