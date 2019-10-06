@@ -137,7 +137,9 @@ module.exports.testCache = async (event, context) => {
     const redis = require("redis");
     require('bluebird').promisifyAll(redis.RedisClient.prototype);
 
-    let cache = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOSTNAME);
+    let cache = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOSTNAME,  {
+        no_ready_check: true});
     const value = await cache.getAsync(body.key);
+    console.log({ value })
     return finish(cache).success({ value });
 };
