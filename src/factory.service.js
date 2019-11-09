@@ -9,7 +9,9 @@ const aargh = require('aargh');
 const make = (cache, twitter) => {
 
     const parseTweetText = (lastMentionIndex, refDate, tweet) => {
+        console.log(lastMentionIndex);
         let textToParse = tweet.text.substring(lastMentionIndex);
+        console.log(textToParse);
         let results = parser.parse(textToParse, refDate, {forwardDate: true});
         if (results.length) {
             const reminderTime = results[0].start.date();
@@ -21,24 +23,23 @@ const make = (cache, twitter) => {
                 };
             }
 
-            let firstMentionIndex = tweet.text.indexOf(`@${process.env.TWITTER_SCREEN_NAME}`);
-            if (lastMentionIndex === firstMentionIndex) {
+            if (lastMentionIndex === 0) {
                 return {
                     failure: "TIME_IN_PAST",
                     tweet
                 };
             }
-            return parseTweetText(firstMentionIndex, refDate, tweet);
 
+            return parseTweetText(0, refDate, tweet);
         }
-        let firstMentionIndex = tweet.text.indexOf(`@${process.env.TWITTER_SCREEN_NAME}`);
-        if (lastMentionIndex === firstMentionIndex) {
+
+        if (lastMentionIndex === 0) {
             return {
                 failure: "PARSE_TIME_FAILURE",
                 tweet
             };
         }
-        return parseTweetText(firstMentionIndex, refDate, tweet);
+        return parseTweetText(0, refDate, tweet);
 
     };
 
