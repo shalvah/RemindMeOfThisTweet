@@ -2,15 +2,15 @@
 
 const parser = require('./timeparser');
 
-const { getDateToNearestMinute } = require('./utils');
+const {getDateToNearestMinute} = require('./utils');
 const metrics = require('./metrics');
 const aargh = require('aargh');
 
 const make = (cache, twitter) => {
 
-    const parseReminderTime = (tweet) => {
-        const refDate = new Date(tweet.created_at);
-        let results = parser.parse(tweet.text, refDate, {forwardDate: true});
+    const parseTweetText = (lastMentionIndex, refDate, tweet) => {
+        let textToParse = tweet.text.substring(lastMentionIndex);
+        let results = parser.parse(textToParse, refDate, {forwardDate: true});
         if (results.length) {
             const reminderTime = results[0].start.date();
             if (reminderTime > refDate && reminderTime > new Date) {
@@ -19,30 +19,52 @@ const make = (cache, twitter) => {
                     refDate,
                     tweet
                 };
-            } else {
+            }
+
+            let firstMentionIndex = tweet.text.indexOf(`@${process.env.TWITTER_SCREEN_NAME}`);
+            if (lastMentionIndex === firstMentionIndex) {
                 return {
                     failure: "TIME_IN_PAST",
                     tweet
                 };
             }
-        } else {
+            return parseTweetText(firstMentionIndex, refDate, tweet);
+
+        }
+        let firstMentionIndex = tweet.text.indexOf(`@${process.env.TWITTER_SCREEN_NAME}`);
+        if (lastMentionIndex === firstMentionIndex) {
             return {
                 failure: "PARSE_TIME_FAILURE",
                 tweet
             };
         }
+        return parseTweetText(firstMentionIndex, refDate, tweet);
+
+    };
+
+    const parseReminderTime = (tweet) => {
+        const refDate = new Date(tweet.created_at);
+
+        // In some scenarios, a user might say "We'll see next year! @RemindMe_OfThis on July 3"
+        // If it's a reply, the tweet text will come in as "@RemindMe_OfThis We'll see next year! @RemindMe_OfThis on July 3"
+        // If it isn't, the tweet text will come in as it appears.
+        // Either way, we want to prefer the text *after* the (last) mention,
+        // and only fallback to the full text if that fails
+        const lastMention = tweet.text.lastIndexOf(`@${process.env.TWITTER_SCREEN_NAME}`);
+
+        return parseTweetText(lastMention, refDate, tweet);
     };
 
     const cancelReminder = async (tweet) => {
         const cacheKey = tweet.referencing_tweet + '-' + tweet.author;
-        console.log(`CANCEL ${JSON.stringify({ cacheKey })}`);
+        console.log(`CANCEL ${JSON.stringify({cacheKey})}`);
         let reminderDetails = await cache.getAsync(cacheKey);
 
         if (reminderDetails) {
             reminderDetails = JSON.parse(reminderDetails);
-            console.log({ reminderDetails });
+            console.log({reminderDetails});
             const remindersOnThatDate = await cache.lrangeAsync(reminderDetails.date, 0, -1);
-            console.log({ remindersOnThatDate });
+            console.log({remindersOnThatDate});
             try {
                 const indexOfTheReminderWeWant = remindersOnThatDate.map(JSON.parse)
                     .findIndex(r => (r.author == tweet.author) && (reminderDetails.original_tweet == r.id));
@@ -137,9 +159,9 @@ const make = (cache, twitter) => {
                 console.log(r);
                 return {status: 'SUCCESS'};
             }).catch(r => {
-            console.log(r);
-            return {status: 'FAIL'};
-        });
+                console.log(r);
+                return {status: 'FAIL'};
+            });
     };
 
     return {
