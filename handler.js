@@ -4,7 +4,13 @@ const cache = require('./src/cache');
 const twitter = require('./src/factory.twitter')(cache);
 const auth = require('./src/factory.auth')(cache);
 const service = require('./src/factory.service')(cache, twitter);
-const {http, getDateToNearestMinute, timezones, redirect} = require('./src/utils');
+const {http, getDateToNearestMinute, timezones} = require('./src/utils');
+const twitterSignIn = require('twittersignin')({
+    consumerKey: process.env.TWITTER_CONSUMER_KEY,
+    consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+    accessToken: process.env.TWITTER_ACCESS_TOKEN,
+    accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+});
 
 module.exports.handleAccountActivity = async (event, context) => {
     const body = JSON.parse(event.body);
@@ -130,8 +136,17 @@ const defaultUserSettings = {
 
 module.exports.getPage = async (event, context) => {
     switch (event.pathParameters.page) {
+        case 'login': {
+            if (await auth.session(event)) {
+                return http.redirect('/settings');
+            }
+
+            return http.render('login');
+        }
+
         case 'settings': {
-            const session = auth.session();
+            const session = await auth.session(event);
+
             if (!session) {
                 return http.redirect('/login');
             }
@@ -149,9 +164,13 @@ module.exports.getPage = async (event, context) => {
     }
 };
 
+module.exports.getHomePage = async (event, context) => {
+    return http.render('home');
+};
+
 module.exports.updateSettings = async (event, context) => {
     console.log(event.body);
-    const session = auth.session();
+    const session = await auth.session(event);
     if (!session) {
         return http.redirect('/login');
     }
@@ -173,4 +192,38 @@ module.exports.updateSettings = async (event, context) => {
     await cache.setAsync(`settings-${username}`, JSON.stringify(settings));
 
     return http.redirect('/settings');
+};
+
+module.exports.startTwitterSignIn = async (event, context) => {
+    const {
+        oauth_token: requestToken,
+        oauth_token_secret: requestTokenSecret,
+        oauth_callback_confirmed
+    } = await twitterSignIn.getRequestToken({
+        x_auth_access_type: "read",
+    });
+    if (!oauth_callback_confirmed) {
+        throw new Error('OAuth callback not confirmed!');
+    }
+    console.log(requestToken);
+    await cache.setAsync(`tokens-${requestToken}`, requestTokenSecret, 'EX', 5 * 60);
+    return http.redirect('https://api.twitter.com/oauth/authenticate?oauth_token=' + requestToken);
+};
+
+module.exports.completeTwitterSignIn = async (event, context) => {
+    const requestToken = event.queryStringParameters.oauth_token;
+    const oauthVerifier = event.queryStringParameters.oauth_verifier;
+
+    const requestTokenSecret = await cache.getAsync(`tokens-${requestToken}`);
+    const {oauth_token, oauth_token_secret, screen_name} =
+        await twitterSignIn.getAccessToken(requestToken, requestTokenSecret, oauthVerifier);
+
+    const user = await twitterSignIn.getUser(oauth_token, oauth_token_secret, {
+        include_entities: false,
+        skip_status: true,
+    });
+
+    const sessionId = await auth.createSession(user);
+
+    return http.redirect('/settings', `id=${sessionId}`);
 };

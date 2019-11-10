@@ -9,7 +9,8 @@
     "moment": "^2.24.0",
     "redis": "^2.8.0",
     "twit": "^2.2.11",
-    "twitter-error-handler": "^2.0.1"
+    "twitter-error-handler": "^2.0.1",
+    "twittersignin": "^1.1.0"
   },
   "devDependencies": {
     "dotenv": "^6.2.0",
