@@ -38,9 +38,8 @@
     <h2>Settings for {{ username }}</h2>
     <h4>Your timezone</h4>
     <form method="post" action="/updateSettings">
-    <br>
     <label>
-        Whenever you mention @RemindMe_OfThis with a time, we'll use this as your timezone.
+        <div><small>Whenever you mention @RemindMe_OfThis with a time, we'll use this as your timezone.</small></div>
         <select name="utcOffset">
         {{#each timezones as |timezone index| }}
             <option value="{{ timezone.value }}" {{#is timezone.value ../settings.utcOffset }}selected{{/is}}>{{ timezone.label }}</option>
@@ -55,6 +54,7 @@
     <div>
         <h4>Push notifications</h4>
         <b><small id="notifications-status"></small></b>
+        <br>
         <br>
         <button id="enable-notifications-btn" onclick="requestPermission(this)" style="display: none;">
             Enable notifications
