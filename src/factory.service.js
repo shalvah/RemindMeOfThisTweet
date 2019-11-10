@@ -8,18 +8,19 @@ const aargh = require('aargh');
 
 const make = (cache, twitter) => {
 
-    const parseTweetText = (lastMentionIndex, refDate, tweet) => {
-        console.log(lastMentionIndex);
+    const parseTweetText = async (lastMentionIndex, refDate, tweet, settings = null) => {
         let textToParse = tweet.text.substring(lastMentionIndex);
-        console.log(textToParse);
         let results = parser.parse(textToParse, refDate, {forwardDate: true});
         if (results.length) {
+            const userSettings = settings || await getUserSettings(tweet.user.screen_name);
+            results[0].start.assign('timezoneOffset', userSettings.utcOffset);;
             const reminderTime = results[0].start.date();
             if (reminderTime > refDate && reminderTime > new Date) {
                 return {
                     remindAt: reminderTime,
                     refDate,
-                    tweet
+                    tweet,
+                    userSettings,
                 };
             }
 
@@ -30,7 +31,7 @@ const make = (cache, twitter) => {
                 };
             }
 
-            return parseTweetText(0, refDate, tweet);
+            return parseTweetText(0, refDate, tweet, userSettings);
         }
 
         if (lastMentionIndex === 0) {
@@ -165,6 +166,11 @@ const make = (cache, twitter) => {
             });
     };
 
+    /**
+     *
+     * @param username
+     * @returns {Promise<{utcOffset: number, notifications: {fbtoken: null, enabled: boolean}}>}
+     */
     const getUserSettings = async (username) => {
         const defaultUserSettings = {
             utcOffset: 0,

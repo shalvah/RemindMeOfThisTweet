@@ -54,7 +54,7 @@ module.exports.handleAccountActivity = async (event, context) => {
         if (allMentions.length) {
             // for failure/recovery purposes
             await cache.setAsync('lastTweetRetrieved', allMentions[allMentions.length - 1].id);
-            let results = allMentions.map(service.handleMention);
+            let results = await Promise.all(allMentions.map(service.handleMention));
             await Promise.all(results.map(service.handleParsingResult));
         }
     } catch (err) {
@@ -120,7 +120,7 @@ module.exports.retryFailedTasks = async (event, context) => {
     }
 
     await cache.delAsync(event.queue);
-    let results = failedTasks.map(service.parseReminderTime);
+    let results = await Promise.all(failedTasks.map(service.parseReminderTime));
     await Promise.all(results.map(service.handleParsingResult));
 
     return http.success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
