@@ -121,6 +121,13 @@ functions:
           path: /_/completetwittersignin
           method: get
 
+  updateSettings:
+    handler: handler.updateSettings
+    events:
+      - http:
+          path: /_/updatesettings
+          method: post
+
   retryFailedTasks:
     handler: handler.retryFailedTasks
 
