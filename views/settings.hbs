@@ -37,14 +37,20 @@
 <div class="content">
     <h2>Settings for {{ username }}</h2>
     <h4>Your timezone</h4>
+    <form method="post" action="/updateSettings">
     <br>
     <label>
+        Whenever you mention @RemindMe_OfThis with a time, we'll use this as your timezone.
         <select name="utcOffset">
         {{#each timezones as |timezone index| }}
             <option value="{{ timezone.value }}" {{#is timezone.value ../settings.utcOffset }}selected{{/is}}>{{ timezone.label }}</option>
         {{/each}}
         </select>
     </label>
+        <button type="submit">
+            Save
+        </button>
+    </form>
 
     <div>
         <h4>Push notifications</h4>
