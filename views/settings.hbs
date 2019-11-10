@@ -1,0 +1,98 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon"
+          href="https://raw.githubusercontent.com/shalvah/RemindMeOfThisTweet/master/favicon.ico"
+          crossorigin="anonymous"
+          type="image/x-icon"/>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', Calibri, sans-serif;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            font-size: 1.2em;
+        }
+
+        .content {
+            flex-grow: 1;
+        }
+
+        footer {
+            text-align: center;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+    </style>
+    <title>Settings for {{ username }} on @RemindMe_OfThis</title>
+</head>
+
+<body>
+<div class="content">
+    <h2>Settings for {{ username }}</h2>
+    <h4>Your timezone</h4>
+    <form method="post" action="/updateSettings">
+    <br>
+    <label>
+        Whenever you mention @RemindMe_OfThis with a time, we'll use this as your timezone.
+        <select name="utcOffset">
+        {{#each timezones as |timezone index| }}
+            <option value="{{ timezone.value }}" {{#is timezone.value ../settings.utcOffset }}selected{{/is}}>{{ timezone.label }}</option>
+        {{/each}}
+        </select>
+    </label>
+        <button type="submit">
+            Save
+        </button>
+    </form>
+
+    <div>
+        <h4>Push notifications</h4>
+        <b><small id="notifications-status"></small></b>
+        <br>
+        <button id="enable-notifications-btn" onclick="requestPermission(this)" style="display: none;">
+            Enable notifications
+        </button>
+        <button id="switch-notifications-btn" onclick="requestPermission(this)" style="display: none;">
+            Switch notifications to this device
+        </button>
+        <button id="disable-notifications-btn" onclick="turnOffNotifications()" style="display: none;">
+            Disable all notifications
+        </button>
+        <br>
+    </div>
+</div>
+<br>
+<footer style="margin-bottom: 0; padding-bottom: 0">
+    <div>
+        <small>
+            <a href="https://www.patreon.com/shalvah">Support @RemindMe_OfThis</a>
+            &nbsp;|&nbsp;
+            <a href="https://github.com/shalvah/RemindMeOfThisTweet">Check out the source code</a>
+        </small>
+    </div>
+</footer>
+
+<script>
+    function setNotificationStatus() {
+        window.notificationSettings = {{{JSONstringify settings.notifications }}};
+        if (notificationSettings.enabled === false) {
+            document.querySelector('#notifications-status').textContent = "Off";
+            document.querySelector('#enable-notifications-btn').style.display = "block";
+        } else {
+            document.querySelector('#notifications-status').textContent = "On";
+            document.querySelector('#disable-notifications-btn').style.display = "block";
+        }
+    }
+</script>
+
+<script>
+    setNotificationStatus();
+</script>
+</body>
