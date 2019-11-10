@@ -165,11 +165,28 @@ const make = (cache, twitter) => {
             });
     };
 
+    const getUserSettings = async (username) => {
+        const defaultUserSettings = {
+            utcOffset: 0,
+            notifications: {
+                enabled: false,
+                fbtoken: null,
+            },
+        };
+        return JSON.parse(await cache.getAsync(`settings-${username}`)) || defaultUserSettings;
+    };
+
+    const setUserSettings = (username, settings) => {
+        return cache.setAsync(`settings-${username}`, JSON.stringify(settings));
+    };
+
     return {
         cleanup,
         handleParsingResult,
         parseReminderTime,
-        handleMention
+        handleMention,
+        getUserSettings,
+        setUserSettings,
     }
 };
 

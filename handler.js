@@ -126,14 +126,6 @@ module.exports.retryFailedTasks = async (event, context) => {
     return http.success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
 };
 
-const defaultUserSettings = {
-    utcOffset: 0,
-    notifications: {
-        enabled: false,
-        fbtoken: null,
-    },
-};
-
 module.exports.getPage = async (event, context) => {
     switch (event.pathParameters.page) {
         case 'login': {
@@ -152,9 +144,7 @@ module.exports.getPage = async (event, context) => {
             }
 
             const username = session.username;
-            const getSettings = cache.getAsync(`settings-${username}`);
-            let [settings,] = await Promise.all([getSettings,]);
-            settings = JSON.parse(settings) || defaultUserSettings;
+            const settings = await service.getUserSettings(username);
 
             return http.render('settings', {username, settings, timezones});
         }
@@ -176,9 +166,10 @@ module.exports.updateSettings = async (event, context) => {
     }
 
     const username = session.username;
+    // Todo verify
     const body = require('querystring').decode(event.body);
     
-    const settings = JSON.parse(await cache.setAsync(`settings-${username}`)) || defaultUserSettings;
+    const settings = await service.getUserSettings(username);
     if (body.utcOffset) {
         settings.utcOffset = body.utcOffset;
     }
@@ -189,7 +180,7 @@ module.exports.updateSettings = async (event, context) => {
         settings.notifications.fbtoken = body.notifications.fbtoken;
     }
 
-    await cache.setAsync(`settings-${username}`, JSON.stringify(settings));
+    await service.setUserSettings(username, settings);
 
     return http.redirect('/settings');
 };
