@@ -3,7 +3,7 @@ node_js:
 - "10.13"
 
 env:
-- SLS_DEBUG=*
+- SLS_DEBUG=* TWITTER_CALLBACK_URL=https://remindmeofthis.app/_/completetwittersignin EXTERNAL_URL=remindmeofthis.app
 
 cache:
   directories:
