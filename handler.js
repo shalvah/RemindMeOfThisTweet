@@ -3,7 +3,7 @@
 const cache = require('./src/cache');
 const twitter = require('./src/factory.twitter')(cache);
 const service = require('./src/factory.service')(cache, twitter);
-const {finish, getDateToNearestMinute} = require('./src/utils');
+const {finish, getDateToNearestMinute, timezones} = require('./src/utils');
 
 module.exports.handleAccountActivity = async (event, context) => {
     const body = JSON.parse(event.body);
@@ -119,27 +119,19 @@ module.exports.retryFailedTasks = async (event, context) => {
     return finish().success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
 };
 
-module.exports.fetchTweetsAndSetReminders = async (event, context) => {
-    console.log({inputData: event});
-    const {from, to} = event;
-    const allMentions = await twitter.fetchAllMentions(from, to);
-
-    let results = allMentions.map(service.handleMention);
-    await Promise.all(results.map(service.handleParsingResult));
-
-    return finish().success(`Handled ${allMentions.length} tweets`);
+const defaultUserSettings = {
+    utcOffset: 0,
+    notifications: {
+        enabled: false,
+        fbtoken: null,
+    },
 };
 
-module.exports.testCache = async (event, context) => {
-    const body = JSON.parse(event.body);
-    console.log(body);
+module.exports.getUserSettingsPage = async (event, context) => {
+    let username = event.pathParameters.username.toLowerCase();
+    const getSettings = cache.getAsync(`settings-${username}`);
+    let [settings, ] = await Promise.all([getSettings, ]);
+    settings = JSON.parse(settings) || defaultUserSettings;
 
-    const redis = require("redis");
-    require('bluebird').promisifyAll(redis.RedisClient.prototype);
-
-    let cache = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOSTNAME,  {
-        no_ready_check: true});
-    const value = await cache.getAsync(body.key);
-    console.log({ value })
-    return finish(cache).success({ value });
+    return finish().render('settings', {username, settings, timezones});
 };
