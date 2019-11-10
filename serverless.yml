@@ -53,13 +53,6 @@ package:
   - awscli-bundle/**
 
 functions:
-  testCache:
-    handler: handler.testCache
-    events:
-    - http:
-        path: /testcache
-        method: post
-
   handleAccountActivity:
     handler: handler.handleAccountActivity
     timeout: 50
@@ -90,18 +83,30 @@ functions:
     - functionErrors
     - functionDuration
 
-# These functions are currently not being used
+  getUserSettingsPage:
+    handler: handler.getUserSettingsPage
+    events:
+      - http:
+          path: /{username}/settings
+          method: get
+          request:
+            parameters:
+              paths:
+                username: true
+    alarms:
+      - functionErrors
+      - name: functionDuration
+        threshold: 2000
+
+  retryFailedTasks:
+    handler: handler.retryFailedTasks
+
+# Deprecated
   remind:
     handler: handler.remind
     alarms:
     - functionErrors
     - functionDuration
-
-  retryFailedTasks:
-    handler: handler.retryFailedTasks
-
-  fetchTweetsAndSetReminders:
-    handler: handler.fetchTweetsAndSetReminders
 
 custom:
   alerts:
