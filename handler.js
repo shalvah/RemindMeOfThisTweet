@@ -218,5 +218,15 @@ module.exports.completeTwitterSignIn = async (event, context) => {
 
     const sessionId = await auth.createSession(user);
 
-    return http.redirect('/settings', `id=${sessionId}`);
+    return {
+        statusCode: 200,
+        headers: {
+            "content-type": "text/html",
+            'set-cookie': `id=${sessionId}; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`
+        },
+        body: `
+<head> 
+  <meta http-equiv="refresh" content="0; URL=http://${process.env.EXTERNAL_URL}/settings/" />
+</head>`
+    };
 };
