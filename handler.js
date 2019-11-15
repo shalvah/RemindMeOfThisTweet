@@ -139,6 +139,8 @@ module.exports.getPage = async (event, context) => {
         case 'settings': {
             const session = await auth.session(event);
 
+            console.log(event.headers);
+            console.log({ session });
             if (!session) {
                 return http.redirect('/login');
             }
