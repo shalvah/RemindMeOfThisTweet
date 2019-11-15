@@ -52,7 +52,7 @@ const http = {
                 location,
             };
             if (cookie) {
-                headers['set-cookie'] = `${cookie}; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`
+                headers['set-cookie'] = `${cookie}; Max-Age=${60 * 60 * 24 * 7}; HttpOnly`
             }
             return {
                 statusCode: 302,
