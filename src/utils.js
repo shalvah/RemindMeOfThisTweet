@@ -47,12 +47,12 @@ const http = {
             };
         },
 
-        redirect (location, cookie) {
+        redirect(location, cookie) {
             let headers = {
                 location,
             };
             if (cookie) {
-                headers['set-cookie'] = `${cookie}; Domain=${process.env.EXTERNAL_URL}; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`;
+                headers['set-cookie'] = `${cookie}; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`;
             }
             return {
                 statusCode: 302,

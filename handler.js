@@ -198,7 +198,6 @@ module.exports.startTwitterSignIn = async (event, context) => {
     if (!oauth_callback_confirmed) {
         throw new Error('OAuth callback not confirmed!');
     }
-    console.log(requestToken);
     await cache.setAsync(`tokens-${requestToken}`, requestTokenSecret, 'EX', 5 * 60);
     return http.redirect('https://api.twitter.com/oauth/authenticate?oauth_token=' + requestToken);
 };
@@ -226,7 +225,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
         },
         body: `
 <head> 
-  <meta http-equiv="refresh" content="0; URL=http://${process.env.EXTERNAL_URL}/settings/" />
+  <meta http-equiv="refresh" content="0; URL=https://${process.env.EXTERNAL_URL}/settings/" />
 </head>`
     };
 };

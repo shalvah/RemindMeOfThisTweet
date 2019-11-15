@@ -3,7 +3,7 @@ node_js:
 - "10.13"
 
 env:
-- SLS_DEBUG=* TWITTER_CALLBACK_URL=https://remindmeofthis.app/_/completetwittersignin EXTERNAL_URL=remindmeofthis.app FIREBASE_PROJECT_ID=remindmeofthistweet
+- SLS_DEBUG=* LAMBDA_FUNCTION_NAME=RemindMeOfThisTweet-dev-remind TWITTER_CALLBACK_URL=https://remindmeofthis.app/_/completetwittersignin EXTERNAL_URL=remindmeofthis.app FIREBASE_PROJECT_ID=remindmeofthistweet
 
 cache:
   directories:
@@ -31,7 +31,6 @@ jobs:
     name: "Lint"
 
   - stage: deploy
-    env: LAMBDA_FUNCTION_NAME=RemindMeOfThisTweet-dev-remind
     before_script:
     - curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
     - unzip awscli-bundle.zip
