@@ -9,10 +9,7 @@ require('handlebars-helpers')(
     {handlebars: hbs}
 );
 
-const finish = (cache = null) => {
-    if (cache) cache.quit();
-
-    return {
+const http = {
         success(body) {
             console.log(`Response: ${body}`);
             const response = {
@@ -49,7 +46,19 @@ const finish = (cache = null) => {
                 body
             };
         },
-    }
+
+        redirect (location, cookie) {
+            let headers = {
+                location,
+            };
+            if (cookie) {
+                headers['set-cookie'] = `${cookie}; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`
+            }
+            return {
+                statusCode: 302,
+                headers,
+            };
+        },
 };
 
 const randomReminderMessage = (username, tweetId) => {
@@ -269,7 +278,7 @@ const UNCERTAIN = 'Uncertain';
 module.exports = {
     randomReminderMessage,
     randomAcknowledgementMessage,
-    finish,
+    http,
     cronify,
     getDateToNearestMinute,
     SUCCESS,

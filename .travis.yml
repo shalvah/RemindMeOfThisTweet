@@ -3,7 +3,7 @@ node_js:
 - "10.13"
 
 env:
-- SLS_DEBUG=*
+- SLS_DEBUG=* TWITTER_CALLBACK_URL=https://remindmeofthis.app/_/completetwittersignin EXTERNAL_URL=remindmeofthis.app FIREBASE_PROJECT_ID=remindmeofthistweet
 
 cache:
   directories:
@@ -38,6 +38,9 @@ jobs:
     - ./awscli-bundle/install -b ~/bin/aws
     - export PATH=~/bin:$PATH
     script: |
+      aws --region us-east-1 s3 cp \
+            s3://shalvah-creds/remindmeofthistweet-serviceaccount.json  \
+            ./remindmeofthistweet-serviceaccount.json && \
       sls deploy && \
       (aws --region us-east-1 lambda get-policy  --function-name RemindMeOfThisTweet-dev-remind \
       || aws --region us-east-1 lambda add-permission --function-name RemindMeOfThisTweet-dev-remind --statement-id InvokePermission --principal events.amazonaws.com --action lambda:InvokeFunction)

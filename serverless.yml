@@ -30,11 +30,14 @@ provider:
     TWITTER_ACCESS_TOKEN: ${env:TWITTER_ACCESS_TOKEN}
     TWITTER_ACCESS_TOKEN_SECRET: ${env:TWITTER_ACCESS_TOKEN_SECRET}
     TWITTER_SCREEN_NAME: RemindMe_OfThis
+    TWITTER_CALLBACK_URL: ${env:TWITTER_CALLBACK_URL}
     REDIS_HOSTNAME: ${env:REDIS_HOSTNAME}
     REDIS_PORT: ${env:REDIS_PORT}
     REDIS_PASSWORD: ${env:REDIS_PASSWORD}
     LAMBDA_FUNCTION_NAME: ${env:LAMBDA_FUNCTION_NAME}
     LAMBDA_FUNCTION_ARN: ${env:LAMBDA_FUNCTION_ARN}
+    EXTERNAL_URL: ${env:EXTERNAL_URL}
+    FIREBASE_PROJECT_ID: ${env:FIREBASE_PROJECT_ID}
 
 package:
   exclude:
@@ -83,20 +86,48 @@ functions:
     - functionErrors
     - functionDuration
 
-  getUserSettingsPage:
-    handler: handler.getUserSettingsPage
+  getHomePage:
+    handler: handler.getHomePage
     events:
       - http:
-          path: /{username}/settings
+          path: /
+          method: get
+
+  getPage:
+    handler: handler.getPage
+    events:
+      - http:
+          path: /p/{page}
           method: get
           request:
             parameters:
               paths:
-                username: true
+                page: true
     alarms:
       - functionErrors
       - name: functionDuration
         threshold: 2000
+
+  startTwitterSignIn:
+    handler: handler.startTwitterSignIn
+    events:
+      - http:
+          path: /_/starttwittersignin
+          method: get
+
+  completeTwitterSignIn:
+    handler: handler.completeTwitterSignIn
+    events:
+      - http:
+          path: /_/completetwittersignin
+          method: get
+
+  updateSettings:
+    handler: handler.updateSettings
+    events:
+      - http:
+          path: /_/updatesettings
+          method: post
 
   retryFailedTasks:
     handler: handler.retryFailedTasks
