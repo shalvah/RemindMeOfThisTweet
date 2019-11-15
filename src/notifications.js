@@ -9,8 +9,7 @@ firebase.initializeApp({
 });
 
 module.exports = {
-    async sendNotification(username, url) {
-        const token = settings.fbToken;
+    async sendNotification(token, username, url) {
         const message = {
             data: {
                 title: `Here's your reminder, @${username}.👋`,

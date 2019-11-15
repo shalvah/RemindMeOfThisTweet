@@ -12,8 +12,8 @@ const make = (cache, twitter) => {
         let textToParse = tweet.text.substring(lastMentionIndex);
         let results = parser.parse(textToParse, refDate, {forwardDate: true});
         if (results.length) {
-            const userSettings = settings || await getUserSettings(tweet.user.screen_name);
-            results[0].start.assign('timezoneOffset', userSettings.utcOffset);;
+            const userSettings = settings || await getUserSettings(tweet.author);
+            results[0].start.assign('timezoneOffset', userSettings.utcOffset);
             const reminderTime = results[0].start.date();
             if (reminderTime > refDate && reminderTime > new Date) {
                 return {
