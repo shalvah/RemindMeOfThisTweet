@@ -1,4 +1,4 @@
-sls invoke local -f getPage -d '{\"pathParameters\":{\"page\":\"settings\"},\"headers\":{\"cookie\":\"id=i7GuCypEfFhU9as7WL0czA==\"}}'
+sls invoke local -f getPage -d '{\"pathParameters\":{\"page\":\"settings\"},\"headers\":{\"cookie\":\"id=vijufui\"}}'
 
 sls invoke local -f startTwitterSignIn
 

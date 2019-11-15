@@ -133,7 +133,7 @@ module.exports.getPage = async (event, context) => {
                 return http.redirect('/settings');
             }
 
-            return http.render('login');
+            return http.redirect('/_/starttwittersignin');
         }
 
         case 'settings': {
