@@ -97,7 +97,7 @@ functions:
     handler: handler.getPage
     events:
       - http:
-          path: /p/{page}
+          path: /{page}
           method: get
           request:
             parameters:
