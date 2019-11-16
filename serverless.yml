@@ -2,7 +2,6 @@ service: RemindMeOfThisTweet
 plugins:
 - serverless-dotenv-plugin
 - serverless-plugin-aws-alerts
-- serverless-mocha-plugin
 
 provider:
   name: aws
