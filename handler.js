@@ -166,18 +166,17 @@ module.exports.updateSettings = async (event, context) => {
     }
 
     const username = session.username;
-    // Todo verify
     const body = require('querystring').decode(event.body);
     
     const settings = await service.getUserSettings(username);
     if (body.utcOffset) {
         settings.utcOffset = body.utcOffset;
     }
-    if (body.notifications && body.notifications.enabled) {
-        settings.notifications.enabled = body.notifications.enabled;
+    if (body['notifications.enabled']) {
+        settings.notifications.enabled = Boolean(body['notifications.enabled']);
     }
-    if (body.notifications && body.notifications.fbtoken) {
-        settings.notifications.fbtoken = body.notifications.fbtoken;
+    if (body['notifications.fbtoken']) {
+        settings.notifications.fbtoken = body['notifications.fbtoken'];
     }
 
     await service.setUserSettings(username, settings);

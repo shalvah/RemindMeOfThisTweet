@@ -53,6 +53,10 @@
 
     <div>
         <h4>Push notifications</h4>
+        <form id="notifications-form" method="post" action="/_/updatesettings">
+            <input type="hidden" name="notifications.enabled"
+                   value="{{#eq settings.notifications.enabled true }}1{{else}}0{{/eq}}">
+            <input type="hidden" name="notifications.fbtoken" value="{{ settings.notifications.fbtoken }}">
         <b><small id="notifications-status"></small></b>
         <br>
         <br>
@@ -62,9 +66,10 @@
         <button id="switch-notifications-btn" onclick="requestPermission(this)" style="display: none;">
             Switch notifications to this device
         </button>
-        <button id="disable-notifications-btn" onclick="turnOffNotifications()" style="display: none;">
+        <button id="disable-notifications-btn" onclick="disableNotifications(this)" style="display: none;">
             Disable all notifications
         </button>
+        </form>
         <br>
     </div>
 </div>
@@ -81,6 +86,9 @@
 
 <script>
     function setNotificationStatus() {
+        /**
+         * @type \{{enabled: boolean, fbtoken: string|null}}
+         */
         window.notificationSettings = {{{JSONstringify settings.notifications }}};
         if (notificationSettings.enabled === false) {
             document.querySelector('#notifications-status').textContent = "Off";
@@ -95,4 +103,211 @@
 <script>
     setNotificationStatus();
 </script>
+
+<script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-messaging.js"></script>
+
+<script>
+    const OSes = {
+        macOS: 'macOS',
+        windows: "Windows",
+        linux: "Linux",
+        android: "Android",
+        iOS: "iOS",
+        unknown: null,
+    };
+
+    function getOS() {
+        const userAgent = window.navigator.userAgent;
+        const platform = window.navigator.platform;
+        const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
+        const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
+        const iosPlatforms = ['iPhone', 'iPad', 'iPod'];
+        let os = OSes.unknown;
+
+        if (macosPlatforms.indexOf(platform) !== -1) {
+            os = OSes.macOS;
+        } else if (iosPlatforms.indexOf(platform) !== -1) {
+            os = OSes.iOS;
+        } else if (windowsPlatforms.indexOf(platform) !== -1) {
+            os = OSes.windows;
+        } else if (/Android/.test(userAgent)) {
+            os = OSes.android;
+        } else if (/Linux/.test(platform)) {
+            os = OSes.linux;
+        }
+
+        return os;
+    }
+
+    const browsers = {
+        opera: "Opera",
+        IE: "IE",
+        chrome: "Chrome",
+        safari: "Safari",
+        firefox: "Firefox",
+        unknown: null,
+    };
+
+    function getBrowser() {
+        var userAgent = navigator.userAgent;
+        var browserName = browsers.unknown;
+
+        if (userAgent.includes("Opera")) {
+            browserName = browsers.opera;
+        } else if (userAgent.includes("MSIE")) {
+            browserName = browsers.IE;
+        } else if (userAgent.includes("Chrome")) {
+            browserName = browsers.chrome;
+        } else if (userAgent.includes("Safari")) {
+            browserName = browsers.safari;
+        } else if (userAgent.includes("Firefox")) {
+            browserName = browsers.firefox;
+        }
+
+        return browserName;
+    }
+</script>
+
+<script>
+    function initializeAndConfigurePushNotifications() {
+
+        if (!("serviceWorker" in navigator)) {
+            console.log("Service workers not supported.");
+            return;
+        }
+
+        const os = getOS();
+        if ([OSes.iOS, OSes.unknown].includes(os)) {
+            console.log("Not supported on " + os);
+            return;
+        }
+
+        const browser = getBrowser();
+        if ([browsers.safari, browsers.IE, browsers.unknown].includes(browser)) {
+            console.log("Not supported on " + browser);
+            return;
+        }
+
+        initializeFirebase();
+
+        initializeNotificationsUI();
+
+        setTokenRefreshHandler();
+
+        setNewMessageHandler();
+
+        markTokenSentIfApplicable();
+
+    }
+
+    function initializeFirebase() {
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6sEFuSmpYOvSa6ZHNqKmG2-0ML26b1EY",
+            authDomain: "remindmeofthistweet.firebaseapp.com",
+            projectId: "remindmeofthistweet",
+            messagingSenderId: "183640492360",
+            appId: "1:183640492360:web:a4206135929aca46e0cb7d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        window.messaging = firebase.messaging();
+        messaging.usePublicVapidKey("BJMYCskhhbaLOLCp7loU00SJrVCpMo--_nTqIpb0jRa5_43Z_F-BnsNy-D4uzcO8mP9om432XvALhpKx3_p808w");
+
+        navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                .then(reg => console.log('Registered SW successfully', reg))
+                .catch(err => console.log('Failed to register SW', err))
+    }
+
+    function setTokenRefreshHandler() {
+        messaging.onTokenRefresh(() => {
+            messaging.getToken()
+                    .then((refreshedToken) => {
+                        console.log('Token refreshed.');
+                        submitNotificationUpdateForm(['notifications.fbtoken', refreshedToken]);
+                    })
+                    .catch((err) => {
+                        console.log('Unable to retrieve refreshed token ', err);
+                    });
+        });
+    }
+
+    function setNewMessageHandler() {
+        messaging.onMessage((payload) => {
+            console.log('Message received. ', payload);
+            if (Notification.permission == 'granted') {
+                navigator.serviceWorker.getRegistration().then((reg) => {
+                    reg.showNotification(payload.data.title,
+                            {body: payload.data.body, data: {url: payload.data.url}});
+                });
+            } else {
+                console.log("No notification permission")
+            }
+        });
+    }
+
+    function initializeNotificationsUI() {
+        messaging.getToken().then((currentToken) => {
+            console.log({currentToken});
+            if (currentToken) {
+                if (notificationSettings.enabled) {
+                    if (notificationSettings.fbtoken === currentToken) {
+                        // Enabld on this device
+                    document.querySelector('#notifications-status').textContent = "Enabled";
+                    } else {
+                        // Enabled on a different device
+                        document.querySelector('#notifications-status').textContent = "Enabled on a different device";
+                        document.querySelector('#switch-notifications-btn').style.display = "block";
+                    }
+                }
+            } else {
+                console.log('No Instance ID token available.');
+            }
+        }).catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+        });
+    }
+
+    function requestPermission(button) {
+        Notification.requestPermission()
+                .then((permission) => {
+                    if (permission === 'granted') {
+                        console.log('Notification permission granted.');
+                        button.disabled = true;
+                        button.textContent = "Loading...";
+
+                        messaging.getToken().then((currentToken) => {
+                            console.log({currentToken});
+                            if (currentToken) {
+                                submitNotificationUpdateForm(['notifications.enabled', 1], ['notifications.fbtoken', currentToken]);
+                            } else {
+                                console.log('No Instance ID token available.');
+                            }
+                        }).catch((err) => {
+                            console.log('An error occurred while retrieving token. ', err);
+                        });
+                    } else {
+                        console.log('Unable to get permission to notify.');
+                    }
+                });
+    }
+
+    function disableNotifications(button) {
+        button.disabled = true;
+        button.textContent = "Loading...";
+        submitNotificationUpdateForm(['notifications.enabled', 0]);
+    }
+
+    function submitNotificationUpdateForm(...formValues) {
+        formValues.forEach(([name, value]) => {
+            document.querySelector(`input[name=${name}]`).value = value;
+        });
+        const form = document.querySelector('#notifications-form');
+        form.submit();
+    }
+</script>
+
+<script>
+    initializeAndConfigurePushNotifications();
+</script>
+
 </body>
