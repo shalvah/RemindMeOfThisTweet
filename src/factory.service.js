@@ -186,6 +186,10 @@ const make = (cache, twitter) => {
         return cache.setAsync(`settings-${username}`, JSON.stringify(settings));
     };
 
+    const remind = (tweet) => {
+        return twitter.replyWithReminder(tweet);
+    };
+
     return {
         cleanup,
         handleParsingResult,
@@ -193,6 +197,7 @@ const make = (cache, twitter) => {
         handleMention,
         getUserSettings,
         setUserSettings,
+        remind,
     }
 };
 
