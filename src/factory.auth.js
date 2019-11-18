@@ -13,8 +13,8 @@ module.exports = (cache) => {
     };
 
     const session = (event) => {
-        const cookie = event.headers.cookie || event.headers.Cookie;
-        const sessionId = cookie.match(/id=([^;\s]+)/)[1];
+        const cookie = event.headers.Cookie || event.headers.cookie;
+        const sessionId = cookie.match(/\brmotid=([^;\s]+)/)[1];
         return cache.getAsync(`sessions-${sessionId}`)
             .then(JSON.parse);
     };
