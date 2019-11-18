@@ -5,7 +5,7 @@ module.exports = (cache) => {
     const createSession = (user) => {
         const sessionId = require('crypto').randomBytes(16).toString('base64');
         const sessionData = {
-            userame: user.screen_name,
+            username: user.screen_name,
             id: user.id_str,
         };
         return cache.setAsync(`sessions-${sessionId}`, JSON.stringify(sessionData), 'EX', 60 * 60 * 24 * 7)
