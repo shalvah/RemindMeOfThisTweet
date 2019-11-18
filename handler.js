@@ -136,6 +136,9 @@ module.exports.getPage = async (event, context) => {
             return http.redirect('/_/starttwittersignin');
         }
 
+        case 'firebase-messaging-sw.js':
+            return http.sendTextFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
+
         case 'settings': {
             const session = await auth.session(event);
 

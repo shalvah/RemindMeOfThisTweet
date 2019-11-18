@@ -10,56 +10,67 @@ require('handlebars-helpers')(
 );
 
 const http = {
-        success(body) {
-            console.log(`Response: ${body}`);
-            const response = {
-                statusCode: 200,
-                body
-            };
-            return response;
-        },
+    success(body) {
+        console.log(`Response: ${body}`);
+        const response = {
+            statusCode: 200,
+            body
+        };
+        return response;
+    },
 
-        fail(err) {
-            console.log(`Fail response: ${err}`);
-            throw err;
-        },
+    fail(err) {
+        console.log(`Fail response: ${err}`);
+        throw err;
+    },
 
-        render(view, data = null) {
-            const fileName = path.resolve(__dirname, '..', 'views', `${view}.hbs`);
-            let body = fs.readFileSync(fileName, "utf8");
+    render(view, data = null) {
+        const fileName = path.resolve(__dirname, '..', 'views', `${view}.hbs`);
+        let body = fs.readFileSync(fileName, "utf8");
 
-            if (!data) {
-                // no need to bother compiling Handlebars template
-                return {
-                    statusCode: 200,
-                    headers: {"content-type": "text/html; charset=utf-8"},
-                    body
-                };
-            }
-
-            let template = hbs.compile(body);
-            body = template(data);
-
+        if (!data) {
+            // no need to bother compiling Handlebars template
             return {
                 statusCode: 200,
-                headers: {"content-type": "text/html"},
+                headers: {"content-type": "text/html; charset=utf-8"},
                 body
             };
-        },
+        }
 
-        redirect(location, cookie) {
-            let headers = {
-                location,
-            };
-            if (cookie) {
-                headers['set-cookie'] = `${cookie}; Domain=.${process.env.EXTERNAL_URL}; `
-                    + `Path=/; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`;
-            }
-            return {
-                statusCode: 302,
-                headers,
-            };
-        },
+        let template = hbs.compile(body);
+        body = template(data);
+
+        return {
+            statusCode: 200,
+            headers: {"content-type": "text/html"},
+            body
+        };
+    },
+
+    redirect(location, cookie) {
+        let headers = {
+            location,
+        };
+        if (cookie) {
+            headers['set-cookie'] = `${cookie}; Domain=.${process.env.EXTERNAL_URL}; `
+                + `Path=/; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`;
+        }
+        return {
+            statusCode: 302,
+            headers,
+        };
+    },
+
+    sendTextFile(filename, headers = {"content-type": "text/html; charset=utf-8"}) {
+        const filePath = path.resolve(__dirname, '..', 'assets', filename);
+        let body = fs.readFileSync(filePath, "utf8");
+
+        return {
+            statusCode: 200,
+            headers,
+            body,
+        };
+    }
 };
 
 const randomReminderMessage = (username, tweetId) => {
