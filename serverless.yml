@@ -42,6 +42,7 @@ package:
   exclude:
   - "*.md"
   - "*.png"
+  - "*.ico"
   - .*
   - .*/**
   - bin/**

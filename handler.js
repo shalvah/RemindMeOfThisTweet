@@ -142,7 +142,7 @@ module.exports.getPage = async (event, context) => {
             console.log(event.headers);
             console.log({ session });
             if (!session) {
-                return http.redirect('/login');
+                return http.redirect('/_/starttwittersignin');
             }
 
             const username = session.username;
@@ -164,7 +164,7 @@ module.exports.updateSettings = async (event, context) => {
     console.log(event.body);
     const session = await auth.session(event);
     if (!session) {
-        return http.redirect('/login');
+        return http.redirect('/_/starttwittersignin');
     }
 
     const username = session.username;
@@ -221,11 +221,8 @@ module.exports.completeTwitterSignIn = async (event, context) => {
         statusCode: 200,
         headers: {
             "content-type": "text/html",
-            'set-cookie': `id=${sessionId}; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`
+            'set-cookie': `id=${sessionId}; Domain=.${process.env.EXTERNAL_URL}; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`
         },
-        body: `
-<head> 
-  <meta http-equiv="refresh" content="0; URL=https://${process.env.EXTERNAL_URL}/settings/" />
-</head>`
+        body: `Ok`
     };
 };
