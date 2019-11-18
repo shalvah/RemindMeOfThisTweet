@@ -297,7 +297,7 @@
 
     function submitNotificationUpdateForm(...formValues) {
         formValues.forEach(([name, value]) => {
-            document.querySelector(`input[name=${name}]`).value = value;
+            document.querySelector(`input[name='${name}']`).value = value;
         });
         const form = document.querySelector('#notifications-form');
         form.submit();
