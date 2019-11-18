@@ -177,7 +177,7 @@ module.exports.updateSettings = async (event, context) => {
         settings.utcOffset = body.utcOffset;
     }
     if (body['notifications.enabled']) {
-        settings.notifications.enabled = Boolean(body['notifications.enabled']);
+        settings.notifications.enabled = body['notifications.enabled'] === '0' ? false : true;
     }
     if (body['notifications.fbtoken']) {
         settings.notifications.fbtoken = body['notifications.fbtoken'];
