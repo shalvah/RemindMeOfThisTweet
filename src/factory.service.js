@@ -6,7 +6,7 @@ const {getDateToNearestMinute} = require('./utils');
 const metrics = require('./metrics');
 const aargh = require('aargh');
 
-const make = (cache, twitter) => {
+const make = (cache, twitter, notifications) => {
 
     const parseTweetText = async (lastMentionIndex, refDate, tweet, settings = null) => {
         let textToParse = tweet.text.substring(lastMentionIndex);
@@ -186,7 +186,15 @@ const make = (cache, twitter) => {
         return cache.setAsync(`settings-${username}`, JSON.stringify(settings));
     };
 
-    const remind = (tweet) => {
+    const remind = async (tweet) => {
+        const settings = await getUserSettings(tweet.author);
+        if (settings.notifications.enabled && settings.notifications.fbtoken) {
+            return notifications.sendNotification(
+                settings.notifications.fbtoken,
+                tweet.author,
+                "https://twitter.com/" + username + "/status/" + tweet.id
+            );
+        }
         return twitter.replyWithReminder(tweet);
     };
 

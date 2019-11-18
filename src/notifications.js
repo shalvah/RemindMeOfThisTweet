@@ -9,11 +9,12 @@ firebase.initializeApp({
 });
 
 module.exports = {
-    async sendNotification(token, username, url) {
+    async sendNotification(token, username, tweetUrl) {
         const message = {
             data: {
                 title: `Here's your reminder, @${username}.👋`,
-                url,
+                body: `You set this reminder with @RemindMe_OfThis. Tap to view the tweet.`,
+                url: tweetUrl,
             },
             token
         };

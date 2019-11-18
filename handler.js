@@ -3,7 +3,8 @@
 const cache = require('./src/cache');
 const twitter = require('./src/factory.twitter')(cache);
 const auth = require('./src/factory.auth')(cache);
-const service = require('./src/factory.service')(cache, twitter);
+const notifications = require('./src/notifications');
+const service = require('./src/factory.service')(cache, twitter, notifications);
 const {http, getDateToNearestMinute, timezones} = require('./src/utils');
 const twitterSignIn = require('twittersignin')({
     consumerKey: process.env.TWITTER_CONSUMER_KEY,
