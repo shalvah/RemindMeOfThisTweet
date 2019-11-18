@@ -192,7 +192,7 @@ const make = (cache, twitter, notifications) => {
             return notifications.sendNotification(
                 settings.notifications.fbtoken,
                 tweet.author,
-                "https://twitter.com/" + username + "/status/" + tweet.id
+                "https://twitter.com/" + tweet.author + "/status/" + tweet.id
             );
         }
         return twitter.replyWithReminder(tweet);

@@ -50,9 +50,16 @@ const mockTwitterAPI = () => {
     return requests;
 };
 
+const mockNotifications = () => {
+    mock('../../src/notifications', {
+        sendNotification() { return Promise.resolve(); },
+    });
+};
+
 module.exports = {
     mockCache,
     mockDate,
     mockMetrics,
     mockTwitterAPI,
+    mockNotifications,
 };
