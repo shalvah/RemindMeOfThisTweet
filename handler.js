@@ -221,7 +221,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
         statusCode: 200,
         headers: {
             "content-type": "text/html",
-            'set-cookie': `id=${sessionId}; Domain=.${process.env.EXTERNAL_URL}; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`
+            'set-cookie': `id=${sessionId}; Domain=.${process.env.EXTERNAL_URL}; Path=/; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`
         },
         body: `Ok`
     };
