@@ -14,7 +14,13 @@ module.exports = (cache) => {
 
     const session = (event) => {
         const cookie = event.headers.Cookie || event.headers.cookie;
+        if (!cookie) {
+            return null;
+        }
         const sessionId = cookie.match(/\brmotid=([^;\s]+)/)[1];
+        if (!sessionId) {
+            return null;
+        }
         return cache.getAsync(`sessions-${sessionId}`)
             .then(JSON.parse);
     };
