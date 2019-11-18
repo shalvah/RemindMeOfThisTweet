@@ -38,14 +38,16 @@
     <h2>Settings for {{ username }}</h2>
     <h4>Your timezone</h4>
     <form method="post" action="/_/updatesettings">
-    <label>
-        <div><small>Whenever you mention @RemindMe_OfThis with a time, we'll use this as your timezone.</small></div>
-        <select name="utcOffset">
-        {{#each timezones as |timezone index| }}
-            <option value="{{ timezone.value }}" {{#is timezone.value ../settings.utcOffset }}selected{{/is}}>{{ timezone.label }}</option>
-        {{/each}}
-        </select>
-    </label>
+        <label>
+            <div><small>Whenever you mention @RemindMe_OfThis with a time (for instance, "9:00pm"), we'll use this to
+                know timezone you're in.</small></div>
+            <select name="utcOffset">
+                {{#each timezones as |timezone index| }}
+                    <option value="{{ timezone.value }}"
+                            {{#is timezone.value ../settings.utcOffset }}selected{{/is}}>{{ timezone.label }}</option>
+                {{/each}}
+            </select>
+        </label>
         <button type="submit">
             Save
         </button>
@@ -57,18 +59,26 @@
             <input type="hidden" name="notifications.enabled"
                    value="{{#eq settings.notifications.enabled true }}1{{else}}0{{/eq}}">
             <input type="hidden" name="notifications.fbtoken" value="{{ settings.notifications.fbtoken }}">
-        <b><small id="notifications-status"></small></b>
-        <br>
-        <br>
-        <button id="enable-notifications-btn" onclick="event.preventDefault(); requestPermission(this)" style="display: none;">
-            Enable notifications
-        </button>
-        <button id="switch-notifications-btn" onclick="event.preventDefault(); requestPermission(this)" style="display: none;">
-            Switch notifications to this device
-        </button>
-        <button id="disable-notifications-btn" onclick="event.preventDefault(); disableNotifications(this)" style="display: none;">
-            Disable all notifications
-        </button>
+            <b><small id="notifications-status"></small></b>
+            <br>
+            <div><small>@RemindMe_OfThis can send you push notifications via your browser, instead of on
+                Twitter. This allows us to get past Twitter's Tweet limits, so you'll always get your reminders on time.✅</small></div>
+            <br>
+            <br>
+            <div id="notifications-buttons">
+                <button id="enable-notifications-btn" onclick="event.preventDefault(); requestPermission(this)"
+                        style="display: none;">
+                    Enable notifications
+                </button>
+                <button id="switch-notifications-btn" onclick="event.preventDefault(); requestPermission(this)"
+                        style="display: none;">
+                    Switch notifications to this device
+                </button>
+                <button id="disable-notifications-btn" onclick="event.preventDefault(); disableNotifications(this)"
+                        style="display: none;">
+                    Disable all notifications
+                </button>
+            </div>
         </form>
         <br>
     </div>
@@ -172,20 +182,27 @@
 <script>
     function initializeAndConfigurePushNotifications() {
 
+        function notificationsNotSupported() {
+            document.querySelector("#notifications-buttons").innerHTML = "Not available on this device";
+        }
+
         if (!("serviceWorker" in navigator)) {
             console.log("Service workers not supported.");
+            notificationsNotSupported();
             return;
         }
 
         const os = getOS();
         if ([OSes.iOS, OSes.unknown].includes(os)) {
             console.log("Not supported on " + os);
+            notificationsNotSupported();
             return;
         }
 
         const browser = getBrowser();
         if ([browsers.safari, browsers.IE, browsers.unknown].includes(browser)) {
             console.log("Not supported on " + browser);
+            document.querySelector("#notifications-buttons").innerHTML = "Not available on this device";
             return;
         }
 
@@ -250,7 +267,7 @@
                 if (notificationSettings.enabled) {
                     if (notificationSettings.fbtoken === currentToken) {
                         // Enabld on this device
-                    document.querySelector('#notifications-status').textContent = "Enabled";
+                        document.querySelector('#notifications-status').textContent = "Enabled";
                     } else {
                         // Enabled on a different device
                         document.querySelector('#notifications-status').textContent = "Enabled on a different device";
