@@ -60,13 +60,13 @@
         <b><small id="notifications-status"></small></b>
         <br>
         <br>
-        <button id="enable-notifications-btn" onclick="requestPermission(this)" style="display: none;">
+        <button id="enable-notifications-btn" onclick="event.preventDefault(); requestPermission(this)" style="display: none;">
             Enable notifications
         </button>
-        <button id="switch-notifications-btn" onclick="requestPermission(this)" style="display: none;">
+        <button id="switch-notifications-btn" onclick="event.preventDefault(); requestPermission(this)" style="display: none;">
             Switch notifications to this device
         </button>
-        <button id="disable-notifications-btn" onclick="disableNotifications(this)" style="display: none;">
+        <button id="disable-notifications-btn" onclick="event.preventDefault(); disableNotifications(this)" style="display: none;">
             Disable all notifications
         </button>
         </form>
