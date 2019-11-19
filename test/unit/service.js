@@ -58,10 +58,20 @@ async function test() {
         text: `@RemindMe_OfThis at ${usersCurrentTime + 14}:00`,
         author: "xxx"
     }));
-    // So actual reminder should be 5pm UTC
     tap.equal(
-        parsingResult.remindAt.getHours() + (mockDate.getTimezoneOffset() / 60), // reminder hour in UTC+0
+        parsingResult.remindAt.getHours() // reminder time
+        + (mockDate.getTimezoneOffset() / 60), // + machine offset =  reminder hour in UTC+0
         currentUTCHour + 14
+    );
+
+    parsingResult = await parseReminderTime(createMention({
+        text: `@RemindMe_OfThis in one hour`,
+        author: "xxx"
+    }));
+    console.log(parsingResult);
+    tap.equal(
+        parsingResult.remindAt.getHours(),
+        mockDate.getHours() + 1
     );
 }
 

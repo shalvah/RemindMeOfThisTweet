@@ -30,8 +30,7 @@ const inHours = (howMany) => {
 };
 
 function scenario (string) {
-    const results = timeparser.parse(string, new Date, {forwardDate: true});
-    return results;
+    return timeparser.parse(string, new Date, {forwardDate: true});
 }
 
 function getDate(results) {

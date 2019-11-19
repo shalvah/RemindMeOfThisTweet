@@ -12,21 +12,30 @@ const make = (cache, twitter, notifications) => {
         let textToParse = tweet.text.substring(lastMentionIndex);
         let results = parser.parse(textToParse, refDate, {forwardDate: true});
         if (results.length) {
-            const userSettings = settings || await getUserSettings(tweet.author);
-            results[0].start.assign('timezoneOffset', userSettings.utcOffset);
-            const reminderTime = results[0].start.date();
+            const mainResult = results[0];
+            let userSettings = null;
+
+            // Only use timezone settings if an absolute time was specified
+            // Otherwise, this will lead to bugs (possible TIME_IN_PAST)
+            if (mainResult.start.knownValues.hour !== undefined
+                || mainResult.start.knownValues.minute !== undefined) {
+                userSettings = settings || await getUserSettings(tweet.author);
+                mainResult.start.assign('timezoneOffset', userSettings.utcOffset);
+            }
+            const reminderTime = mainResult.start.date();
             if (reminderTime > refDate && reminderTime > new Date) {
                 return {
                     remindAt: reminderTime,
                     refDate,
                     tweet,
-                    userSettings,
                 };
             }
 
             if (lastMentionIndex === 0) {
+                // No other alternatives
                 return {
                     failure: "TIME_IN_PAST",
+                    remindAt: reminderTime,
                     tweet
                 };
             }
