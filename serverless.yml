@@ -41,8 +41,8 @@ provider:
 package:
   exclude:
   - "*.md"
-  - "*.png"
-  - "*.ico"
+  - "assets/*.png"
+  - "assets/*.ico"
   - .*
   - .*/**
   - bin/**
