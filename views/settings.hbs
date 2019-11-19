@@ -267,10 +267,10 @@
                 if (notificationSettings.enabled) {
                     if (notificationSettings.fbtoken === currentToken) {
                         // Enabld on this device
-                        document.querySelector('#notifications-status').textContent = "Enabled";
+                        document.querySelector('#notifications-status').textContent = "On ✅";
                     } else {
                         // Enabled on a different device
-                        document.querySelector('#notifications-status').textContent = "Enabled on a different device";
+                        document.querySelector('#notifications-status').textContent = "Enabled on a different device 👍";
                         document.querySelector('#switch-notifications-btn').style.display = "block";
                     }
                 }
