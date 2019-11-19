@@ -59,10 +59,10 @@
             <input type="hidden" name="notifications.enabled"
                    value="{{#eq settings.notifications.enabled true }}1{{else}}0{{/eq}}">
             <input type="hidden" name="notifications.fbtoken" value="{{ settings.notifications.fbtoken }}">
-            <b><small id="notifications-status"></small></b>
-            <br>
             <div><small>@RemindMe_OfThis can send you push notifications via your browser, instead of on
-                Twitter. This allows us to get past Twitter's Tweet limits, so you'll always get your reminders on time.✅</small></div>
+                Twitter. This allows us to get past Twitter's Tweet limits, so you'll always get your reminders on time.</small></div>
+            <br>
+            <b><small id="notifications-status"></small></b>
             <br>
             <br>
             <div id="notifications-buttons">
@@ -104,7 +104,7 @@
             document.querySelector('#notifications-status').textContent = "Off";
             document.querySelector('#enable-notifications-btn').style.display = "block";
         } else {
-            document.querySelector('#notifications-status').textContent = "On";
+            document.querySelector('#notifications-status').textContent = "On ✅";
             document.querySelector('#disable-notifications-btn').style.display = "block";
         }
     }

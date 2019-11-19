@@ -1,0 +1,175 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon"
+          href="https://raw.githubusercontent.com/shalvah/RemindMeOfThisTweet/master/favicon.ico"
+          crossorigin="anonymous"
+          type="image/x-icon"/>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', Calibri, sans-serif;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            font-size: 1.2em;
+            color: #ff5722;
+            background-image: url("https://raw.githubusercontent.com/shalvah/RemindMeOfThisTweet/master/bg.png");
+            background-repeat: no-repeat;
+            background-color: #fa8ea0;
+            background-attachment: fixed;
+            background-position: center center;
+            background-size: cover;
+            text-align: center;
+        }
+
+        .content {
+            flex-grow: 0.8;
+        }
+
+        a {
+            color: white;
+        }
+
+        footer {
+            text-align: center;
+        }
+
+        .screenshot {
+            max-width: 60%;
+            height: auto;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .screenshot {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        .scalable {
+            display: inline-block;
+            zoom: 1;
+            vertical-align: top;
+        }
+
+        .scalable a {
+            background: #c1e6ea;
+            border-radius: .4em;
+            border: 0;
+            display: inline-block;
+            height: 52px;
+            position: relative;
+            text-decoration: none;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .scalable .label {
+            display: inline-block;
+            color: #222;
+            font-size: 24px;
+            line-height: 2.2em;
+            padding: 0 1.5em 0 3.2em;
+        }
+
+        .scalable i {
+            position: absolute;
+        }
+
+        .scalable i.raster {
+            background-position: absolute;
+            background-size: 88% auto;
+            height: 100%;
+            left: .9em;
+            top: .5em;
+            width: 2.3em;
+        }
+
+        .scalable.dark a {
+            background: cornflowerblue;
+            color: #FFF;
+        }
+
+        i.raster {
+            background: transparent url(data:image/png;base64,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) no-repeat 0 0;
+        }
+    </style>
+    <title>@RemindMe_OfThis: Set reminders with a Tweet</title>
+    <meta name="title" content="@RemindMe_OfThis: Set reminders with a Tweet">
+    <meta name="description" content="Set a reminder for anything, with a single Tweet.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://remindmeofthis.app/">
+    <meta property="og:title" content="@RemindMe_OfThis: Set reminders with a Tweet">
+    <meta property="og:description" content="Set a reminder for anything, with a single Tweet.">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://remindmeofthis.app/">
+    <meta property="twitter:title" content="@RemindMe_OfThis: Set reminders with a Tweet">
+    <meta property="twitter:description" content="Set a reminder for anything, with a single Tweet.">
+</head>
+
+<body>
+
+<div class="content">
+    <h1 style="color: cornflowerblue">Set reminders for anything with a single Tweet.</h1>
+</div>
+
+<div>
+    <h3>Mention <a href="http://twitter.com/@RemindMe_OfThis">@RemindMe_OfThis</a> with a time:</h3>
+</div>
+
+<div>
+    <img class="screenshot" alt="Example of setting reminder: @RemindMe_OfThis in three years"
+         src="https://raw.githubusercontent.com/shalvah/RemindMeOfThisTweet/master/reminder-request.png">
+    <br>
+    <br>
+</div>
+
+<div>
+    <h3>And get notified when it's time, via Twitter:</h3>
+</div>
+
+<div>
+    <img class="screenshot" alt="Reminder notification on Twitter"
+         src="https://raw.githubusercontent.com/shalvah/RemindMeOfThisTweet/master/reminder.png">
+    <br>
+    <br>
+</div>
+
+<div>
+    <h3>Or with a push notification:</h3>
+</div>
+
+<div>
+    <img class="screenshot" alt="Reminder notification on Twitter"
+         src="https://raw.githubusercontent.com/shalvah/RemindMeOfThisTweet/master/reminder-pn.png">
+    <br>
+    <br>
+</div>
+
+<div>
+    Already using @RemindMe_OfThis? Sign in to change your settings.
+</div>
+<br>
+
+<div class='scalable dark'>
+    <a href='/_/starttwittersignin'><i class='raster'></i><span
+            class='label'>Sign in with Twitter</span></a>
+</div>
+<br>
+
+<footer style="margin-bottom: 0; padding-bottom: 5px;">
+    <div>
+        <a href="https://www.patreon.com/shalvah">Support @RemindMe_OfThis</a>
+        &nbsp;|&nbsp;
+        <a href="https://github.com/shalvah/RemindMeOfThisTweet">Check out the source code</a>
+
+    </div>
+</footer>
+
+</body>

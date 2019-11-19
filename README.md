@@ -14,12 +14,12 @@ Just tweet:
 > @RemindMe_OfThis in three years
 
 
-![Reminder request screenshot](reminder-request.png)
+![Reminder request screenshot](assets/reminder-request.png)
 
 And when the time is right:
 
 
-![Reminder screenshot](reminder.png)
+![Reminder screenshot](assets/reminder.png)
 
 
 Of course, that's not all you can do! You can set reminders for your own tweets (New Year's Resolutions, anyone?👀), too, for instance.
