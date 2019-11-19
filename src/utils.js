@@ -47,6 +47,18 @@ const http = {
         };
     },
 
+    renderHtml(view) {
+        const fileName = path.resolve(__dirname, '..', 'views', `${view}.html`);
+        let body = fs.readFileSync(fileName, "utf8");
+
+        return {
+            statusCode: 200,
+            headers: {"content-type": "text/html; charset=utf-8"},
+            body
+        };
+
+    },
+
     redirect(location, cookie) {
         let headers = {
             location,

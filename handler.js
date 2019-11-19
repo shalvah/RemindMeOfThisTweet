@@ -159,7 +159,7 @@ module.exports.getPage = async (event, context) => {
 };
 
 module.exports.getHomePage = async (event, context) => {
-    return http.render('home');
+    return http.renderHtml('home');
 };
 
 module.exports.updateSettings = async (event, context) => {
