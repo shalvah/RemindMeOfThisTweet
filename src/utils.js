@@ -116,6 +116,8 @@ const randomAcknowledgementMessage = (reminderTime, username, tweetId) => {
     ];
     let message = responses[Math.floor(Math.random() * responses.length)];
     message += " Reply \"cancel\" to cancel this reminder.";
+
+    message += "\nPsst! Did I get your time wrong?👀 You can set your timezone (and enable push notifications) by going to https://remindmeofthis.app/settings.";
     message += "\n" + "https://twitter.com/" + username + "/status/" + tweetId;
     return message;
 };
