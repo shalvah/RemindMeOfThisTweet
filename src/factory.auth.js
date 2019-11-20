@@ -17,7 +17,12 @@ module.exports = (cache) => {
         if (!cookie) {
             return null;
         }
-        const sessionId = cookie.match(/\brmotid=([^;\s]+)/)[1];
+        const matched = cookie.match(/\brmotid=([^;\s]+)/);
+        if (!matched) {
+            return null;
+        }
+
+        const sessionId = matched[1];
         if (!sessionId) {
             return null;
         }
