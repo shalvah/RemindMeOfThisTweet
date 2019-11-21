@@ -94,6 +94,11 @@ const randomReminderMessage = (username, tweetId) => {
         `Hey boss! Here's the reminder you asked for.👍`,
     ];
     let response = responses[Math.floor(Math.random() * responses.length)];
+    const extras = [
+        "Did I get your time wrong?👀 You can set your timezone (and enable push notifications) by going to https://remindmeofthis.app/settings.",
+        "Would you like to get a push notification instead? You can enable this (or set your timezone) by going to https://remindmeofthis.app/settings.",
+    ];
+    response += "\n\n" + extras[Math.floor(Math.random() * extras.length)];
     response += "\n" + "https://twitter.com/" + username + "/status/" + tweetId;
     return response;
 };
@@ -117,7 +122,7 @@ const randomAcknowledgementMessage = (reminderTime, username, tweetId) => {
     let message = responses[Math.floor(Math.random() * responses.length)];
     message += " Reply \"cancel\" to cancel this reminder.";
 
-    message += "\nPsst! Did I get your time wrong?👀 You can set your timezone (and enable push notifications) by going to https://remindmeofthis.app/settings.";
+    message += "\n\nPsst! Did I get your time wrong?👀 You can set your timezone (and enable push notifications) by going to https://remindmeofthis.app/settings.";
     message += "\n" + "https://twitter.com/" + username + "/status/" + tweetId;
     return message;
 };
