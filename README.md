@@ -53,7 +53,7 @@ This function runs once every minute (this means reminders can only have minute 
 Renders the home page of http://remindmeofthis.app
 
 #### `getPage`
-Renders all other pages on http://remindmeofthis.app. Why are `getHomePage` and `getPage` separate, you ask? I honestly do not remember. Maybe I wasn't sure if I could make path parameters optional.
+Renders all other pages on http://remindmeofthis.app. Why are `getHomePage` and `getPage` separate, you ask? I honestly do not remember. Maybe I wasn't sure if I could make path parameters optional.🤔
 
 #### `startTwitterSignIn`
 When you click "Sign in With Twitter" on the website, you're redirected to the URL of this function. It retrieves the necessary tokens and passes on to Twitter API to start [the sign in process](https://developer.twitter.com/en/docs/basics/authentication/guides/log-in-with-twitter).
