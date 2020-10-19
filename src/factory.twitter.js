@@ -9,6 +9,7 @@ const {
     errors: {
         RateLimited,
         BadRequest,
+        ProblemWithPermissions
     },
     wrapTwitterErrors
 } = require('twitter-error-handler');
@@ -78,6 +79,8 @@ module.exports = (cache) => {
                         await cache.setAsync('no-reply', 1, 'EX', 60 * 10);
                     })
                     .type(BadRequest, () => null)
+                    // todo handle this better
+                    .type(ProblemWithPermissions, console.log)
                     .throw();
             });
     };

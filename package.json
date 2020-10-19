@@ -12,7 +12,7 @@
     "redis": "^2.8.0",
     "serverless-dotenv-plugin": "^2.1.1",
     "twit": "^2.2.11",
-    "twitter-error-handler": "^2.0.1",
+    "twitter-error-handler": "^2.2.0",
     "twittersignin": "^1.1.0"
   },
   "devDependencies": {
