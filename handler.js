@@ -1,4 +1,9 @@
 'use strict';
+const Sentry = require("@sentry/serverless");
+
+Sentry.AWSLambda.init({
+    dsn: process.env.SENTRY_DSN,
+});
 
 const cache = require('./src/cache');
 const twitter = require('./src/factory.twitter')(cache);
@@ -68,6 +73,11 @@ module.exports.handleAccountActivity = async (event, context) => {
     return http.success(`Handled ${allMentions.length} tweets`);
 };
 
+(process.env.NODE_ENV === 'production') && (exports.handleAccountActivity = Sentry.AWSLambda.wrapHandler(exports.handleAccountActivity, {
+    timeoutWarningLimit: 5000,
+}));
+
+
 module.exports.handleTwitterCrc = async (event, context) => {
     const crypto = require('crypto');
     const hmac = crypto.createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET)
@@ -83,6 +93,9 @@ module.exports.handleTwitterCrc = async (event, context) => {
     return response;
 };
 
+(process.env.NODE_ENV === 'production') && (exports.handleTwitterCrc = Sentry.AWSLambda.wrapHandler(exports.handleTwitterCrc));
+
+
 module.exports.remind = async (event, context) => {
     const tweet = event.data;
     await Promise.all([
@@ -92,6 +105,9 @@ module.exports.remind = async (event, context) => {
 
     return http.success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
 };
+
+(process.env.NODE_ENV === 'production') && (exports.remind = Sentry.AWSLambda.wrapHandler(exports.remind));
+
 
 module.exports.checkForRemindersAndSend = async (event, context) => {
     let reminders = [];
@@ -113,6 +129,9 @@ module.exports.checkForRemindersAndSend = async (event, context) => {
     return http.success(`Reminded for ${reminders.length} tweets`);
 };
 
+(process.env.NODE_ENV === 'production') && (exports.checkForRemindersAndSend = Sentry.AWSLambda.wrapHandler(exports.checkForRemindersAndSend));
+
+
 module.exports.retryFailedTasks = async (event, context) => {
     const failedTasks = await cache.lrangeAsync(event.queue || 'PARSE_TIME_FAILURE', 0, -1);
 
@@ -126,6 +145,7 @@ module.exports.retryFailedTasks = async (event, context) => {
 
     return http.success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
 };
+
 
 module.exports.getPage = async (event, context) => {
     switch (event.pathParameters.page) {
@@ -158,9 +178,18 @@ module.exports.getPage = async (event, context) => {
     }
 };
 
+(process.env.NODE_ENV === 'production') && (exports.getPage = Sentry.AWSLambda.wrapHandler(exports.getPage, {
+    timeoutWarningLimit: 2000,
+}));
+
+
 module.exports.getHomePage = async (event, context) => {
     return http.renderHtml('home');
 };
+
+(process.env.NODE_ENV === 'production') && (exports.getHomePage = Sentry.AWSLambda.wrapHandler(exports.getHomePage, {
+    timeoutWarningLimit: 5000,
+}));
 
 module.exports.updateSettings = async (event, context) => {
     console.log(event.body);
@@ -188,6 +217,9 @@ module.exports.updateSettings = async (event, context) => {
     return http.redirect('/settings');
 };
 
+(process.env.NODE_ENV === 'production') && (exports.updateSettings = Sentry.AWSLambda.wrapHandler(exports.updateSettings));
+
+
 module.exports.startTwitterSignIn = async (event, context) => {
     const {
         oauth_token: requestToken,
@@ -202,6 +234,9 @@ module.exports.startTwitterSignIn = async (event, context) => {
     await cache.setAsync(`tokens-${requestToken}`, requestTokenSecret, 'EX', 5 * 60);
     return http.redirect('https://api.twitter.com/oauth/authenticate?oauth_token=' + requestToken);
 };
+
+(process.env.NODE_ENV === 'production') && (exports.startTwitterSignIn = Sentry.AWSLambda.wrapHandler(exports.startTwitterSignIn));
+
 
 module.exports.completeTwitterSignIn = async (event, context) => {
     const requestToken = event.queryStringParameters.oauth_token;
@@ -220,3 +255,5 @@ module.exports.completeTwitterSignIn = async (event, context) => {
 
     return http.redirect('/settings', `rmotid=${sessionId}`);
 };
+
+(process.env.NODE_ENV === 'production') && (exports.completeTwitterSignIn = Sentry.AWSLambda.wrapHandler(exports.completeTwitterSignIn));

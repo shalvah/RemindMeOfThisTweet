@@ -1,7 +1,6 @@
 service: RemindMeOfThisTweet
 plugins:
 - serverless-dotenv-plugin
-- serverless-plugin-aws-alerts
 
 provider:
   name: aws
@@ -37,6 +36,8 @@ provider:
     LAMBDA_FUNCTION_ARN: ${env:LAMBDA_FUNCTION_ARN}
     EXTERNAL_URL: ${env:EXTERNAL_URL}
     FIREBASE_PROJECT_ID: ${env:FIREBASE_PROJECT_ID}
+    SENTRY_DSN: ${env:SENTRY_DSN}
+    NODE_ENV: ${env:NODE_ENV}
 
 package:
   exclude:
@@ -59,9 +60,6 @@ functions:
     - http:
         path: /webhook
         method: post
-    alarms:
-    - functionErrors
-    - functionDuration
 
   handleTwitterCrc:
     handler: handler.handleTwitterCrc
@@ -69,18 +67,12 @@ functions:
     - http:
         path: /webhook
         method: get
-    alarms:
-    - functionErrors
-    - functionDuration
 
   checkForRemindersAndSend:
     handler: handler.checkForRemindersAndSend
     timeout: 60
     events:
     - schedule: rate(1 minute)
-    alarms:
-    - functionErrors
-    - functionDuration
 
   getHomePage:
     handler: handler.getHomePage
