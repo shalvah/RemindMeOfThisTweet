@@ -91,10 +91,6 @@ functions:
             parameters:
               paths:
                 page: true
-    alarms:
-      - functionErrors
-      - name: functionDuration
-        threshold: 2000
 
   startTwitterSignIn:
     handler: handler.startTwitterSignIn
@@ -123,28 +119,3 @@ functions:
 # Deprecated
   remind:
     handler: handler.remind
-    alarms:
-    - functionErrors
-    - functionDuration
-
-custom:
-  alerts:
-    definitions:
-      functionErrors:
-        # alert if function throws an error
-        threshold: 1
-        period: 60
-        treatMissingData: notBreaching
-      functionDuration:
-        # alert if function takes more than 2 seconds too many times
-        threshold: 2000
-        period: 60
-        datapointsToAlarm: 10
-        evaluationPeriods: 30
-        treatMissingData: notBreaching
-    topics:
-      alarm:
-        topic: ${self:service}-dev-alerts-alarm
-        notifications:
-        - protocol: email
-          endpoint: shalvah.adebayo+awsalerts@gmail.com
