@@ -97,8 +97,8 @@ const randomReminderMessage = (username, tweetId) => {
     ];
     let response = responses[Math.floor(Math.random() * responses.length)];
     const extras = [
-        "Did I get your time wrong?👀 You can fix your timezone by going to https://remindmeofthis.app/settings.",
-        "Go to https://remindmeofthis.app/settings if you'd like to customize my behaviour.",
+        "Did I get your time wrong?👀 You can fix your timezone at https://remindmeofthis.app/settings.",
+        "Check out https://remindmeofthis.app/settings for some options to customize my behaviour.",
         "PS. You can set up push notifications or let me know your correct timezone at https://remindmeofthis.app/settings.",
     ];
     response += "\n\n" + extras[Math.floor(Math.random() * extras.length)];
@@ -116,16 +116,17 @@ const getReminderTime = (dateTime) => {
 
 const randomAcknowledgementMessage = (reminderTime, username, tweetId) => {
     let responses = [
-        `Sure thing👌! I'll remind you of this tweet on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.😃`,
-        `Got it, @${username}! I'll remind you about this on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.🤗`,
-        `Gotcha, boss! I've set your reminder for ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.🤗`,
-        `Aye aye, captain👮‍♀️! Reminder set for ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.📝`,
-        `Yes, boss. ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}. One new reminder coming right up.`,
+        `Noted📝!\n\nYour reminder will be on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.😃`,
+        `Sure thing👌!\n\nI'll remind you of this tweet on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.😃`,
+        `Got it, @${username}!\n\nI'll remind you about this on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.🤗`,
+        `Gotcha, boss!\n\nI've set your reminder for ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.🤗`,
+        `Aye aye, captain👮‍♀️!\n\nReminder set for ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.📝`,
+        `Yes, boss.\n\n${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}. One new reminder, coming right up.`,
     ];
     let message = responses[Math.floor(Math.random() * responses.length)];
-    message += " Reply \"cancel\" to cancel this reminder.";
+    message += "\n\nReply \"cancel\" to cancel this reminder.";
 
-    message += "\n\nPsst! Did I get your time wrong?👀 You can set your timezone (and enable push notifications) by going to https://remindmeofthis.app/settings.";
+    message += "\n\nPS. If I got your time wrong, you can fix your timezone at https://remindmeofthis.app/settings.";
     message += "\n" + "https://twitter.com/" + username + "/status/" + tweetId;
     return message;
 };

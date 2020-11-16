@@ -143,7 +143,6 @@ module.exports = (cache) => {
     };
 
     return {
-        getTweet,
         replyWithReminder,
         replyWithAcknowledgement,
         replyWithCancellation,
