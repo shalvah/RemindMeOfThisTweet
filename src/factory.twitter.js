@@ -94,7 +94,7 @@ module.exports = (cache) => {
         if (!currentTweetDetails) {
             return;
         }
-        tweet.author = currentTweetDetails.user.screen_name;
+        tweet.author = currentTweetDetails.user.screen_name; // eslint-disable-line require-atomic-updates
         let content = randomReminderMessage(tweet.author, tweet.id);
         return reply(tweet, content);
     };
