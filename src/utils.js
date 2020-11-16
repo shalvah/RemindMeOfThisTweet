@@ -87,16 +87,19 @@ const http = {
 
 const randomReminderMessage = (username, tweetId) => {
     let responses = [
-        `Hi 👋, you asked me to remind you of this tweet. 😁`,
+        `Heyo 👋, you asked me to remind you of this tweet. 😁`,
         `⏰ Hey @${username}, you wanted me to remind you of this tweet. Well, here you go! 🤗`,
         `Hey @${username}, here's your reminder.😄 ⏰`,
         `Ding dong! ⏰ Here's your reminder, @${username}.`,
         `Hey boss! Here's the reminder you asked for.👍`,
+        "Psst! Your reminder's here.",
+        `It's reminder time. Here you go @${username}`,
     ];
     let response = responses[Math.floor(Math.random() * responses.length)];
     const extras = [
-        "Did I get your time wrong?👀 You can set your timezone (and enable push notifications) by going to https://remindmeofthis.app/settings.",
-        "Would you like to get a push notification instead? You can enable this (or set your timezone) by going to https://remindmeofthis.app/settings.",
+        "Did I get your time wrong?👀 You can fix your timezone by going to https://remindmeofthis.app/settings.",
+        "Go to https://remindmeofthis.app/settings if you'd like to customize my behaviour.",
+        "PS. You can set up push notifications or let me know your correct timezone at https://remindmeofthis.app/settings.",
     ];
     response += "\n\n" + extras[Math.floor(Math.random() * extras.length)];
     response += "\n" + "https://twitter.com/" + username + "/status/" + tweetId;
