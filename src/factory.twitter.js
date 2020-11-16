@@ -9,7 +9,8 @@ const {
     errors: {
         RateLimited,
         BadRequest,
-        ProblemWithPermissions
+        ProblemWithPermissions,
+        ProblemWithTwitter,
     },
     wrapTwitterErrors
 } = require('twitter-error-handler');
@@ -87,9 +88,27 @@ module.exports = (cache) => {
 
     const replyWithReminder = async (tweet) => {
         console.log("Reminding for tweet: " + JSON.stringify(tweet));
+        // A common problem is people changing their usernames or deleting Tweets, making the reply show up as a full Tweet
+        // Let's fix that by fetching their updated username first (via re-fetching the Tweet)
+        const currentTweetDetails = await getTweet(tweet.id);
+        if (!currentTweetDetails) {
+            return;
+        }
+        tweet.author = currentTweetDetails.user.screen_name;
         let content = randomReminderMessage(tweet.author, tweet.id);
         return reply(tweet, content);
     };
+
+    const getTweet = (id) => {
+        return t.get('statuses/show', {id})
+            .then(r => r.data)
+            .catch(e => wrapTwitterErrors('statuses/show', e))
+            .catch(e => {
+                return aargh(e)
+                    .type([ProblemWithPermissions, BadRequest, ProblemWithTwitter], () => null)
+                    .throw();
+            });
+    }
 
     const replyWithCancellation = async (tweet) => {
         let content = "Reminder cancelled.";
@@ -124,6 +143,7 @@ module.exports = (cache) => {
     };
 
     return {
+        getTweet,
         replyWithReminder,
         replyWithAcknowledgement,
         replyWithCancellation,
