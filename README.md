@@ -34,7 +34,7 @@ Note that the bot will assume all absolute times are in UTC, so if you want to s
 - Firebase Messaging for push notifications
 - [Redis](http://redis.io) for data storage
 - Node.js 10.x
-- [Chrono](https://github.com/chrono-node) for parsing dates/times from text
+- [Chrono](https://github.com/wanasit/chrono) for parsing dates/times from text
 
 ### Implementation
 The bot uses a number of AWS Lambda functions that work in tandem:
