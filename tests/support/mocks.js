@@ -1,13 +1,11 @@
 "use strict";
 
-const mock = require('mock-require');
-
 const mockCache = () => {
-    const redis = require("redis-mock");
-    require('bluebird').promisifyAll(redis.RedisClient.prototype);
-    const cache = redis.createClient();
-    mock("../../src/cache", cache);
-    return cache;
+    jest.mock("../../src/cache", () => {
+        const redis = require("redis-mock");
+        require('bluebird').promisifyAll(redis.RedisClient.prototype);
+        return redis.createClient();
+    });
 };
 
 const mockDate = (date) => {
@@ -21,7 +19,7 @@ const mockDate = (date) => {
 };
 
 const mockMetrics = () => {
-    mock('../../src/metrics', { newReminderSet() {}});
+    jest.mock('../../src/metrics', () => ({ newReminderSet() {}}));
 };
 
 const mockTwitterAPI = () => {
@@ -51,9 +49,9 @@ const mockTwitterAPI = () => {
 };
 
 const mockNotifications = () => {
-    mock('../../src/notifications', {
+    jest.mock('../../src/notifications', () => ({
         sendNotification() { return Promise.resolve(); },
-    });
+    }));
 };
 
 module.exports = {

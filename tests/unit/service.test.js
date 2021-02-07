@@ -1,15 +1,15 @@
-
 require('dotenv').config({path: '.env.test'});
 
-const tap = require('tap');
-const { mockCache } = require('../../spec/support/mocks');
-const { parseReminderTime, setUserSettings } = require('../../src/factory.service')(mockCache());
+const { mockCache } = require("../support/mocks");
+mockCache();
+const cache = require('../../src/cache');
+const {parseReminderTime, setUserSettings} = require('../../src/factory.service')(cache);
 
 let parsingResult;
 
 const mockDate = new Date("2019-06-12T03:00:05");
 require('mockdate').set(mockDate);
-    
+
 const createMention = ({text, date, author}) => {
     return {
         id: 13984834,
@@ -20,34 +20,34 @@ const createMention = ({text, date, author}) => {
     };
 };
 
-async function test() {
+test('It works', async () => {
     parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis next year"}));
-    tap.equal(parsingResult.remindAt.getFullYear(), mockDate.getFullYear() + 1);
+    expect(parsingResult.remindAt.getFullYear()).toBe(mockDate.getFullYear() + 1);
 
     parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis tomorrow"}));
-    tap.equal(parsingResult.remindAt.getDay(), mockDate.getDay() + 1);
+    expect(parsingResult.remindAt.getDay()).toBe(mockDate.getDay() + 1);
 
     parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis bla bla"}));
-    tap.equal(parsingResult.failure, "PARSE_TIME_FAILURE");
+    expect(parsingResult.failure).toBe("PARSE_TIME_FAILURE");
 
     parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis last year"}));
-    tap.equal(parsingResult.failure, "TIME_IN_PAST");
+    expect(parsingResult.failure).toBe("TIME_IN_PAST");
 
     parsingResult = await parseReminderTime(createMention({text: "next month @RemindMe_OfThis"}));
-    tap.equal(parsingResult.remindAt.getUTCMonth(), mockDate.getUTCMonth() + 1);
+    expect(parsingResult.remindAt.getUTCMonth()).toBe(mockDate.getUTCMonth() + 1);
 
     // Picks time after the last mention
     parsingResult = await parseReminderTime(createMention({
         text: "@RemindMe_OfThis next month @RemindMe_OfThis five minutes",
     }));
-    tap.equal(parsingResult.remindAt.getUTCMonth(), mockDate.getUTCMonth());
-    tap.equal(parsingResult.remindAt.getMinutes(), mockDate.getMinutes() + 5);
+    expect(parsingResult.remindAt.getUTCMonth()).toBe(mockDate.getUTCMonth());
+    expect(parsingResult.remindAt.getMinutes()).toBe(mockDate.getMinutes() + 5);
 
     parsingResult = await parseReminderTime(createMention({
         text: "next month @RemindMe_OfThis five minutes",
     }));
-    tap.equal(parsingResult.remindAt.getUTCMonth(), mockDate.getUTCMonth());
-    tap.equal(parsingResult.remindAt.getMinutes(), mockDate.getMinutes() + 5);
+    expect(parsingResult.remindAt.getUTCMonth()).toBe(mockDate.getUTCMonth());
+    expect(parsingResult.remindAt.getMinutes()).toBe(mockDate.getMinutes() + 5);
 
     // Respects a user's timezone setting
     // It's UTC+5 user's time
@@ -58,21 +58,14 @@ async function test() {
         text: `@RemindMe_OfThis at ${usersCurrentTime + 14}:00`,
         author: "xxx"
     }));
-    tap.equal(
+    expect(
         parsingResult.remindAt.getHours() // reminder time
-        + (mockDate.getTimezoneOffset() / 60), // + machine offset =  reminder hour in UTC+0
-        currentUTCHour + 14
-    );
+        + (mockDate.getTimezoneOffset() / 60) // + machine offset =  reminder hour in UTC+0
+    ).toBe(currentUTCHour + 14);
 
     parsingResult = await parseReminderTime(createMention({
         text: `@RemindMe_OfThis in one hour`,
         author: "xxx"
     }));
-    console.log(parsingResult);
-    tap.equal(
-        parsingResult.remindAt.getHours(),
-        mockDate.getHours() + 1
-    );
-}
-
-test();
+    expect(parsingResult.remindAt.getHours()).toBe(mockDate.getHours() + 1);
+});

@@ -18,9 +18,8 @@
   "devDependencies": {
     "dotenv": "^6.2.0",
     "eslint": "^6.4.0",
-    "jasmine": "^3.5.0",
+    "jest": "^26.6.3",
     "mitm": "^1.7.0",
-    "mock-require": "^3.0.3",
     "mockdate": "^2.0.5",
     "redis-mock": "^0.46.0",
     "request-promise": "^4.2.4",
@@ -28,9 +27,8 @@
     "tap": "^14.10.8"
   },
   "scripts": {
-    "test-unit": "tap test/unit/** --reporter spec --no-cov",
-    "test-init": "jasmine init",
-    "test": "jasmine",
+    "test-unit": "jest tests/unit/",
+    "test": "jest tests/",
     "lint": "eslint src handler.js"
   }
 }

@@ -1,15 +1,18 @@
 'use strict';
 require('dotenv').config({path: '.env.test'});
+
+const { mockCache, mockDate, mockTwitterAPI, mockMetrics, mockNotifications } = require("./support/mocks");
+mockCache();
+mockMetrics();
+mockNotifications();
+
 const screenName = process.env.TWITTER_SCREEN_NAME;
 
 const {createWebhookEvent, createUser, createTweetCreateEvent, createRetweet, createTweet} = require("./support/utils");
 const getDateToNearestMinute = require("../src/utils").getDateToNearestMinute;
 
-const { mockCache, mockDate, mockTwitterAPI, mockMetrics, mockNotifications } = require("./support/mocks");
-const cache = mockCache();
+const cache = require('../src/cache');
 const today = mockDate();
-mockMetrics();
-mockNotifications();
 mockTwitterAPI();
 
 const handleAccountActivity = require('../handler').handleAccountActivity;
@@ -18,10 +21,10 @@ describe("handleAccountActivity", () => {
 
     describe("when body has no tweet_create_events", () => {
 
-        it("returns correct response", () => {
-            handleAccountActivity(createWebhookEvent({}), {})
+        it("returns correct response", async () => {
+            await handleAccountActivity(createWebhookEvent({}), {})
                 .then(response => {
-                    expect(response.body).toMatch('No new tweets');
+                    expect(response.body).toBe('No new tweets');
                 });
 
             const body = {
@@ -33,9 +36,9 @@ describe("handleAccountActivity", () => {
                     source: createUser(),
                 }],
             };
-            handleAccountActivity(createWebhookEvent(body), {})
+            return handleAccountActivity(createWebhookEvent(body), {})
                 .then(response => {
-                    expect(response.body).toMatch('No new tweets');
+                    expect(response.body).toBe('No new tweets');
                 });
         });
 
@@ -51,7 +54,7 @@ describe("handleAccountActivity", () => {
             const body = createTweetCreateEvent(createTweet({username: screenName}));
             return handleAccountActivity(createWebhookEvent(body), {})
                 .then(response => {
-                    expect(response.body).toMatch('Handled 0 tweets');
+                    expect(response.body).toBe('Handled 0 tweets');
                 });
         });
 
@@ -59,7 +62,7 @@ describe("handleAccountActivity", () => {
             const body = createTweetCreateEvent(createRetweet({text: "@RemindMe_OfThis in five minutes"}));
             return handleAccountActivity(createWebhookEvent(body), {})
                 .then(response => {
-                    expect(response.body).toMatch('Handled 0 tweets');
+                    expect(response.body).toBe('Handled 0 tweets');
                 });
         });
 
@@ -68,11 +71,12 @@ describe("handleAccountActivity", () => {
             date.setFullYear(today.getFullYear() - 1);
             const tweet = createTweet({text: "@RemindMe_OfThis in five minutes", date});
             const body = createTweetCreateEvent(tweet);
+            console.log(body, "YUPPP");
             const sinon = require('sinon');
             const logSpy = sinon.spy(console, "log");
             return handleAccountActivity(createWebhookEvent(body), {})
                 .then(async response => {
-                    expect(response.body).toMatch('Handled 1 tweets');
+                    expect(response.body).toBe('Handled 1 tweets');
                     expect(logSpy.calledWith(sinon.match({
                         failure: "TIME_IN_PAST",
                         tweet: sinon.match({
@@ -92,19 +96,18 @@ describe("handleAccountActivity", () => {
 
             return handleAccountActivity(createWebhookEvent(body), {})
                 .then(async response => {
-                    expect(response.body).toMatch('Handled 1 tweets');
+                    expect(response.body).toBe('Handled 1 tweets');
 
                     const date = new Date(today);
                     date.setFullYear(today.getFullYear() + 5);
                     date.setHours(12);
                     date.setSeconds(0);
-                    console.log(date);
                     const key = getDateToNearestMinute(date).toISOString();
                     const tweetObject = JSON.parse(await cache.lrangeAsync(key, 0, -1));
-                    expect(tweetObject.id).toMatch(tweet.id_str);
+                    expect(tweetObject.id).toBe(tweet.id_str);
                     expect(new Date(tweetObject.created_at).getTime()).toBe(new Date(tweet.created_at).getTime());
-                    expect(tweetObject.text).toMatch(tweet.text);
-                    expect(tweetObject.author).toMatch(tweet.user.screen_name);
+                    expect(tweetObject.text).toBe(tweet.text);
+                    expect(tweetObject.author).toBe(tweet.user.screen_name);
                 });
         });
 
@@ -114,19 +117,18 @@ describe("handleAccountActivity", () => {
 
             return handleAccountActivity(createWebhookEvent(body), {})
                 .then(async response => {
-                    expect(response.body).toMatch('Handled 1 tweets');
+                    expect(response.body).toBe('Handled 1 tweets');
 
                     const date = new Date(today);
                     date.setFullYear(today.getFullYear() + 2);
                     date.setHours(12);
                     date.setSeconds(0);
-                    console.log(date);
                     const key = getDateToNearestMinute(date).toISOString();
                     const tweetObject = JSON.parse(await cache.lrangeAsync(key, 0, -1));
-                    expect(tweetObject.id).toMatch(tweet.id_str);
+                    expect(tweetObject.id).toBe(tweet.id_str);
                     expect(new Date(tweetObject.created_at).getTime()).toBe(new Date(tweet.created_at).getTime());
-                    expect(tweetObject.text).toMatch(tweet.text);
-                    expect(tweetObject.author).toMatch(tweet.user.screen_name);
+                    expect(tweetObject.text).toBe(tweet.text);
+                    expect(tweetObject.author).toBe(tweet.user.screen_name);
 
                     const notificationKey = (await cache.keysAsync(`*${tweetObject.author}`))[0];
                     return notificationKey.replace(`-${tweetObject.author}`, '');
@@ -137,7 +139,7 @@ describe("handleAccountActivity", () => {
                     return handleAccountActivity(createWebhookEvent(body), {});
                 })
                 .then(async(response) => {
-                    expect(response.body).toMatch('Handled 1 tweets');
+                    expect(response.body).toBe('Handled 1 tweets');
 
                     const date = new Date(today);
                     date.setFullYear(today.getFullYear() + 2);
