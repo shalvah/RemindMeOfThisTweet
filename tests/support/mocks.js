@@ -8,14 +8,11 @@ const mockCache = () => {
     });
 };
 
-const mockDate = (date) => {
+const mockDate = () => {
     const DEFAULT_MOCK_DATE = new Date("2019-06-12T03:00:05");
-    const dateForTesting = date || DEFAULT_MOCK_DATE;
-    const tzOffset = 0;
-    console.log(`Using date ${dateForTesting} with timezone offset ${tzOffset} (${dateForTesting.toISOString()}) for testing`);
-    const MockDate = require('mockdate');
-    MockDate.set(dateForTesting, tzOffset);
-    return dateForTesting;
+    console.log(`Using date ${DEFAULT_MOCK_DATE} (${DEFAULT_MOCK_DATE.toISOString()}) for testing`);
+    require('mockdate').set(DEFAULT_MOCK_DATE);
+    return DEFAULT_MOCK_DATE;
 };
 
 const mockMetrics = () => {

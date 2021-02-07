@@ -1,15 +1,10 @@
 const timeparser = require('../../src/timeparser');
 
-const DEFAULT_MOCK_DATE = new Date("2019-06-12T03:00:05");
-let MOCK_DATE_IN_USE;
+const MOCK_DATE_IN_USE = new Date("2019-06-12T03:00:05");
 
-function mockDate(date) {
-    const dateForTesting = date || DEFAULT_MOCK_DATE;
-    const tzOffset = 0;
-    console.log(`Timeparser: Using date ${dateForTesting} with timezone offset ${tzOffset} (${dateForTesting.toISOString()}) for testing`);
-    const MockDate = require('mockdate');
-    MockDate.set(dateForTesting, tzOffset);
-    MOCK_DATE_IN_USE = dateForTesting
+function mockDate() {
+    console.log(`Timeparser: Using date ${MOCK_DATE_IN_USE} (${MOCK_DATE_IN_USE.toISOString()}) for testing`);
+    require('mockdate').set(MOCK_DATE_IN_USE);
 }
 
 const tomorrow = () => {
@@ -67,10 +62,10 @@ test('It works', () => {
     expect(parsedDate.getMinutes()).toBe(59);
 
     parsedDate = getDate(scenario("Tuesday, 9th of July. 19:00 GMT"));
-    expect(parsedDate.getDate()).toBe(9);
-    expect(parsedDate.getMonth()).toBe(6);
-    expect(parsedDate.getHours()).toBe(19);
-    expect(parsedDate.getMinutes()).toBe(0);
+    expect(parsedDate.getUTCDate()).toBe(9);
+    expect(parsedDate.getUTCMonth()).toBe(6);
+    expect(parsedDate.getUTCHours()).toBe(19);
+    expect(parsedDate.getUTCMinutes()).toBe(0);
 
     parsedDate = getDate(scenario("on Friday by 9:30am"));
     expect(parsedDate.getDate()).toBe(14);
