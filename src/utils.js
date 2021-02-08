@@ -87,19 +87,19 @@ const http = {
 
 const randomReminderMessage = (username, tweetId) => {
     let responses = [
-        `Heyo 👋, you asked me to remind you of this tweet. 😁`,
-        `⏰ Hey @${username}, you wanted me to remind you of this tweet. Well, here you go! 🤗`,
-        `Hey @${username}, here's your reminder.😄 ⏰`,
+        `Heyo 👋, you asked me to remind you of this tweet.`,
+        `⏰ Hey @${username}, you wanted me to remind you of this tweet. Well, here you go!`,
+        `Hey @${username}, here's your reminder.⏰`,
         `Ding dong! ⏰ Here's your reminder, @${username}.`,
         `Hey boss! Here's the reminder you asked for.👍`,
         "Psst! Your reminder's here.",
-        `It's reminder time. Here you go @${username}`,
+        `It's reminder time. Here you go @${username}.`,
     ];
     let response = responses[Math.floor(Math.random() * responses.length)];
     const extras = [
-        "Did I get your time wrong?👀 You can fix your timezone at https://remindmeofthis.app/settings.",
+        "Did I get your time wrong? Visit https://remindmeofthis.app/settings to set your timezone.",
         "Check out https://remindmeofthis.app/settings for some options to customize my behaviour.",
-        "PS. You can set up push notifications or let me know your correct timezone at https://remindmeofthis.app/settings.",
+        "Visit https://remindmeofthis.app/settings to set up push notifications or let me know your correct timezone.",
     ];
     response += "\n\n" + extras[Math.floor(Math.random() * extras.length)];
     response += "\n" + "https://twitter.com/" + username + "/status/" + tweetId;
@@ -114,11 +114,11 @@ const formatDateFriendly = (dateTime) => {
 
 const randomAcknowledgementMessage = (reminderTime, username, tweetId) => {
     let responses = [
-        `Noted.📝 Your reminder will be on ${formatDateFriendly(reminderTime)}.😃`,
-        `Sure thing👌! I'll remind you of this tweet on ${formatDateFriendly(reminderTime)}.😃`,
-        `Got it, @${username}! I'll remind you about this on ${formatDateFriendly(reminderTime)}.🤗`,
-        `Gotcha, boss! I've set your reminder for ${formatDateFriendly(reminderTime)}.🤗`,
-        `Aye aye, captain👮‍♀️! Reminder set for ${formatDateFriendly(reminderTime)}.📝`,
+        `Noted.📝 Your reminder will be on ${formatDateFriendly(reminderTime)}.`,
+        `Sure thing👌! I'll remind you of this tweet on ${formatDateFriendly(reminderTime)}.`,
+        `Got it, @${username}! I'll remind you about this on ${formatDateFriendly(reminderTime)}.`,
+        `Gotcha, boss! I've set your reminder for ${formatDateFriendly(reminderTime)}.`,
+        `Aye aye, captain👮‍♀️! Reminder set for ${formatDateFriendly(reminderTime)}.`,
         `Yes, boss. ${formatDateFriendly(reminderTime)}. One new reminder, coming right up.`,
     ];
     let message = responses[Math.floor(Math.random() * responses.length)];
