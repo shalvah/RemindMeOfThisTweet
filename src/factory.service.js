@@ -6,7 +6,8 @@ const {getDateToNearestMinute} = require('./utils');
 const metrics = require('./metrics');
 const aargh = require('aargh');
 
-const make = (cache, twitter, notifications) => {
+const makeService = (cache, twitter, notifications) => {
+    const {getUserSettings} = require('./factory.settings')(cache);
 
     const parseTweetText = async (lastMentionIndex, refDate, tweet, settings = null) => {
         let textToParse = tweet.text.substring(lastMentionIndex);
@@ -175,26 +176,6 @@ const make = (cache, twitter, notifications) => {
             });
     };
 
-    /**
-     *
-     * @param username
-     * @returns {Promise<{utcOffset: number, notifications: {fbtoken: null, enabled: boolean}}>}
-     */
-    const getUserSettings = async (username) => {
-        const defaultUserSettings = {
-            utcOffset: 0,
-            notifications: {
-                enabled: false,
-                fbtoken: null,
-            },
-        };
-        return JSON.parse(await cache.getAsync(`settings-${username}`)) || defaultUserSettings;
-    };
-
-    const setUserSettings = (username, settings) => {
-        return cache.setAsync(`settings-${username}`, JSON.stringify(settings));
-    };
-
     const remind = async (tweet) => {
         const settings = await getUserSettings(tweet.author);
         if (settings.notifications.enabled && settings.notifications.fbtoken) {
@@ -212,10 +193,8 @@ const make = (cache, twitter, notifications) => {
         handleParsingResult,
         parseReminderTime,
         handleMention,
-        getUserSettings,
-        setUserSettings,
         remind,
     }
 };
 
-module.exports = make;
+module.exports = makeService;

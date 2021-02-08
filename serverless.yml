@@ -47,8 +47,7 @@ package:
   - .*
   - .*/**
   - bin/**
-  - test/**
-  - spec/**
+  - tests/**
   - awscli-bundle.zip
   - awscli-bundle/**
 

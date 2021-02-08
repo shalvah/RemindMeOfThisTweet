@@ -1,11 +1,9 @@
 require('dotenv').config({path: '.env.test'});
 
-const {mockCache} = require("../support/mocks");
-mockCache();
+require("../support/mocks").mockCache();
 const cache = require('../../src/cache');
-const {parseReminderTime, setUserSettings} = require('../../src/factory.service')(cache);
-
-let parsingResult;
+const {parseReminderTime} = require('../../src/factory.service')(cache);
+const {setUserSettings} = require('../../src/factory.settings')(cache);
 
 const mockDate = new Date("2019-06-12T03:00:05");
 require('mockdate').set(mockDate);
@@ -19,6 +17,8 @@ const createMention = ({text, date, author}) => {
         author: author || "diouha",
     };
 };
+
+let parsingResult;
 
 test('handles relative times', async () => {
     parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis next year"}));
@@ -36,6 +36,10 @@ test('handles relative times', async () => {
 
 test("doesn't set for time in past", async () => {
     parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis last year"}));
+    expect(parsingResult.failure).toBe("TIME_IN_PAST");
+
+    parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis January 2018"}));
+    console.log(parsingResult);
     expect(parsingResult.failure).toBe("TIME_IN_PAST");
 });
 

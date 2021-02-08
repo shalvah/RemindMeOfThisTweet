@@ -10,6 +10,7 @@ const twitter = require('./src/factory.twitter')(cache);
 const auth = require('./src/factory.auth')(cache);
 const notifications = require('./src/notifications');
 const service = require('./src/factory.service')(cache, twitter, notifications);
+const {setUserSettings, getUserSettings} = require('./src/factory.settings')(cache);
 const {http, getDateToNearestMinute, timezones} = require('./src/utils');
 const twitterSignIn = require('twittersignin')({
     consumerKey: process.env.TWITTER_CONSUMER_KEY,
@@ -168,7 +169,7 @@ module.exports.getPage = async (event, context) => {
             }
 
             const username = session.username;
-            const settings = await service.getUserSettings(username);
+            const settings = await getUserSettings(username);
 
             return http.render('settings', {username, settings, timezones});
         }
@@ -201,7 +202,7 @@ module.exports.updateSettings = async (event, context) => {
     const username = session.username;
     const body = require('querystring').decode(event.body);
     
-    const settings = await service.getUserSettings(username);
+    const settings = await getUserSettings(username);
     if (body.utcOffset) {
         settings.utcOffset = body.utcOffset;
     }
@@ -212,7 +213,7 @@ module.exports.updateSettings = async (event, context) => {
         settings.notifications.fbtoken = body['notifications.fbtoken'];
     }
 
-    await service.setUserSettings(username, settings);
+    await setUserSettings(username, settings);
 
     return http.redirect('/settings');
 };
