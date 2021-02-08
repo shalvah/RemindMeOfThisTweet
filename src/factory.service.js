@@ -24,11 +24,19 @@ const makeService = (cache, twitter, notifications) => {
                 mainResult.start.assign('timezoneOffset', userSettings.utcOffset);
             }
             const reminderTime = mainResult.start.date();
-            if (reminderTime > refDate && reminderTime > new Date) {
+            // Minimum of 3 minutes from now
+            const minimumReminderInterval = (new Date(Date.now() + (3 * 60 * 1000)));
+            if (reminderTime >= minimumReminderInterval) {
                 return {
                     remindAt: reminderTime,
                     refDate,
                     tweet,
+                };
+            } else {
+                return {
+                    failure: "TIME_IN_PAST",
+                    remindAt: reminderTime,
+                    tweet
                 };
             }
 
@@ -134,6 +142,10 @@ const makeService = (cache, twitter, notifications) => {
         console.log(result);
         if (result.cancel) {
             return await cancelReminder(result.tweet);
+        }
+
+        if (result.failure) {
+            return;
         }
 
         if (result.remindAt) {

@@ -1,10 +1,11 @@
 'use strict';
 require('dotenv').config({path: '.env.test'});
 
-const { mockCache, mockDate, mockTwitterAPI, mockMetrics, mockNotifications } = require("./support/mocks");
+const {mockCache, mockDate, mockTwitterAPI, mockMetrics, mockNotifications} = require("./support/mocks");
 mockCache();
 mockMetrics();
 mockNotifications();
+mockTwitterAPI();
 
 const screenName = process.env.TWITTER_SCREEN_NAME;
 
@@ -12,8 +13,8 @@ const {createWebhookEvent, createUser, createTweetCreateEvent, createRetweet, cr
 const getDateToNearestMinute = require("../src/utils").getDateToNearestMinute;
 
 const cache = require('../src/cache');
+/** @type {Date} today */
 const today = mockDate();
-mockTwitterAPI();
 
 const handleAccountActivity = require('../handler').handleAccountActivity;
 
@@ -66,49 +67,57 @@ describe("handleAccountActivity", () => {
                 });
         });
 
-        it("does not set reminder for tweets where time has past", () => {
-            const date = new Date(today);
-            date.setFullYear(today.getFullYear() - 1);
-            const tweet = createTweet({text: "@RemindMe_OfThis in five minutes", date});
-            const body = createTweetCreateEvent(tweet);
-            console.log(body, "YUPPP");
-            const sinon = require('sinon');
-            const logSpy = sinon.spy(console, "log");
-            return handleAccountActivity(createWebhookEvent(body), {})
-                .then(async response => {
-                    expect(response.body).toBe('Handled 1 tweets');
-                    expect(logSpy.calledWith(sinon.match({
-                        failure: "TIME_IN_PAST",
-                        tweet: sinon.match({
-                            id: tweet.id_str,
-                            created_at: tweet.created_at,
-                            text: tweet.text,
-                            referencing_tweet: tweet.in_reply_to_status_id_str,
-                            author: tweet.user.screen_name
-                        })
-                    }))).toBe(true);
-                });
+        it("does not set reminder for tweets where time has past", async () => {
+            let tweet = createTweet({text: "@RemindMe_OfThis last year"});
+            let body = createTweetCreateEvent(tweet);
+            let response = await handleAccountActivity(createWebhookEvent(body), {})
+
+            expect(response.body).toBe('Handled 1 tweets');
+            let year = today.getFullYear() - 1;
+            let reminder = await cache.keysAsync(year + "-*");
+            expect(reminder.length).toBe(0);
+
+            tweet = createTweet({text: "@RemindMe_OfThis in two minutes"});
+            body = createTweetCreateEvent(tweet);
+            response = await handleAccountActivity(createWebhookEvent(body), {})
+
+            expect(response.body).toBe('Handled 1 tweets');
+            reminder = await cache.keysAsync(today.getFullYear() + "-*");
+            expect(reminder.length).toBe(0);
+
         });
 
-        it("handles reminder creations properly", () => {
-            const tweet = createTweet({text: "@RemindMe_OfThis in five years"});
-            const body = createTweetCreateEvent(tweet);
+        it("handles reminder creations properly", async () => {
+            let tweet = createTweet({text: "@RemindMe_OfThis in five years"});
+            let body = createTweetCreateEvent(tweet);
 
-            return handleAccountActivity(createWebhookEvent(body), {})
-                .then(async response => {
-                    expect(response.body).toBe('Handled 1 tweets');
+            let response = await handleAccountActivity(createWebhookEvent(body), {})
 
-                    const date = new Date(today);
-                    date.setFullYear(today.getFullYear() + 5);
-                    date.setHours(12);
-                    date.setSeconds(0);
-                    const key = getDateToNearestMinute(date).toISOString();
-                    const tweetObject = JSON.parse(await cache.lrangeAsync(key, 0, -1));
-                    expect(tweetObject.id).toBe(tweet.id_str);
-                    expect(new Date(tweetObject.created_at).getTime()).toBe(new Date(tweet.created_at).getTime());
-                    expect(tweetObject.text).toBe(tweet.text);
-                    expect(tweetObject.author).toBe(tweet.user.screen_name);
-                });
+            expect(response.body).toBe('Handled 1 tweets');
+
+            const date = new Date(today);
+            date.setFullYear(today.getFullYear() + 5);
+            date.setHours(12);
+            date.setSeconds(0);
+            let key = getDateToNearestMinute(date).toISOString();
+            let tweetObject = JSON.parse(await cache.lrangeAsync(key, 0, -1));
+            expect(tweetObject.id).toBe(tweet.id_str);
+            expect(new Date(tweetObject.created_at).getTime()).toBe(new Date(tweet.created_at).getTime());
+            expect(tweetObject.text).toBe(tweet.text);
+            expect(tweetObject.author).toBe(tweet.user.screen_name);
+        });
+
+        it("properly uses last mention", async () => {
+            let tweet = createTweet({text: "now or six months @RemindMe_OfThis six months",});
+            let response = await handleAccountActivity(createWebhookEvent(createTweetCreateEvent(tweet)), {})
+
+            expect(response.body).toBe('Handled 1 tweets');
+
+            let reminder = await cache.keysAsync(`${today.getFullYear()}-*`);
+            expect(reminder.length).toBe(1);
+            let pattern = `${today.getFullYear()}-${today.getMonth() + 1 + 6}-*`;
+            reminder = await cache.keysAsync(pattern);
+            expect(reminder.length).toBe(1);
         });
 
         it("handles reminder creations and cancellations properly", () => {
@@ -134,11 +143,14 @@ describe("handleAccountActivity", () => {
                     return notificationKey.replace(`-${tweetObject.author}`, '');
                 })
                 .then((notificationId) => {
-                    const tweet = createTweet({text: `@${screenName} cancel`, inReplyTo: { id: notificationId, user: screenName } });
+                    const tweet = createTweet({
+                        text: `@${screenName} cancel`,
+                        inReplyTo: {id: notificationId, user: screenName}
+                    });
                     const body = createTweetCreateEvent(tweet);
                     return handleAccountActivity(createWebhookEvent(body), {});
                 })
-                .then(async(response) => {
+                .then(async (response) => {
                     expect(response.body).toBe('Handled 1 tweets');
 
                     const date = new Date(today);
