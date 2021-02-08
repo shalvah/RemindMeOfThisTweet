@@ -106,22 +106,20 @@ const randomReminderMessage = (username, tweetId) => {
     return response;
 };
 
-const getReminderDay = (dateTime) => {
-    return dateTime.toDateString();
-};
-
-const getReminderTime = (dateTime) => {
-    return dateTime.toTimeString().replace(/ \(.+\)/, '');
+const formatDateFriendly = (dateTime) => {
+    const timezone = new Date().toTimeString().slice(9, 17);
+    return (new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'short' }))
+        .format(dateTime) + " " + timezone;
 };
 
 const randomAcknowledgementMessage = (reminderTime, username, tweetId) => {
     let responses = [
-        `Noted📝!\n\nYour reminder will be on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.😃`,
-        `Sure thing👌!\n\nI'll remind you of this tweet on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.😃`,
-        `Got it, @${username}!\n\nI'll remind you about this on ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.🤗`,
-        `Gotcha, boss!\n\nI've set your reminder for ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.🤗`,
-        `Aye aye, captain👮‍♀️!\n\nReminder set for ${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}.📝`,
-        `Yes, boss.\n\n${getReminderDay(reminderTime)} at ${getReminderTime(reminderTime)}. One new reminder, coming right up.`,
+        `Noted📝!\n\nYour reminder will be on ${formatDateFriendly(reminderTime)}.😃`,
+        `Sure thing👌!\n\nI'll remind you of this tweet on ${formatDateFriendly(reminderTime)}.😃`,
+        `Got it, @${username}!\n\nI'll remind you about this on ${formatDateFriendly(reminderTime)}.🤗`,
+        `Gotcha, boss!\n\nI've set your reminder for ${formatDateFriendly(reminderTime)}.🤗`,
+        `Aye aye, captain👮‍♀️!\n\nReminder set for ${formatDateFriendly(reminderTime)}.📝`,
+        `Yes, boss.\n\n${formatDateFriendly(reminderTime)}. One new reminder, coming right up.`,
     ];
     let message = responses[Math.floor(Math.random() * responses.length)];
     message += "\n\nReply \"cancel\" to cancel this reminder.";
@@ -315,6 +313,7 @@ module.exports = {
     randomAcknowledgementMessage,
     http,
     cronify,
+    formatDateFriendly,
     getDateToNearestMinute,
     SUCCESS,
     FAIL,
