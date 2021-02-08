@@ -114,17 +114,15 @@ const formatDateFriendly = (dateTime) => {
 
 const randomAcknowledgementMessage = (reminderTime, username, tweetId) => {
     let responses = [
-        `Noted📝!\n\nYour reminder will be on ${formatDateFriendly(reminderTime)}.😃`,
-        `Sure thing👌!\n\nI'll remind you of this tweet on ${formatDateFriendly(reminderTime)}.😃`,
-        `Got it, @${username}!\n\nI'll remind you about this on ${formatDateFriendly(reminderTime)}.🤗`,
-        `Gotcha, boss!\n\nI've set your reminder for ${formatDateFriendly(reminderTime)}.🤗`,
-        `Aye aye, captain👮‍♀️!\n\nReminder set for ${formatDateFriendly(reminderTime)}.📝`,
-        `Yes, boss.\n\n${formatDateFriendly(reminderTime)}. One new reminder, coming right up.`,
+        `Noted.📝 Your reminder will be on ${formatDateFriendly(reminderTime)}.😃`,
+        `Sure thing👌! I'll remind you of this tweet on ${formatDateFriendly(reminderTime)}.😃`,
+        `Got it, @${username}! I'll remind you about this on ${formatDateFriendly(reminderTime)}.🤗`,
+        `Gotcha, boss! I've set your reminder for ${formatDateFriendly(reminderTime)}.🤗`,
+        `Aye aye, captain👮‍♀️! Reminder set for ${formatDateFriendly(reminderTime)}.📝`,
+        `Yes, boss. ${formatDateFriendly(reminderTime)}. One new reminder, coming right up.`,
     ];
     let message = responses[Math.floor(Math.random() * responses.length)];
-    message += "\n\nReply \"cancel\" to cancel this reminder.";
-
-    message += "\n\nPS. If I got your time wrong, you can fix your timezone at https://remindmeofthis.app/settings.";
+    message += "\n\nIf I got your time wrong, try setting your timezone at https://remindmeofthis.app/settings. You can also reply \"cancel\" to cancel this reminder";
     message += "\n" + "https://twitter.com/" + username + "/status/" + tweetId;
     return message;
 };
