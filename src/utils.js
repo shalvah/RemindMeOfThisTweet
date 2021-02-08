@@ -116,13 +116,13 @@ const randomAcknowledgementMessage = (reminderTime, username, tweetId) => {
     let responses = [
         `Noted.📝 Your reminder will be on ${formatDateFriendly(reminderTime)}.`,
         `Sure thing👌! I'll remind you of this tweet on ${formatDateFriendly(reminderTime)}.`,
-        `Got it, @${username}! I'll remind you about this on ${formatDateFriendly(reminderTime)}.`,
+        `Got it, @${username}! I'll remind you about this on ${formatDateFriendly(reminderTime)}.👍`,
         `Gotcha, boss! I've set your reminder for ${formatDateFriendly(reminderTime)}.`,
         `Aye aye, captain👮‍♀️! Reminder set for ${formatDateFriendly(reminderTime)}.`,
         `Yes, boss. ${formatDateFriendly(reminderTime)}. One new reminder, coming right up.`,
     ];
     let message = responses[Math.floor(Math.random() * responses.length)];
-    message += "\n\nIf I got your time wrong, try setting your timezone at https://remindmeofthis.app/settings. You can also reply \"cancel\" to cancel this reminder";
+    message += "\n\nIf I got your time wrong, try setting your timezone at https://remindmeofthis.app/settings. You can also reply \"cancel\" to cancel this reminder.";
     message += "\n" + "https://twitter.com/" + username + "/status/" + tweetId;
     return message;
 };
