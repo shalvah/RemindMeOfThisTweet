@@ -1,6 +1,6 @@
 require('dotenv').config({path: '.env.test'});
 
-const { mockCache } = require("../support/mocks");
+const {mockCache} = require("../support/mocks");
 mockCache();
 const cache = require('../../src/cache');
 const {parseReminderTime, setUserSettings} = require('../../src/factory.service')(cache);
@@ -20,7 +20,7 @@ const createMention = ({text, date, author}) => {
     };
 };
 
-test('It works', async () => {
+test('handles relative times', async () => {
     parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis next year"}));
     expect(parsingResult.remindAt.getFullYear()).toBe(mockDate.getFullYear() + 1);
 
@@ -30,13 +30,16 @@ test('It works', async () => {
     parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis bla bla"}));
     expect(parsingResult.failure).toBe("PARSE_TIME_FAILURE");
 
-    parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis last year"}));
-    expect(parsingResult.failure).toBe("TIME_IN_PAST");
-
     parsingResult = await parseReminderTime(createMention({text: "next month @RemindMe_OfThis"}));
     expect(parsingResult.remindAt.getUTCMonth()).toBe(mockDate.getUTCMonth() + 1);
+});
 
-    // Picks time after the last mention
+test("doesn't set for time in past", async () => {
+    parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis last year"}));
+    expect(parsingResult.failure).toBe("TIME_IN_PAST");
+});
+
+test("picks time after the last mention", async () => {
     parsingResult = await parseReminderTime(createMention({
         text: "@RemindMe_OfThis next month @RemindMe_OfThis five minutes",
     }));
@@ -48,8 +51,9 @@ test('It works', async () => {
     }));
     expect(parsingResult.remindAt.getUTCMonth()).toBe(mockDate.getUTCMonth());
     expect(parsingResult.remindAt.getMinutes()).toBe(mockDate.getMinutes() + 5);
+});
 
-    // Respects a user's timezone setting
+test("respects a user's timezone setting", async () => {
     // It's UTC+5 user's time
     await setUserSettings("xxx", {utcOffset: 300});
     let currentUTCHour = mockDate.getHours() + (mockDate.getTimezoneOffset() / 60);

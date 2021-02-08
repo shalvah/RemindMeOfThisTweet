@@ -37,41 +37,23 @@ beforeEach(() => {
 
 let parsedDate;
 
-test('It works', () => {
+test('month only', () => {
     parsedDate = getDate(scenario("April"));
     expect(parsedDate.getFullYear()).toBe(nextYear());
+});
 
+test('month only - wraps year', () => {
     parsedDate = getDate(scenario("July"));
     expect(parsedDate.getFullYear()).toBe(MOCK_DATE_IN_USE.getFullYear());
+});
 
-    parsedDate = getDate(scenario("12.45 am"));
-    expect(parsedDate.getDate()).toBe(tomorrow());
-    expect(parsedDate.getHours()).toBe(0);
-    expect(parsedDate.getMinutes()).toBe(45);
-
+test('relative interval', () => {
     parsedDate = getDate(scenario("in 5 months"));
     expect(parsedDate.getDate()).toBe(MOCK_DATE_IN_USE.getDate());
     expect(parsedDate.getMonth()).toBe(inMonths(5));
 
     parsedDate = getDate(scenario("in 15 hours"));
     expect(parsedDate.getHours()).toBe(inHours(15));
-
-    parsedDate = getDate(scenario("tomorrow by 6:59pm"));
-    expect(parsedDate.getDate()).toBe(tomorrow());
-    expect(parsedDate.getHours()).toBe(18);
-    expect(parsedDate.getMinutes()).toBe(59);
-
-    parsedDate = getDate(scenario("Tuesday, 9th of July. 19:00 GMT"));
-    expect(parsedDate.getUTCDate()).toBe(9);
-    expect(parsedDate.getUTCMonth()).toBe(6);
-    expect(parsedDate.getUTCHours()).toBe(19);
-    expect(parsedDate.getUTCMinutes()).toBe(0);
-
-    parsedDate = getDate(scenario("on Friday by 9:30am"));
-    expect(parsedDate.getDate()).toBe(14);
-    expect(parsedDate.getMonth()).toBe(5);
-    expect(parsedDate.getHours()).toBe(9);
-    expect(parsedDate.getMinutes()).toBe(30);
 
     parsedDate = getDate(scenario("in 22hrs 30mins"));
     expect(parsedDate.getDate()).toBe(13);
@@ -84,4 +66,34 @@ test('It works', () => {
     expect(parsedDate.getMonth()).toBe(5);
     expect(parsedDate.getHours()).toBe(3);
     expect(parsedDate.getMinutes()).toBe(30);
+});
+
+test('absolute time', () => {
+    parsedDate = getDate(scenario("12.45 am"));
+    expect(parsedDate.getDate()).toBe(tomorrow());
+    expect(parsedDate.getHours()).toBe(0);
+    expect(parsedDate.getMinutes()).toBe(45);
+});
+
+test('absolute date + time with timezone', () => {
+    parsedDate = getDate(scenario("Tuesday, 9th of July. 19:00 GMT"));
+    expect(parsedDate.getUTCDate()).toBe(9);
+    expect(parsedDate.getUTCMonth()).toBe(6);
+    expect(parsedDate.getUTCHours()).toBe(19);
+    expect(parsedDate.getUTCMinutes()).toBe(0);
+});
+
+test('day + absolute time', () => {
+    parsedDate = getDate(scenario("on Friday by 9:30am"));
+    expect(parsedDate.getDate()).toBe(14);
+    expect(parsedDate.getMonth()).toBe(5);
+    expect(parsedDate.getHours()).toBe(9);
+    expect(parsedDate.getMinutes()).toBe(30);
+});
+
+test('relative day + absolute time', () => {
+    parsedDate = getDate(scenario("tomorrow by 6:59pm"));
+    expect(parsedDate.getDate()).toBe(tomorrow());
+    expect(parsedDate.getHours()).toBe(18);
+    expect(parsedDate.getMinutes()).toBe(59);
 });
