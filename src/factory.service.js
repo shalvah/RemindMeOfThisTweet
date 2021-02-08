@@ -32,15 +32,7 @@ const makeService = (cache, twitter, notifications) => {
                     refDate,
                     tweet,
                 };
-            } else {
-                return {
-                    failure: "TIME_IN_PAST",
-                    remindAt: reminderTime,
-                    tweet
-                };
-            }
-
-            if (lastMentionIndex === 0) {
+            } else if (lastMentionIndex === 0) {
                 // No other alternatives
                 return {
                     failure: "TIME_IN_PAST",
