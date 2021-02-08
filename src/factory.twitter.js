@@ -11,7 +11,9 @@ const {
         BadRequest,
         ProblemWithPermissions,
         ProblemWithTwitter,
+        NotFound,
     },
+    codes,
     wrapTwitterErrors
 } = require('twitter-error-handler');
 const aargh = require('aargh');
@@ -106,6 +108,20 @@ module.exports = (cache) => {
             .catch(e => {
                 return aargh(e)
                     .type([ProblemWithPermissions, BadRequest, ProblemWithTwitter], () => null)
+                    .type(NotFound, (e) => {
+                        if ([
+                            codes.USER_SUSPENDED,
+                            codes.COULDNT_FIND_USER,
+                            codes.USER_NOT_FOUND_IN_THE_LIST,
+                            codes.NO_SUCH_TWEET,
+                            codes.USER_SUSPENDED,
+                            codes.TWEET_UNAVAILABLE,
+                            codes.TWEET_UNAVAILABLE_FOR_VIOLATING_RULES,
+                        ].includes(e.code)) {
+                            return null;
+                        }
+                        throw e;
+                    })
                     .throw();
             });
     }
