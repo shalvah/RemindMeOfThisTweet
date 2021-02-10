@@ -28,6 +28,8 @@ Of course, that's not all you can do! You can set reminders for your own tweets 
 
 Note that the bot will assume all absolute times are in UTC, so if you want to specify an absolute time, you need to specify a timezone if you're not in UTC/GMT. For instance, "11:30 pm WAT" (West African Time), "10:20 am UTC+0300", "10:20 am GMT-0900". Better yet, sign in on https://remindmeofthis.app and set your timezone.🙂
 
+> PS: I also made [@this_vid](https://github.com/shalvah/DownloadThisVideo)!
+
 ## How This Works
 ### Stack
 - [AWS Lambda](https://aws.amazon.com/lambda/) with the [Serverless Framework](http://serverless.com)

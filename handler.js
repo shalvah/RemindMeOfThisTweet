@@ -4,7 +4,7 @@ const Tracing = require("@sentry/tracing");
 
 Sentry.AWSLambda.init({
     dsn: process.env.SENTRY_DSN,
-    tracesSampleRate: 0.4,
+    tracesSampleRate: 0.5,
 });
 
 const cache = require('./src/cache');
@@ -22,6 +22,9 @@ const twitterSignIn = require('twittersignin')({
 });
 
 module.exports.handleAccountActivity = async (event, context) => {
+    // By default, the transaction name is RemindMeOfThisTweet-dev-handleAccountActivity, which is pretty unhelpful in a table
+    Sentry.configureScope(scope => scope.setTransactionName("handleAccountActivity"));
+
     const body = JSON.parse(event.body);
     console.log(body);
 
@@ -82,6 +85,8 @@ module.exports.handleAccountActivity = async (event, context) => {
 
 
 module.exports.handleTwitterCrc = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("handleTwitterCrc"));
+
     const crypto = require('crypto');
     const hmac = crypto.createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET)
         .update(event.queryStringParameters.crc_token).digest('base64');
@@ -100,6 +105,8 @@ module.exports.handleTwitterCrc = async (event, context) => {
 
 
 module.exports.remind = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("remind"));
+
     const tweet = event.data;
     await Promise.all([
         twitter.replyWithReminder(tweet),
@@ -113,6 +120,8 @@ module.exports.remind = async (event, context) => {
 
 
 module.exports.checkForRemindersAndSend = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("checkForRemindersAndSend"));
+
     let reminders = [];
     try {
         const key = getDateToNearestMinute().toISOString();
@@ -151,6 +160,8 @@ module.exports.retryFailedTasks = async (event, context) => {
 
 
 module.exports.getPage = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("getPage"));
+
     switch (event.pathParameters.page) {
         case 'login': {
             if (await auth.session(event)) {
@@ -187,6 +198,8 @@ module.exports.getPage = async (event, context) => {
 
 
 module.exports.getHomePage = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("getHomePage"));
+
     return http.renderHtml('home');
 };
 
@@ -195,6 +208,8 @@ module.exports.getHomePage = async (event, context) => {
 }));
 
 module.exports.updateSettings = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("updateSettings"));
+
     console.log(event.body);
     const session = await auth.session(event);
     if (!session) {
@@ -224,6 +239,8 @@ module.exports.updateSettings = async (event, context) => {
 
 
 module.exports.startTwitterSignIn = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("startTwitterSignIn"));
+
     const {
         oauth_token: requestToken,
         oauth_token_secret: requestTokenSecret,
@@ -242,6 +259,8 @@ module.exports.startTwitterSignIn = async (event, context) => {
 
 
 module.exports.completeTwitterSignIn = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("completeTwitterSignIn"));
+
     const requestToken = event.queryStringParameters.oauth_token;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
