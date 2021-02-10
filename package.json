@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "dependencies": {
-    "@sentry/serverless": "^5.26.0",
+    "@sentry/serverless": "^6.1.0",
     "@sentry/tracing": "^6.1.0",
     "aargh": "^1.2.0",
     "aws-sdk": "^2.533.0",
@@ -30,6 +30,7 @@
   "scripts": {
     "test-unit": "jest tests/unit/",
     "test": "jest tests/",
-    "lint": "eslint src handler.js"
+    "lint": "eslint src handler.js",
+    "invoke": "serverless invoke local"
   }
 }
