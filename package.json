@@ -1,11 +1,12 @@
 {
   "license": "MIT",
   "dependencies": {
-    "@sentry/serverless": "^5.26.0",
+    "@sentry/serverless": "^6.1.0",
+    "@sentry/tracing": "^6.1.0",
     "aargh": "^1.2.0",
     "aws-sdk": "^2.533.0",
     "chrono-node": "^1.3.11",
-    "firebase-admin": "^8.7.0",
+    "firebase-admin": "^9.4.2",
     "handlebars": "^4.7.6",
     "handlebars-helpers": "^0.10.0",
     "moment": "^2.24.0",
@@ -29,6 +30,7 @@
   "scripts": {
     "test-unit": "jest tests/unit/",
     "test": "jest tests/",
-    "lint": "eslint src handler.js"
+    "lint": "eslint src handler.js",
+    "invoke": "serverless invoke local"
   }
 }

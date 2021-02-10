@@ -116,6 +116,7 @@ module.exports = (cache) => {
                             codes.NO_SUCH_TWEET,
                             codes.USER_SUSPENDED,
                             codes.TWEET_UNAVAILABLE,
+                            codes.NOT_FOUND,
                             codes.TWEET_UNAVAILABLE_FOR_VIOLATING_RULES,
                         ].includes(e.code)) {
                             return null;
