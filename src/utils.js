@@ -64,8 +64,14 @@ const http = {
             location,
         };
         if (cookie) {
-            headers['set-cookie'] = `${cookie}; Domain=.${process.env.EXTERNAL_URL}; `
-                + `Path=/; Max-Age=${60 * 60 * 24 * 7}; Secure; HttpOnly`;
+            let setCookie = `${cookie}; Path=/; Max-Age=${60 * 60 * 24 * 7}; HttpOnly; `;
+            const domain = process.env.EXTERNAL_URL;
+            // Setting Domain and Secure on localhost causes the cookie to be rejected.
+            if (!domain.startsWith('localhost')) {
+                setCookie += `Secure; Domain=.${domain}; `
+            }
+
+            headers['set-cookie'] = setCookie;
         }
         return {
             statusCode: 302,

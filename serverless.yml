@@ -1,6 +1,7 @@
 service: RemindMeOfThisTweet
 plugins:
 - serverless-dotenv-plugin
+- serverless-offline
 
 provider:
   name: aws

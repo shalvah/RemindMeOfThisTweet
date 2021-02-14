@@ -24,6 +24,7 @@
     "mockdate": "^2.0.5",
     "redis-mock": "^0.46.0",
     "request-promise": "^4.2.4",
+    "serverless-offline": "^6.8.0",
     "sinon": "^7.4.2",
     "tap": "^14.10.8"
   },
@@ -31,6 +32,7 @@
     "test-unit": "jest tests/unit/",
     "test": "jest tests/",
     "lint": "eslint src handler.js",
-    "invoke": "serverless invoke local"
+    "invoke": "serverless invoke local",
+    "local": "serverless offline --noPrependStageInUrl"
   }
 }
