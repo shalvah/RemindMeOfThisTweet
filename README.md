@@ -78,6 +78,4 @@ This architecture isn't perfect, and I'm open to criticism and suggestions. It's
 
 
 ## Development
-- To run a function locally, use the `npm run invoke` script It calls `serverless invoke local`, so see the [available list of options](https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/).
-- Tests are written in Jest, and cover mainly the time parsing features and some end-to-end tests (with the Twitter API mocked to an extent). To run tests: `npm run tests`.
-- Linting is used to help catch errors: `npm run lint`.
+See the [contributing and development guide](./CONTRIBUTING.md) for details on working on this project.
