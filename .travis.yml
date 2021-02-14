@@ -19,10 +19,6 @@ stages:
 jobs:
   include:
   - stage: predeploy
-    script: NODE_ENV=development npm run test-unit
-    name: "Unit tests"
-
-  - stage: predeploy
     script: NODE_ENV=development npm run test
     name: "Feature tests"
 
