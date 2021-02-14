@@ -246,6 +246,7 @@ module.exports.startTwitterSignIn = async (event, context) => {
         oauth_token_secret: requestTokenSecret,
         oauth_callback_confirmed
     } = await twitterSignIn.getRequestToken({
+        oauth_callback: process.env.TWITTER_CALLBACK_URL,
         x_auth_access_type: "read",
     });
     if (!oauth_callback_confirmed) {

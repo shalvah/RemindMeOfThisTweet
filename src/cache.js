@@ -32,6 +32,6 @@ client.on('error', function (err) {
     }
     throw err;
 });
-client.authAsync(process.env.REDIS_PASSWORD);
+process.env.REDIS_PASSWORD && client.authAsync(process.env.REDIS_PASSWORD);
 
 module.exports = client;
