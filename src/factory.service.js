@@ -147,13 +147,18 @@ const makeService = (cache, twitter, notifications) => {
             if (reminderNotificationTweetId) {
                 // So the reminder can be cancelled.
                 const cacheKey = reminderNotificationTweetId + "-" + result.tweet.author;
+                // Can cancel reminder for up to 12 hours later, or up till the reminder expires, whichever is sooner
+                let cancellationTtlInSeconds = 12 * 60 * 60;
+                if ((result.remindAt - new Date) < (cancellationTtlInSeconds * 1000)) {
+                    cancellationTtlInSeconds = Math.floor((result.remindAt - new Date)/1000);
+                }
                 const reminderDetails = {
                     date,
                     original_tweet: result.tweet.id
                 };
                 return await Promise.all([
                     metrics.newReminderSet(result),
-                    cache.setAsync(cacheKey, JSON.stringify(reminderDetails), 'EX', 48 * 60 * 60), // can cancel reminder for up to two days later
+                    cache.setAsync(cacheKey, JSON.stringify(reminderDetails), 'EX', cancellationTtlInSeconds),
                 ]);
             }
         }
