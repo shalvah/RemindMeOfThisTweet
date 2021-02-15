@@ -49,6 +49,7 @@ package:
   - .*/**
   - bin/**
   - tests/**
+  - runbooks/**
   - awscli-bundle.zip
   - awscli-bundle/**
 

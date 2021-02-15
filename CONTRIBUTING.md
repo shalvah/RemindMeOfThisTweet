@@ -3,8 +3,10 @@
 ## Requirements
 - Node.js v12 or later
 - A Redis server. You can run one easily with Docker: `docker run --name remindme-redis -d -p 6379:6379redis redis-server --appendonly yes`
+- [Optional] A Redis GUI so you can easily see what's going on in the Redis instance. I recommend [Redis Commander](https://www.npmjs.com/package/redis-commander), but there are [other options](https://redislabs.com/blog/so-youre-looking-for-the-redis-gui/). 
 - The Serverless framework: `npm i -g serverless`
 - If you're going to use the Sign In With Twitter functionality, you'll need to create a Twitter app at [developer.twitter.com](http://developer.twitter.com). Alternately, you can use the local Twitter mock API (not implemented yet).
+
 
 ## Setting up
 1. Clone the repo and install dependencies.
@@ -22,7 +24,14 @@
 
 
 ## Tests
-- Tests are written in Jest, and cover mainly the time parsing features and some end-to-end tests (with the Twitter API mocked to an extent). To run tests: `npm run tests`.
+Tests are written in Jest, and cover mainly the time parsing features and some end-to-end tests (with the Twitter API mocked to an extent). To run tests: `npm run tests`.
+
+For tests, external services are mocked:
+- Redis is mocked with `redis-mock`
+- The Twitter API is mocked by using `node-mitm` to intercept APi calls
+- CloudWatch Metric calls and Firebase Messaging are mocked to no-ops.
+
+Mocking is mostly done with `jest.mock` for tests.
 
 
 ## Linting

@@ -1,11 +1,17 @@
 "use strict";
 
+const mock = require('mock-require');
+const isInJest = !!process.env.JEST_WORKER_ID;
+
 const mockCache = () => {
-    jest.mock("../../src/cache", () => {
+    const cacheFactory = () => {
         const redis = require("redis-mock");
         require('bluebird').promisifyAll(redis.RedisClient.prototype);
         return redis.createClient();
-    });
+    }
+    // Jest doesn't play well with mock-require
+    isInJest ? jest.mock("../../src/cache", cacheFactory)
+        : mock("../../src/cache", cacheFactory());
 };
 
 const mockDate = () => {
@@ -16,7 +22,8 @@ const mockDate = () => {
 };
 
 const mockMetrics = () => {
-    jest.mock('../../src/metrics', () => ({ newReminderSet() {}}));
+    isInJest ? jest.mock('../../src/metrics', () => ({ newReminderSet() {}}))
+        : mock('../../src/metrics', { newReminderSet() {}});
 };
 
 const mockTwitterAPI = () => {
@@ -46,9 +53,11 @@ const mockTwitterAPI = () => {
 };
 
 const mockNotifications = () => {
-    jest.mock('../../src/notifications', () => ({
+    isInJest ? jest.mock('../../src/notifications', () => ({
         sendNotification() { return Promise.resolve(); },
-    }));
+    })) : mock('../../src/notifications', {
+        sendNotification() { return Promise.resolve(); },
+    });
 };
 
 module.exports = {
