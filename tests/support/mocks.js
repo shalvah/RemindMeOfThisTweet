@@ -1,17 +1,19 @@
 "use strict";
 
-const mock = require('mock-require');
-const isInJest = !!process.env.JEST_WORKER_ID;
+const mockRequire = require('mock-require');
+
+const setUpMock = (path, factory) => {
+    // Jest doesn't play well with mock-require, so we can't use both together
+    const isInJest = !!process.env.JEST_WORKER_ID;
+    isInJest ? jest.mock(path, factory) : mockRequire(path, factory());
+}
 
 const mockCache = () => {
-    const cacheFactory = () => {
+    setUpMock("../../src/cache", () => {
         const redis = require("redis-mock");
         require('bluebird').promisifyAll(redis.RedisClient.prototype);
         return redis.createClient();
-    }
-    // Jest doesn't play well with mock-require
-    isInJest ? jest.mock("../../src/cache", cacheFactory)
-        : mock("../../src/cache", cacheFactory());
+    });
 };
 
 const mockDate = () => {
@@ -22,15 +24,13 @@ const mockDate = () => {
 };
 
 const mockMetrics = () => {
-    isInJest ? jest.mock('../../src/metrics', () => ({ newReminderSet() {}}))
-        : mock('../../src/metrics', { newReminderSet() {}});
+    setUpMock('../../src/metrics', () => ({ newReminderSet() {}}));
 };
 
 const mockTwitterAPI = () => {
-    const tls = require('tls');
     // MITM converts HTTPS requests to HTTP, so we need to do this
     // so we don't get TLS errors on the response
-    tls.TLSSocket.prototype.getPeerCertificate = detailed => null;
+    require('tls').TLSSocket.prototype.getPeerCertificate = detailed => null;
     const Mitm = require("mitm");
     const mitm = Mitm();
     const requests = [];
@@ -53,11 +53,9 @@ const mockTwitterAPI = () => {
 };
 
 const mockNotifications = () => {
-    isInJest ? jest.mock('../../src/notifications', () => ({
+    setUpMock('../../src/notifications', () => ({
         sendNotification() { return Promise.resolve(); },
-    })) : mock('../../src/notifications', {
-        sendNotification() { return Promise.resolve(); },
-    });
+    }));
 };
 
 module.exports = {
