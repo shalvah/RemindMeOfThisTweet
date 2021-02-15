@@ -4,6 +4,7 @@ const {createTweetCreateEvent, createTweet} = require("../tests/support/utils");
 const got = require('got');
 const {mockMetrics, mockTwitterAPI} = require("../tests/support/mocks");
 mockMetrics();
+mockTwitterAPI();
 
 (async () => {
     const endpoint = "http://localhost:3000/webhook";
@@ -11,7 +12,6 @@ mockMetrics();
         username: 'theshalvah',
         text: 'in five minutes',
     }));
-    console.log(webhook);
     const response = await got.post(endpoint, {
         json: webhook,
     });
