@@ -17,16 +17,7 @@ function generateMetricsPayload(term, number) {
     return {
         MetricData: [
             {
-                MetricName: 'RemindersSet',
-                Dimensions: [
-                    {
-                        Name: 'ReminderTermInSeconds',
-                        Value: '' + term // interval between time reminder was set and time of reminder
-                    },                    {
-                        Name: 'Count',
-                        Value: "1"
-                    },
-                ],
+                MetricName: 'Reminders',
                 Timestamp: new Date,
                 Unit: 'Count',
                 Value: number
