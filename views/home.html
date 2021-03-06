@@ -41,6 +41,18 @@
             height: auto;
         }
 
+        .emoji-flag-nigeria {
+            display: inline-block;
+            height: 1em;
+            width: 1em;
+            margin: 0 .05em 0 .1em;
+            vertical-align: -0.1em;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: 1em 1em;
+            background-image: url("https://twemoji.maxcdn.com/v/latest/svg/1f1f3-1f1ec.svg")
+         }
+
         @media only screen and (max-width: 600px) {
             .screenshot {
                 max-width: 100%;
@@ -111,6 +123,11 @@
 <br>
 
 <footer style="margin-bottom: 0; padding-bottom: 5px;">
+    <!-- Thanks to Twemoji (and boo to Microsoft for not having flag emojis in Win10) -->
+    <div style="color: cornflowerblue;">Made in Lagos, Nigeria<i class="emoji-flag-nigeria"></i></div>
+
+    <br>
+
     <div>
         <a href="https://www.patreon.com/shalvah">Support @RemindMe_OfThis</a>
         &nbsp;|&nbsp;
