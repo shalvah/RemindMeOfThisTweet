@@ -5,6 +5,7 @@ const Tracing = require("@sentry/tracing");
 (process.env.NODE_ENV === 'production') && Sentry.AWSLambda.init({
     dsn: process.env.SENTRY_DSN,
     tracesSampleRate: 0.5,
+    sendDefaultPii: true,
 });
 
 if (process.env.IS_OFFLINE === 'true') {
@@ -213,7 +214,7 @@ module.exports.getHomePage = async (event, context) => {
 module.exports.updateSettings = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("updateSettings"));
 
-    Sentry.setContext('aws_incoming_event');
+    Sentry.setContext('aws_incoming_event', event);
     const session = await auth.session(event);
     if (!session) {
         return http.redirect('/_/starttwittersignin');
@@ -265,6 +266,7 @@ module.exports.startTwitterSignIn = async (event, context) => {
 module.exports.completeTwitterSignIn = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("completeTwitterSignIn"));
 
+    Sentry.setContext('aws_incoming_event', event);
     const requestToken = event.queryStringParameters.oauth_token;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 

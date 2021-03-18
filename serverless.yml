@@ -1,27 +1,32 @@
 service: RemindMeOfThisTweet
 plugins:
 - serverless-dotenv-plugin
-# - serverless-offline
+- serverless-offline
 
 provider:
   name: aws
   runtime: nodejs12.x
   memorySize: 256
   logRetentionInDays: 30
-  iamRoleStatements:
-  - Effect: "Allow"
-    Action:
-    - "events:DeleteRule"
-    - "events:RemoveTargets"
-    - "events:PutRule"
-    - "events:PutTargets"
-    Resource:
-    - "*"
-  - Effect: Allow
-    Action:
-    - cloudwatch:PutMetricData
-    Resource:
-    - "*"
+  lambdaHashingVersion: 20201221
+  apiGateway:
+    shouldStartNameWithService: false
+  iam:
+    role:
+      statements:
+      - Effect: "Allow"
+        Action:
+        - "events:DeleteRule"
+        - "events:RemoveTargets"
+        - "events:PutRule"
+        - "events:PutTargets"
+        Resource:
+        - "*"
+      - Effect: Allow
+        Action:
+        - cloudwatch:PutMetricData
+        Resource:
+        - "*"
 
   environment:
     TWITTER_CONSUMER_KEY: ${env:TWITTER_CONSUMER_KEY}
