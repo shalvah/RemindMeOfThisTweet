@@ -37,7 +37,6 @@ jobs:
       aws --region us-east-1 s3 cp \
             s3://shalvah-creds/remindmeofthistweet-serviceaccount.json  \
             ./remindmeofthistweet-serviceaccount.json
-    - npm prune --production
     - NODE_ENV=production sls deploy
     - |
       aws --region us-east-1 lambda get-policy  --function-name RemindMeOfThisTweet-dev-remind \
