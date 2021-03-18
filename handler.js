@@ -266,7 +266,6 @@ module.exports.startTwitterSignIn = async (event, context) => {
 module.exports.completeTwitterSignIn = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("completeTwitterSignIn"));
 
-    Sentry.setContext('aws_incoming_event', event);
     const requestToken = event.queryStringParameters.oauth_token;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
@@ -274,6 +273,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     Sentry.setContext('twitterauth', {
         requestToken, requestTokenSecret, oauthVerifier
     });
+    console.log("completeSignIn");
     const {oauth_token, oauth_token_secret, screen_name} =
         await twitterSignIn.getAccessToken(requestToken, requestTokenSecret, oauthVerifier);
 
