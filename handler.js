@@ -2,10 +2,15 @@
 const Sentry = require("@sentry/serverless");
 const Tracing = require("@sentry/tracing");
 
-Sentry.AWSLambda.init({
+(process.env.NODE_ENV === 'production') && Sentry.AWSLambda.init({
     dsn: process.env.SENTRY_DSN,
     tracesSampleRate: 0.5,
 });
+
+if (process.env.IS_OFFLINE === 'true') {
+    require('./tests/support/mocks').mockMetrics();
+    require('mock-twitter-api/interceptor').start();
+}
 
 const cache = require('./src/cache');
 const twitter = require('./src/factory.twitter')(cache);
@@ -26,7 +31,7 @@ module.exports.handleAccountActivity = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("handleAccountActivity"));
 
     const body = JSON.parse(event.body);
-    console.log(body);
+    Sentry.setContext('twitter_webhook', body);
 
     if (!body.tweet_create_events) {
         return http.success(`No new tweets`);
@@ -90,15 +95,13 @@ module.exports.handleTwitterCrc = async (event, context) => {
     const crypto = require('crypto');
     const hmac = crypto.createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET)
         .update(event.queryStringParameters.crc_token).digest('base64');
-    const response = {
+    return {
         statusCode: 200,
         headers: {
             'content-type': 'application/json',
         },
         body: JSON.stringify({response_token: 'sha256=' + hmac})
     };
-    console.log("CRC handled");
-    return response;
 };
 
 (process.env.NODE_ENV === 'production') && (exports.handleTwitterCrc = Sentry.AWSLambda.wrapHandler(exports.handleTwitterCrc));
@@ -210,7 +213,7 @@ module.exports.getHomePage = async (event, context) => {
 module.exports.updateSettings = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("updateSettings"));
 
-    console.log(event.body);
+    Sentry.setContext('aws_incoming_event');
     const session = await auth.session(event);
     if (!session) {
         return http.redirect('/_/starttwittersignin');
@@ -266,6 +269,9 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
     const requestTokenSecret = await cache.getAsync(`tokens-${requestToken}`);
+    Sentry.setContext('twitterauth', {
+        requestToken, requestTokenSecret, oauthVerifier
+    });
     const {oauth_token, oauth_token_secret, screen_name} =
         await twitterSignIn.getAccessToken(requestToken, requestTokenSecret, oauthVerifier);
 

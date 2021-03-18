@@ -2,7 +2,7 @@
 
 ## Requirements
 - Node.js v12 or later
-- A Redis server. You can run one easily with Docker: `docker run --name remindme-redis -d -p 6379:6379redis redis-server --appendonly yes`
+- A Redis server. You can run one easily with Docker: `docker run --name remindme-redis -d -p 6379:6379 redis redis-server --appendonly yes`
 - [Optional] A Redis GUI so you can easily see what's going on in the Redis instance. I recommend [Redis Commander](https://www.npmjs.com/package/redis-commander), but there are [other options](https://redislabs.com/blog/so-youre-looking-for-the-redis-gui/). 
 - The Serverless framework: `npm i -g serverless`
 - If you're going to use the Sign In With Twitter functionality, you'll need to create a Twitter app at [developer.twitter.com](http://developer.twitter.com). Alternately, you can use the local Twitter mock API (not implemented yet).
@@ -22,6 +22,7 @@
    ```
 7. Start the service by running `npm run local`. This will start all the http functions (accessible from http://localhost:3000) as well as schedule the `checkForRemindersAndSend` function to run every minute.
 
+To trigger a new reminder, run `npm run webhook`. This will trigger a new webhook event containing a reminder tweet (for five minutes from now).
 
 ## Tests
 Tests are written in Jest, and cover mainly the time parsing features and some end-to-end tests (with the Twitter API mocked to an extent). To run tests: `npm run tests`.
