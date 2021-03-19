@@ -12,16 +12,20 @@ require('handlebars-helpers')(
 const http = {
     success(body) {
         console.log(`Response: ${body}`);
-        const response = {
+        return {
             statusCode: 200,
             body
         };
-        return response;
     },
 
-    fail(err) {
-        console.log(`Fail response: ${err}`);
-        throw err;
+    badRequest(message, headers = {
+        "content-type": "text/html",
+    }) {
+        return {
+            statusCode: 400,
+            body: message,
+            headers,
+        };
     },
 
     render(view, data = null) {

@@ -132,7 +132,7 @@ module.exports.checkForRemindersAndSend = async (event, context) => {
         reminders = await cache.lrangeAsync(key, 0, -1);
         reminders = reminders.map(JSON.parse);
         await Promise.all([
-                ...reminders.map(service.remind),
+            ...reminders.map(service.remind),
             cache.delAsync(key)
         ]);
     } catch (err) {
@@ -190,9 +190,9 @@ module.exports.getPage = async (event, context) => {
 
             return http.render('settings', {username, settings, timezones});
         }
-        
+
         default:
-            return { statusCode: 404 };
+            return {statusCode: 404};
     }
 };
 
@@ -222,7 +222,7 @@ module.exports.updateSettings = async (event, context) => {
 
     const username = session.username;
     const body = require('querystring').decode(event.body);
-    
+
     const settings = await getUserSettings(username);
     if (body.utcOffset) {
         settings.utcOffset = body.utcOffset;
@@ -266,18 +266,38 @@ module.exports.startTwitterSignIn = async (event, context) => {
 module.exports.completeTwitterSignIn = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("completeTwitterSignIn"));
 
+    const errorMessage = 'Oops, something went wrong. Please try signing in again.🙏';
+
     const requestToken = event.queryStringParameters.oauth_token;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
+    if (!requestToken || !oauthVerifier) {
+        return http.badRequest(errorMessage);
+    }
     const requestTokenSecret = await cache.getAsync(`tokens-${requestToken}`);
+    if (!requestTokenSecret) {
+        return http.badRequest(errorMessage);
+    }
+
     Sentry.setContext('twitterauth', {
         requestToken, requestTokenSecret, oauthVerifier
     });
-    console.log("completeSignIn");
-    const {oauth_token, oauth_token_secret, screen_name} =
-        await twitterSignIn.getAccessToken(requestToken, requestTokenSecret, oauthVerifier);
 
-    const user = await twitterSignIn.getUser(oauth_token, oauth_token_secret, {
+    let oauthToken, oauthTokenSecret;
+    try {
+        const accessTokenDetails = await twitterSignIn.getAccessToken(requestToken, requestTokenSecret, oauthVerifier);
+        oauthToken = accessTokenDetails.oauth_token;
+        oauthTokenSecret = accessTokenDetails.oauth_token_secret;
+    } catch (e) {
+        if (e.message === "This feature is temporarily unavailable") {
+            // This error seems to happen intermittently from the Twitter API, or when the request access token endpoint is called more than once
+            return http.badRequest(errorMessage);
+        }
+
+        throw e;
+    }
+
+    const user = await twitterSignIn.getUser(oauthToken, oauthTokenSecret, {
         include_entities: false,
         skip_status: true,
     });
