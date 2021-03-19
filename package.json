@@ -1,8 +1,8 @@
 {
   "license": "MIT",
   "dependencies": {
-    "@sentry/serverless": "^6.1.0",
-    "@sentry/tracing": "^6.1.0",
+    "@sentry/serverless": "^6.2.2",
+    "@sentry/tracing": "^6.2.2",
     "aargh": "^1.2.0",
     "aws-sdk": "^2.533.0",
     "chrono-node": "^1.3.11",
