@@ -61,7 +61,7 @@ module.exports.handleAccountActivity = async (event, context) => {
         return {
             id: tweetObject.id_str,
             created_at: tweetObject.created_at,
-            text: tweetObject.full_text || tweetObject.text,
+            text: tweet.truncated ? tweetObject.extended_tweet.full_text || tweetObject.text,
             referencing_tweet: tweetObject.in_reply_to_status_id_str,
             author: tweetObject.user.screen_name,
         };
