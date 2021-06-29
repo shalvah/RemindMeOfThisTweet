@@ -27,7 +27,7 @@ const makeService = (cache, twitter, notifications) => {
             // Minimum of 3 minutes from now
             const minimumReminderInterval = (new Date(Date.now() + (3 * 60 * 1000)));
             // Maximum of 30 years from now
-            const maximumReminderInterval = (new Date((d => d.setFullYear(d.getFullYear() + 30))(new Date)));
+            const maximumReminderInterval = new Date((new Date).setFullYear((new Date).getFullYear() + 30));
 
             if (reminderTime >= maximumReminderInterval) {
                 return {
