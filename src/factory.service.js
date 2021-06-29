@@ -26,7 +26,15 @@ const makeService = (cache, twitter, notifications) => {
             const reminderTime = mainResult.start.date();
             // Minimum of 3 minutes from now
             const minimumReminderInterval = (new Date(Date.now() + (3 * 60 * 1000)));
-            if (reminderTime >= minimumReminderInterval) {
+            // Maximum of 30 years from now
+            const maximumReminderInterval = new Date((new Date).setFullYear((new Date).getFullYear() + 30));
+
+            if (reminderTime >= maximumReminderInterval) {
+                return {
+                    failure: "TIME_IN_FAR_FUTURE",
+                    tweet
+                };
+            } else if (reminderTime >= minimumReminderInterval) {
                 return {
                     remindAt: reminderTime,
                     refDate,

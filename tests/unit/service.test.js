@@ -39,8 +39,15 @@ test("doesn't set for time in past", async () => {
     expect(parsingResult.failure).toBe("TIME_IN_PAST");
 
     parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis January 2018"}));
-    console.log(parsingResult);
     expect(parsingResult.failure).toBe("TIME_IN_PAST");
+});
+
+test("doesn't set for time in far future (>=30 years)", async () => {
+    parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis Jan 2100"}));
+    expect(parsingResult.failure).toBe("TIME_IN_FAR_FUTURE");
+
+    parsingResult = await parseReminderTime(createMention({text: "@RemindMe_OfThis in 1000 years"}));
+    expect(parsingResult.failure).toBe("TIME_IN_FAR_FUTURE");
 });
 
 test("picks time after the last mention", async () => {
