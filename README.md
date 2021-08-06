@@ -42,7 +42,7 @@ Note that the bot will assume all absolute times are in UTC, so if you want to s
 The bot uses a number of AWS Lambda functions that work in tandem:
 
 #### `handleAccountActivity`
-This function serves as the webhook registered to Twitter's [Accout Activity API](https://developer.twitter.com/en/docs/accounts-and-users/subscribe-account-activity/overview). Whenever anyone mentions the bot (or likes or retweets a tweet by the bot), Twitter hits this URL with a payload containing details of the events.
+This function serves as the webhook registered to Twitter's [Account Activity API](https://developer.twitter.com/en/docs/accounts-and-users/subscribe-account-activity/overview). Whenever anyone mentions the bot (or likes or retweets a tweet by the bot), Twitter hits this URL with a payload containing details of the events.
 
 This function iterates through all the mentions and looks for any possible reminder requests (or reminder cancellations). If it finds any requests, it sets a reminder by storing the relevant data (tweet, author, etc) in Redis, with the Redis key being the timestamp (ISO8601—can't remmber why I went with that instead of the UNIX timestamp, but possibly human-readability). 
 
