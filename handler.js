@@ -1,10 +1,8 @@
 'use strict';
 const Sentry = require("@sentry/serverless");
-const Tracing = require("@sentry/tracing");
 
 (process.env.NODE_ENV === 'production') && Sentry.AWSLambda.init({
     dsn: process.env.SENTRY_DSN,
-    tracesSampleRate: 0.5,
     sendDefaultPii: true,
 });
 
