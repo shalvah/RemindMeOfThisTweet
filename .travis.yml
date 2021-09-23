@@ -28,12 +28,11 @@ jobs:
     name: "Lint"
 
   - stage: deploy
-    before_script:
+    script:
+    
     - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     - unzip awscliv2.zip
-    - sudo ./aws/install -b ~/bin/aws
-    - export PATH=~/bin:$PATH
-    script:
+    - sudo ./aws/install
     - |
       aws --region us-east-1 s3 cp \
             s3://shalvah-creds/remindmeofthistweet-serviceaccount.json  \
