@@ -55,8 +55,8 @@ package:
   - bin/**
   - tests/**
   - runbooks/**
-  - awscli-bundle.zip
-  - awscli-bundle/**
+  - awscliv2.zip
+  - aws/**
 
 functions:
   handleAccountActivity:
