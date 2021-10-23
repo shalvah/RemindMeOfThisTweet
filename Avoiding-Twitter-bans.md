@@ -1,4 +1,4 @@
-When building a Twitter bot, it's easy to get restricted (your account is locked, can't post tweets), shadow-banned (users can't see your replies) or banned outright. Twitter's spam/bot detection is really gucked up. You have to take extreme care. Read through their policies (linked below) to ensure that you're in compliance and try these tips.
+When building a Twitter bot, it's easy to get restricted (your account is locked, can't post tweets), shadow-banned (users can't see your replies) or banned outright. Twitter's spam/bot detection is really fucked up. You have to take extreme care. Read through their policies (linked below) to ensure that you're in compliance and try these tips.
 
 Even then, they'll probably still shadowban you and lock your account a couple of times, without any notice. I recommend you set up alerting so you get an alert when your account is locked. For instance, with my library [twitter-error-handler](https://github.com/shalvah/twitter-error-handler), you can do
 
