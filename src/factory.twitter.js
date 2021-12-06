@@ -63,7 +63,23 @@ module.exports = (cache) => {
         let noReply = await cache.getAsync('no-reply');
         if (noReply == 1) {
             console.log("Twitter reply hiatus");
-            return;
+            let noLike = await cache.getAsync('no-like');
+            if (noLike == 1) {
+                console.log("Twitter like hiatus");
+                return;
+            }
+
+            return t.post('favorites/create', {id: tweet.id, include_entities: false})
+                .then(r => r.data)
+                .catch(e => wrapTwitterErrors('favorites/create', e))
+                .catch(e => {
+                    return aargh(e)
+                        .type([RateLimited], async (e) => {
+                            console.log(`Error: ${e.code}, backing off for 10 minutes`);
+                            await cache.setAsync('no-like', 1, 'EX', 60 * 10);
+                        })
+                        .throw();
+                });
         }
 
         let options = {
@@ -72,7 +88,7 @@ module.exports = (cache) => {
         };
         return t.post('statuses/update', options)
             .then(r => r.data)
-            .catch(e => (console.log(e), wrapTwitterErrors('statuses/update', e)))
+            .catch(e => wrapTwitterErrors('statuses/update', e))
             .catch(e => {
                 return aargh(e)
                     .type([RateLimited], async (e) => {
