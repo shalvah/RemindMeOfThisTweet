@@ -54,8 +54,8 @@
     <h4>Your timezone</h4>
     <form method="post" action="/_/updatesettings">
         <label>
-            <div><small>Whenever you mention @RemindMe_OfThis with a time (for instance, "9:00pm"), we'll use this to
-                know timezone you're in.</small></div>
+            <div><small>Whenever you mention @RemindMe_OfThis with a specific time (for instance, "9:00pm"), we'll use this to
+                know the timezone you're in.</small></div>
             <select name="utcOffset">
                 {{#each timezones as |timezone index| }}
                     <option value="{{ timezone.value }}"
