@@ -150,8 +150,12 @@ const makeService = (cache, twitter, notifications) => {
 
         if (result.remindAt) {
             const date = getDateToNearestMinute(result.remindAt).toISOString();
-            await scheduleReminder(result.tweet, date);
-            const reminderNotificationTweetId = await notifyUserOfReminder(result.tweet, result.remindAt);
+            const [, , reminderNotificationTweetId] = await Promise.all([
+                scheduleReminder(result.tweet, date),
+                metrics.newReminderSet(result),
+                notifyUserOfReminder(result.tweet, result.remindAt)
+            ]);
+
             if (reminderNotificationTweetId) {
                 // So the reminder can be cancelled.
                 const cacheKey = reminderNotificationTweetId + "-" + result.tweet.author;
@@ -164,10 +168,7 @@ const makeService = (cache, twitter, notifications) => {
                     date,
                     original_tweet: result.tweet.id
                 };
-                return await Promise.all([
-                    metrics.newReminderSet(result),
-                    cache.setAsync(cacheKey, JSON.stringify(reminderDetails), 'EX', cancellationTtlInSeconds),
-                ]);
+                return cache.setAsync(cacheKey, JSON.stringify(reminderDetails), 'EX', cancellationTtlInSeconds);
             }
         }
     };
