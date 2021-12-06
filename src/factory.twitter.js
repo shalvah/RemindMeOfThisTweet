@@ -118,13 +118,21 @@ module.exports = (cache) => {
         return reply(tweet, content);
     };
 
-    const getTweet = (id) => {
+    const getTweet = async (id) => {
+        if (await cache.getAsync('no-statusesShow')) {
+            return null;
+        }
+
         return t.get('statuses/show', {id})
             .then(r => r.data)
             .catch(e => wrapTwitterErrors('statuses/show', e))
             .catch(e => {
                 return aargh(e)
                     .type([ProblemWithPermissions, BadRequest, ProblemWithTwitter], () => null)
+                    .type([RateLimited], async (e) => {
+                        console.log(`Error: ${e.code}, backing off for 10 minutes`);
+                        await cache.setAsync('no-statusesShow', 1, 'EX', 60 * 10);
+                    })
                     .type(NotFound, (e) => {
                         if ([
                             codes.USER_SUSPENDED,
