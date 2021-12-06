@@ -20,22 +20,21 @@
     "dotenv": "^6.2.0",
     "eslint": "^6.4.0",
     "got": "^11.8.1",
-    "jest": "^26.6.3",
+    "jest": "^27.0.6",
     "mitm": "^1.7.0",
     "mock-require": "^3.0.3",
     "mockdate": "^2.0.5",
     "redis-mock": "^0.46.0",
     "request-promise": "^4.2.4",
-    "serverless-offline": "^6.8.0",
-    "sinon": "^7.4.2",
-    "tap": "^14.10.8"
+    "serverless-offline": "^8.0.0",
+    "sinon": "^7.4.2"
   },
   "scripts": {
-    "test-unit": "jest tests/unit/",
-    "test": "jest tests/",
+    "test:unit": "jest --env=node --runInBand tests/unit/",
+    "test": "jest --env=node --runInBand tests/",
     "lint": "eslint src handler.js",
-    "invoke": "serverless invoke local",
-    "local": "serverless offline --noPrependStageInUrl",
-    "webhook": "node ./runbooks/trigger-webhook.js"
+    "local": "serverless offline --noPrependStageInUrl --allowCache",
+    "reminder": "node runbooks/trigger-reminder.js",
+    "invoke": "serverless invoke local"
   }
 }

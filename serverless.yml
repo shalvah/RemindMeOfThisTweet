@@ -46,17 +46,17 @@ provider:
     NODE_ENV: ${env:NODE_ENV}
 
 package:
-  exclude:
-  - "*.md"
-  - "assets/*.png"
-  - "assets/*.ico"
-  - .*
-  - .*/**
-  - bin/**
-  - tests/**
-  - runbooks/**
-  - awscliv2.zip
-  - aws/**
+  patterns:
+  - "!*.md"
+  - "!assets/*.png"
+  - "!assets/*.ico"
+  - "!.*"
+  - "!.*/**"
+  - "!bin/**"
+  - "!tests/**"
+  - "!runbooks/**"
+  - "!awscli-bundle.zip"
+  - "!awscli-bundle/**"
 
 functions:
   handleAccountActivity:

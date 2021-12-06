@@ -1,0 +1,51 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Checks"]
+    branches: [master]
+    types:
+      - completed
+env:
+  NODE_ENV: production
+  SLS_DEBUG: "*"
+  TWITTER_SCREEN_NAME: RemindMe_OfThis
+  EXTERNAL_URL: remindmeofthis.app
+
+  FIREBASE_PROJECT_ID: remindmeofthistweet
+  TWITTER_CALLBACK_URL: https://remindmeofthis.app/_/completetwittersignin
+
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+  TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+  TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+  TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+  REDIS_HOSTNAME: ${{ secrets.REDIS_HOSTNAME }}
+  REDIS_PORT: ${{ secrets.REDIS_PORT }}
+  REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  LAMBDA_FUNCTION_NAME: RemindMeOfThisTweet-dev-remind
+  LAMBDA_FUNCTION_ARN: "arn:aws:lambda:us-east-1:741799119337:function:RemindMeOfThisTweet-dev-remind"
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    name: Deploy to prod
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14.18.0
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.18.0
+      - run: npm i -g serverless@2 && npm ci --production=false
+      - name: Deploy that shit
+        run: |
+          aws --version
+          aws --region us-east-1 s3 cp \
+            s3://shalvah-creds/remindmeofthistweet-serviceaccount.json  \
+            ./remindmeofthistweet-serviceaccount.json
+          serverless deploy
+          aws --region us-east-1 lambda get-policy  --function-name RemindMeOfThisTweet-dev-remind \
+            || aws --region us-east-1 lambda add-permission --function-name RemindMeOfThisTweet-dev-remind --statement-id InvokePermission --principal events.amazonaws.com --action lambda:InvokeFunction

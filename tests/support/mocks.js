@@ -31,25 +31,25 @@ const mockTwitterAPI = () => {
     // MITM converts HTTPS requests to HTTP, so we need to do this
     // so we don't get TLS errors on the response
     require('tls').TLSSocket.prototype.getPeerCertificate = detailed => null;
+
     const Mitm = require("mitm");
     const mitm = Mitm();
-    const requests = [];
+    const tweets = [];
     mitm.on("connect", (socket, opts) => {
         if (!opts.host.includes("twitter.com")) socket.bypass();
     });
     mitm.on("request", (req, res) => {
         let rawData = '';
         req.on("data", (chunk) => { rawData += chunk; });
-        if (req.url.includes("statuses/update")) {
-            req.on("end", () => {
-                requests.push({ url: req.url, body: rawData });
+        req.on("end", () => {
+            if (req.url.includes("statuses/update")) {
+                tweets.push({ url: req.url, body: rawData });
                 res.statusCode = 201;
                 const tweet = require("./utils").createTweet();
                 res.end(JSON.stringify(tweet));
-            });
-        }
+            }
+        });
     });
-    return requests;
 };
 
 const mockNotifications = () => {
