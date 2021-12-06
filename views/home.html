@@ -18,18 +18,14 @@
             display: flex;
             flex-direction: column;
             font-size: 1.2em;
-            color: #ff5722;
+            color: whitesmoke;
             background-color: #473331;
             background-size: cover;
             text-align: center;
         }
 
-        .content {
-            flex-grow: 0.8;
-        }
-
         a {
-            color: white;
+            color: #ff5722;
         }
 
         footer {
@@ -81,6 +77,10 @@
 <body>
 
 <div class="content">
+
+    <div style="text-align: right; padding-right: 70px;">
+        <a href='/settings'>Sign in with Twitter</a>
+    </div>
     <h1 style="color: cornflowerblue">Set reminders for anything with a Tweet.</h1>
 </div>
 
@@ -107,7 +107,11 @@
 </div>
 
 <div>
-    <h3>Or with a push notification:</h3>
+    Twitter has a reply limit, so we won't be able to respond to <u>every</u> tweet.😢
+    <br>
+    To get around that, <a href="/settings">sign in</a> and enable push notifications:
+    <br>
+    <br>
 </div>
 
 <div>
