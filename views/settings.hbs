@@ -205,8 +205,9 @@
 <script>
     function initializeAndConfigurePushNotifications() {
 
-        function notificationsNotSupported() {
-            document.querySelector("#notifications-buttons").innerHTML = "Not available on this device";
+        function notificationsNotSupported(deviceOrBrowser) {
+            document.querySelector("#notifications-buttons").innerHTML =
+                    `Sorry, notifications are not supported on this ${deviceOrBrowser}😟. We recommend Google Chrome or Firefox on Android, Windows, macOS or Linux`;
         }
 
         if (!("serviceWorker" in navigator)) {
@@ -218,14 +219,14 @@
         const os = getOS();
         if ([OSes.iOS, OSes.unknown].includes(os)) {
             console.log("Not supported on " + os);
-            notificationsNotSupported();
+            notificationsNotSupported(`OS (${os})`);
             return;
         }
 
         const browser = getBrowser();
         if ([browsers.safari, browsers.IE, browsers.unknown].includes(browser)) {
             console.log("Not supported on " + browser);
-            document.querySelector("#notifications-buttons").innerHTML = "Not available on this device";
+            notificationsNotSupported(`browser (${browser})`);
             return;
         }
 
