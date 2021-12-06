@@ -8,7 +8,6 @@ const Sentry = require("@sentry/serverless");
 
 if (process.env.IS_OFFLINE === 'true') {
     require('./tests/support/mocks').mockMetrics();
-    require('mock-twitter-api/interceptor').start();
 }
 
 const cache = require('./src/cache');

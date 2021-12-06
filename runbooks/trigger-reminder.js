@@ -1,0 +1,85 @@
+'use strict';
+
+const {createTweetCreateEvent, createTweet} = require("../tests/support/utils");
+const got = require('got');
+(async () => {
+    const endpoint = "http://localhost:3000/webhook";
+    const tweet =     {
+        "created_at": "Thu Aug 12 23:26:21 +0100 2021",
+        "id": null,
+        "id_str": "8759849726758343547627",
+        "text": "@RemindMe_OFThis in six minutes",
+        "display_text_range": [],
+        "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
+        "truncated": false,
+        "in_reply_to_status_id": null,
+        "in_reply_to_status_id_str": null,
+        "in_reply_to_user_id": null,
+        "in_reply_to_user_id_str": null,
+        "in_reply_to_screen_name": null,
+        "user": {
+            "id": null,
+            "id_str": "6253282",
+            "name": "Jonathon Prosacco",
+            "screen_name": "Hazle.Mante20",
+            "location": "Harberport",
+            "profile_location": null,
+            "description": "Praesentium non quisquam sit nulla totam molestiae. Quis incidunt eius perspiciatis in sint atque officiis. Explicabo praesentium eius laborum ut praesentium sint deleniti. Voluptas id modi fuga sit repellat. Libero illo non repellendus necessitatibus dolorem sit est culpa inventore. Sit asperiores fugiat quia deserunt neque.",
+            "entities": {},
+            "protected": false,
+            "followers_count": 6136,
+            "friends_count": 8424,
+            "listed_count": 136,
+            "created_at": "Sat Aug 7 21:10:34 +0100 2021",
+            "favourites_count": 31,
+            "utc_offset": null,
+            "time_zone": null,
+            "geo_enabled": null,
+            "verified": false,
+            "statuses_count": 3656,
+            "lang": null,
+            "contributors_enabled": null,
+            "is_translator": null,
+            "is_translation_enabled": null,
+            "profile_background_color": null,
+            "profile_background_image_url": null,
+            "profile_background_image_url_https": null,
+            "profile_background_tile": null,
+            "profile_image_url": null,
+            "profile_image_url_https": "https://pbs.twimg.com/profile_images/942858479592554497/BbazLO9L_normal.jpg",
+            "profile_banner_url": null,
+            "profile_link_color": null,
+            "profile_sidebar_border_color": null,
+            "profile_sidebar_fill_color": null,
+            "profile_text_color": null,
+            "profile_use_background_image": null,
+            "has_extended_profile": null,
+            "default_profile": false,
+            "default_profile_image": false,
+            "following": null,
+            "follow_request_sent": null,
+            "notifications": null,
+            "translator_type": null
+        },
+        "geo": null,
+        "coordinates": null,
+        "place": null,
+        "contributors": null,
+        "is_quote_status": false,
+        "quote_count": 0,
+        "reply_count": 0,
+        "retweet_count": 0,
+        "favorite_count": 0,
+        "entities": [],
+        "favorited": false,
+        "retweeted": false,
+        "filter_level": "low",
+        "lang": "en",
+        "timestamp_ms": 1628503600984
+    }
+    const webhook = createTweetCreateEvent(tweet);
+    const response = await got.post(endpoint, {
+        json: webhook,
+    });
+    console.log(response.body);
+})();

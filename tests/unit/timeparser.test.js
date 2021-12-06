@@ -3,7 +3,6 @@ const timeparser = require('../../src/timeparser');
 const MOCK_DATE_IN_USE = new Date("2019-06-12T03:00:05");
 
 function mockDate() {
-    console.log(`Timeparser: Using date ${MOCK_DATE_IN_USE} (${MOCK_DATE_IN_USE.toISOString()}) for testing`);
     require('mockdate').set(MOCK_DATE_IN_USE);
 }
 
