@@ -60,7 +60,7 @@ describe("handleAccountActivity", () => {
         });
 
         it("ignores retweets", () => {
-            const body = createTweetCreateEvent(createRetweet({text: "@RemindMe_OfThis in five minutes"}));
+            const body = createTweetCreateEvent(createRetweet({text: "@RemindMe_OfThis in twenty minutes"}));
             return handleAccountActivity(createWebhookEvent(body), {})
                 .then(response => {
                     expect(response.body).toBe('Handled 0 tweets');

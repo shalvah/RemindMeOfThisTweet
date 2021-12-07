@@ -26,7 +26,7 @@
 ## Manual testing
 To test the service manually, you'll probably want to run `npm run local` first to start up all the functions locally. Then:
 
-- To trigger a new reminder, run `npm run reminder`. This will trigger a fake webhook event containing a reminder tweet (for five minutes from now) and pass it to the `handleAccountActivity` function, so it looks like it came from the actual Twitter API.
+- To trigger a new reminder, run `npm run reminder`. This will trigger a fake webhook event containing a reminder tweet (for ten minutes from now) and pass it to the `handleAccountActivity` function, so it looks like it came from the actual Twitter API.
 
 ## Automated tests
 Tests are written in Jest (the `tests/` folder). The unit tests cover the time parsing features and behaviour of the service, while the integration tests test behaviour from when a webhook is received (with the Twitter API mocked to an extent).

@@ -52,16 +52,16 @@ test("doesn't set for time in far future (>=30 years)", async () => {
 
 test("picks time after the last mention", async () => {
     parsingResult = await parseReminderTime(createMention({
-        text: "@RemindMe_OfThis next month @RemindMe_OfThis five minutes",
+        text: "@RemindMe_OfThis next month @RemindMe_OfThis ten minutes",
     }));
     expect(parsingResult.remindAt.getUTCMonth()).toBe(mockDate.getUTCMonth());
-    expect(parsingResult.remindAt.getMinutes()).toBe(mockDate.getMinutes() + 5);
+    expect(parsingResult.remindAt.getMinutes()).toBe(mockDate.getMinutes() + 10);
 
     parsingResult = await parseReminderTime(createMention({
-        text: "next month @RemindMe_OfThis five minutes",
+        text: "next month @RemindMe_OfThis ten minutes",
     }));
     expect(parsingResult.remindAt.getUTCMonth()).toBe(mockDate.getUTCMonth());
-    expect(parsingResult.remindAt.getMinutes()).toBe(mockDate.getMinutes() + 5);
+    expect(parsingResult.remindAt.getMinutes()).toBe(mockDate.getMinutes() + 10);
 });
 
 test("respects a user's timezone setting", async () => {

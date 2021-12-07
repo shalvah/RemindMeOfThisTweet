@@ -8,7 +8,7 @@ const got = require('got');
         "created_at": "Thu Aug 12 23:26:21 +0100 2021",
         "id": null,
         "id_str": "8759849726758343547627",
-        "text": "@RemindMe_OFThis in six minutes",
+        "text": "@RemindMe_OFThis in ten minutes",
         "display_text_range": [],
         "source": "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>",
         "truncated": false,
