@@ -24,8 +24,8 @@ const makeService = (cache, twitter, notifications) => {
                 mainResult.start.assign('timezoneOffset', userSettings.utcOffset);
             }
             const reminderTime = mainResult.start.date();
-            // Minimum of 3 minutes from now
-            const minimumReminderInterval = (new Date(Date.now() + (3 * 60 * 1000)));
+            // Minimum of 10 minutes from now
+            const minimumReminderInterval = (new Date(Date.now() + (10 * 60 * 1000)));
             // Maximum of 30 years from now
             const maximumReminderInterval = new Date((new Date).setFullYear((new Date).getFullYear() + 30));
 
