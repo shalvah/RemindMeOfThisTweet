@@ -150,8 +150,8 @@ const makeService = (cache, twitter, notifications) => {
 
         if (result.remindAt) {
             const date = getDateToNearestMinute(result.remindAt).toISOString();
-            const [, , reminderNotificationTweetId] = await Promise.all([
-                scheduleReminder(result.tweet, date),
+            await scheduleReminder(result.tweet, date);
+            const [, reminderNotificationTweetId] = await Promise.all([
                 metrics.newReminderSet(result),
                 notifyUserOfReminder(result.tweet, result.remindAt)
             ]);
