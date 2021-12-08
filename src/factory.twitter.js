@@ -74,7 +74,7 @@ module.exports = (cache) => {
                 .catch(e => wrapTwitterErrors('favorites/create', e))
                 .catch(e => {
                     return aargh(e)
-                        .type([BadRequest], () => null) // "Already liked tweet", likely
+                        .type([BadRequest, NotFound], () => null) // "Already liked tweet", likely
                         .type([RateLimited], async (e) => {
                             console.log(`Error: ${e.code}, backing off for 10 minutes`);
                             await cache.setAsync('no-like', 1, 'EX', 60 * 10);
@@ -98,7 +98,7 @@ module.exports = (cache) => {
                         console.log(`Error: ${e.code}, backing off for 10 minutes`);
                         await cache.setAsync('no-reply', 1, 'EX', 60 * 10);
                     })
-                    .type(BadRequest, () => null)
+                    .type([BadRequest, NotFound], () => null)
                     // todo handle this better
                     .type(ProblemWithPermissions, console.log)
                     .throw();
