@@ -2,6 +2,7 @@
 
 ## Requirements
 - Node.js v14 or later
+- A Google Firebase Project ID and service-account configuration file.
 - The Serverless framework: `npm i -g serverless@2`
 - A Redis server. You can run one easily with Docker: `docker run --name remindme-redis -d -p 6379:6379 redis redis-server --appendonly yes`
 - [Optional] A Redis GUI so you can easily see what's going on in the Redis instance. I recommend [Redis Commander](https://www.npmjs.com/package/redis-commander), but there are [other options](https://redislabs.com/blog/so-youre-looking-for-the-redis-gui/). 
