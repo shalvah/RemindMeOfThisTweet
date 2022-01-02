@@ -75,6 +75,12 @@ module.exports = (cache) => {
                 .catch(e => {
                     return aargh(e)
                         .type([BadRequest, NotFound], () => null) // "Already liked tweet", likely
+                        .type([ProblemWithPermissions], () => {
+                            if (e.code !== codes.BLOCKED_BY_USER) {
+                                throw e;
+                            }
+                            return null;
+                        })
                         .type([RateLimited], async (e) => {
                             console.log(`Error: ${e.code}, backing off for 10 minutes`);
                             await cache.setAsync('no-like', 1, 'EX', 60 * 10);
