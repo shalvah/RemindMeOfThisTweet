@@ -6,6 +6,7 @@ plugins:
 provider:
   name: aws
   runtime: nodejs14.x
+  region: us-east-1
   memorySize: 256
   logRetentionInDays: 30
   lambdaHashingVersion: 20201221
@@ -122,6 +123,6 @@ functions:
   retryFailedTasks:
     handler: handler.retryFailedTasks
 
-# Deprecated
+# Deprecated. If you're deploying a new service, you should remove this function.
   remind:
     handler: handler.remind
