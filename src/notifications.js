@@ -1,7 +1,23 @@
 'use strict';
 
 const firebase = require('firebase-admin');
-const serviceAccount = require("../remindmeofthistweet-serviceaccount.json");
+let serviceAccount;
+try {
+    serviceAccount = require("../remindmeofthistweet-serviceaccount.json");
+} catch (e) {
+    if (process.env.NODE_ENV === "development") {
+        console.log("Firebase service account remindmeofthistweet-serviceaccount.json not found; mocking notifications...");
+        module.exports = {
+            sendNotification() {
+                return Promise.resolve();
+            },
+        };
+        return;
+    }
+
+    throw e;
+}
+
 firebase.initializeApp({
     credential: firebase.credential.cert(serviceAccount),
     projectId: process.env.FIREBASE_PROJECT_ID,
