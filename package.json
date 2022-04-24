@@ -26,6 +26,7 @@
     "mockdate": "^2.0.5",
     "redis-mock": "^0.46.0",
     "request-promise": "^4.2.4",
+    "serverless": "^2.72.3",
     "serverless-offline": "^8.3.1",
     "sinon": "^7.4.2"
   },
@@ -33,8 +34,8 @@
     "test:unit": "jest --env=node --runInBand tests/unit/",
     "test": "jest --env=node --runInBand tests/",
     "lint": "eslint src handler.js",
-    "local": "serverless offline --noPrependStageInUrl --allowCache",
+    "local": "npx serverless offline --noPrependStageInUrl --allowCache",
     "reminder": "node runbooks/trigger-reminder.js",
-    "invoke": "serverless invoke local"
+    "invoke": "npx serverless invoke local"
   }
 }

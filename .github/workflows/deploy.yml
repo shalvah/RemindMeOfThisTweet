@@ -39,14 +39,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.18.0
-      - run: npm i -g serverless@2 && npm ci --production=false
+      - run: npm ci --production=false
       - name: Deploy that shit
         run: |
           aws --version
           aws --region us-east-1 s3 cp \
             s3://shalvah-creds/remindmeofthistweet-serviceaccount.json  \
             ./remindmeofthistweet-serviceaccount.json
-          serverless deploy
+          npx serverless deploy
           # Maintaining BC for the old remind function
           aws --region us-east-1 lambda get-policy  --function-name RemindMeOfThisTweet-dev-remind \
             || aws --region us-east-1 lambda add-permission --function-name RemindMeOfThisTweet-dev-remind --statement-id InvokePermission --principal events.amazonaws.com --action lambda:InvokeFunction

@@ -1,4 +1,5 @@
 service: RemindMeOfThisTweet
+frameworkVersion: "^2.0"
 plugins:
 - serverless-dotenv-plugin
 - serverless-offline

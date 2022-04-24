@@ -37,8 +37,8 @@ Note that the bot will assume all absolute times are in UTC, so if you want to s
 - [AWS Lambda](https://aws.amazon.com/lambda/) with the [Serverless Framework](http://serverless.com)
 - Firebase Messaging for push notifications
 - [Redis](http://redis.io) for data storage
-- Node.js 10.x
-- [Chrono](https://github.com/wanasit/chrono) for parsing dates/times from text
+- Node.js 14.x
+- [Chrono](https://github.com/wanasit/chrono) (pinned at v1) for parsing dates/times from text
 
 ### Implementation
 The bot uses a number of AWS Lambda functions that work in tandem:
