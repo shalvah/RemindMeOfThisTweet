@@ -24,8 +24,17 @@ const twitterSignIn = require('twittersignin')({
     accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
 });
 
-module.exports.handleAccountActivity = async (event, context) => {
-    // By default, the transaction name is RemindMeOfThisTweet-dev-handleAccountActivity, which is pretty unhelpful in a table
+const wrapHandler = (handler, options = undefined) => {
+    if (process.env.NODE_ENV === 'production') {
+        return Sentry.AWSLambda.wrapHandler(handler, options);
+    }
+
+    return handler;
+}
+
+module.exports.handleAccountActivity = wrapHandler(async (event, context) => {
+    // By default, the transaction name is RemindMeOfThisTweet-dev-handleAccountActivity,
+    // which is pretty unhelpful in a table
     Sentry.configureScope(scope => scope.setTransactionName("handleAccountActivity"));
 
     const body = JSON.parse(event.body);
@@ -80,14 +89,10 @@ module.exports.handleAccountActivity = async (event, context) => {
     }
 
     return http.success(`Handled ${allMentions.length} tweets`);
-};
-
-(process.env.NODE_ENV === 'production') && (exports.handleAccountActivity = Sentry.AWSLambda.wrapHandler(exports.handleAccountActivity, {
-    timeoutWarningLimit: 5000,
-}));
+}, { timeoutWarningLimit: 5000 });
 
 
-module.exports.handleTwitterCrc = async (event, context) => {
+module.exports.handleTwitterCrc = wrapHandler(async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("handleTwitterCrc"));
 
     const crypto = require('crypto');
@@ -100,12 +105,9 @@ module.exports.handleTwitterCrc = async (event, context) => {
         },
         body: JSON.stringify({response_token: 'sha256=' + hmac})
     };
-};
+});
 
-(process.env.NODE_ENV === 'production') && (exports.handleTwitterCrc = Sentry.AWSLambda.wrapHandler(exports.handleTwitterCrc));
-
-
-module.exports.remind = async (event, context) => {
+module.exports.remind = wrapHandler(async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("remind"));
 
     const tweet = event.data;
@@ -115,12 +117,9 @@ module.exports.remind = async (event, context) => {
     ]);
 
     return http.success(`Reminded for tweet: ${JSON.stringify(tweet)}`);
-};
+});
 
-(process.env.NODE_ENV === 'production') && (exports.remind = Sentry.AWSLambda.wrapHandler(exports.remind));
-
-
-module.exports.checkForRemindersAndSend = async (event, context) => {
+module.exports.checkForRemindersAndSend = wrapHandler(async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("checkForRemindersAndSend"));
 
     let reminders = [];
@@ -140,10 +139,7 @@ module.exports.checkForRemindersAndSend = async (event, context) => {
     }
 
     return http.success(`Reminded for ${reminders.length} tweets`);
-};
-
-(process.env.NODE_ENV === 'production') && (exports.checkForRemindersAndSend = Sentry.AWSLambda.wrapHandler(exports.checkForRemindersAndSend));
-
+});
 
 module.exports.retryFailedTasks = async (event, context) => {
     const failedTasks = await cache.lrangeAsync(event.queue || 'PARSE_TIME_FAILURE', 0, -1);
@@ -159,8 +155,7 @@ module.exports.retryFailedTasks = async (event, context) => {
     return http.success(`Retried ${failedTasks.length} tasks from ${event.queue} queue`);
 };
 
-
-module.exports.getPage = async (event, context) => {
+module.exports.getPage = wrapHandler(async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("getPage"));
 
     switch (event.pathParameters.page) {
@@ -191,24 +186,17 @@ module.exports.getPage = async (event, context) => {
         default:
             return {statusCode: 404};
     }
-};
+});
 
-(process.env.NODE_ENV === 'production') && (exports.getPage = Sentry.AWSLambda.wrapHandler(exports.getPage, {
-    timeoutWarningLimit: 2000,
-}));
-
-
-module.exports.getHomePage = async (event, context) => {
+module.exports.getHomePage = wrapHandler(async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("getHomePage"));
 
     return http.renderHtml('home');
-};
-
-(process.env.NODE_ENV === 'production') && (exports.getHomePage = Sentry.AWSLambda.wrapHandler(exports.getHomePage, {
+}, {
     timeoutWarningLimit: 5000,
-}));
+});
 
-module.exports.updateSettings = async (event, context) => {
+module.exports.updateSettings = wrapHandler(async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("updateSettings"));
 
     Sentry.setContext('aws_incoming_event', event);
@@ -234,12 +222,9 @@ module.exports.updateSettings = async (event, context) => {
     await setUserSettings(username, settings);
 
     return http.redirect('/settings');
-};
+});
 
-(process.env.NODE_ENV === 'production') && (exports.updateSettings = Sentry.AWSLambda.wrapHandler(exports.updateSettings));
-
-
-module.exports.startTwitterSignIn = async (event, context) => {
+module.exports.startTwitterSignIn = wrapHandler(async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("startTwitterSignIn"));
 
     const {
@@ -255,12 +240,9 @@ module.exports.startTwitterSignIn = async (event, context) => {
     }
     await cache.setAsync(`tokens-${requestToken}`, requestTokenSecret, 'EX', 5 * 60);
     return http.redirect('https://api.twitter.com/oauth/authenticate?oauth_token=' + requestToken);
-};
+});
 
-(process.env.NODE_ENV === 'production') && (exports.startTwitterSignIn = Sentry.AWSLambda.wrapHandler(exports.startTwitterSignIn));
-
-
-module.exports.completeTwitterSignIn = async (event, context) => {
+module.exports.completeTwitterSignIn = wrapHandler(async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("completeTwitterSignIn"));
 
     const errorMessage = 'Oops, something went wrong. Please try signing in again.🙏';
@@ -302,6 +284,4 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const sessionId = await auth.createSession(user);
 
     return http.redirect('/settings', `rmotid=${sessionId}`);
-};
-
-(process.env.NODE_ENV === 'production') && (exports.completeTwitterSignIn = Sentry.AWSLambda.wrapHandler(exports.completeTwitterSignIn));
+});
