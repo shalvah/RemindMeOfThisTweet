@@ -31,15 +31,15 @@ provider:
         - "*"
 
   environment:
-    TWITTER_CONSUMER_KEY: ${env:TWITTER_CONSUMER_KEY}
-    TWITTER_CONSUMER_SECRET: ${env:TWITTER_CONSUMER_SECRET}
-    TWITTER_ACCESS_TOKEN: ${env:TWITTER_ACCESS_TOKEN}
-    TWITTER_ACCESS_TOKEN_SECRET: ${env:TWITTER_ACCESS_TOKEN_SECRET}
-    TWITTER_SCREEN_NAME: RemindMe_OfThis
-    TWITTER_CALLBACK_URL: ${env:TWITTER_CALLBACK_URL}
-    REDIS_HOSTNAME: ${env:REDIS_HOSTNAME}
-    REDIS_PORT: ${env:REDIS_PORT}
-    REDIS_PASSWORD: ${env:REDIS_PASSWORD}
+    # TWITTER_CONSUMER_KEY: ${env:TWITTER_CONSUMER_KEY}
+    # TWITTER_CONSUMER_SECRET: ${env:TWITTER_CONSUMER_SECRET}
+    # TWITTER_ACCESS_TOKEN: ${env:TWITTER_ACCESS_TOKEN}
+    # TWITTER_ACCESS_TOKEN_SECRET: ${env:TWITTER_ACCESS_TOKEN_SECRET}
+    # TWITTER_SCREEN_NAME: RemindMe_OfThis
+    # TWITTER_CALLBACK_URL: ${env:TWITTER_CALLBACK_URL}
+    # REDIS_HOSTNAME: ${env:REDIS_HOSTNAME}
+    # REDIS_PORT: ${env:REDIS_PORT}
+    # REDIS_PASSWORD: ${env:REDIS_PASSWORD}
     LAMBDA_FUNCTION_NAME: ${env:LAMBDA_FUNCTION_NAME}
     LAMBDA_FUNCTION_ARN: ${env:LAMBDA_FUNCTION_ARN}
     EXTERNAL_URL: ${env:EXTERNAL_URL}
@@ -61,69 +61,9 @@ package:
   - "!awscli-bundle/**"
 
 functions:
-  handleAccountActivity:
-    handler: handler.handleAccountActivity
-    timeout: 50
-    events:
-    - http:
-        path: /webhook
-        method: post
-
-  handleTwitterCrc:
-    handler: handler.handleTwitterCrc
-    events:
-    - http:
-        path: /webhook
-        method: get
-
-  checkForRemindersAndSend:
-    handler: handler.checkForRemindersAndSend
-    timeout: 60
-    events:
-    - schedule: rate(1 minute)
-
   getHomePage:
-    handler: handler.getHomePage
+    handler: homepage.getHomePage
     events:
       - http:
           path: /
           method: get
-
-  getPage:
-    handler: handler.getPage
-    events:
-      - http:
-          path: /{page}
-          method: get
-          request:
-            parameters:
-              paths:
-                page: true
-
-  startTwitterSignIn:
-    handler: handler.startTwitterSignIn
-    events:
-      - http:
-          path: /_/starttwittersignin
-          method: get
-
-  completeTwitterSignIn:
-    handler: handler.completeTwitterSignIn
-    events:
-      - http:
-          path: /_/completetwittersignin
-          method: get
-
-  updateSettings:
-    handler: handler.updateSettings
-    events:
-      - http:
-          path: /_/updatesettings
-          method: post
-
-  retryFailedTasks:
-    handler: handler.retryFailedTasks
-
-# Deprecated. If you're deploying a new service, you should remove this function.
-  remind:
-    handler: handler.remind
