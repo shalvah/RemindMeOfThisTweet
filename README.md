@@ -2,6 +2,8 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
+> As of July 2023, @RemindMe_OfThis is dead, thanks to the Twitter API changes.
+
 ### The Problem
 
 Some guy on Twitter tweets:
