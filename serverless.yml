@@ -124,6 +124,7 @@ functions:
   retryFailedTasks:
     handler: handler.retryFailedTasks
 
-# Deprecated. If you're deploying a new service, you should remove this function.
+  # Deprecated. If you're deploying as a new service, you should remove this function.
+  # Previously, reminders were done by scheduling an execution of this function. Now they're done by polling Redis.
   remind:
     handler: handler.remind
